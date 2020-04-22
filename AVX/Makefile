@@ -24,7 +24,7 @@ HEADERS = SABER_params.h pack_unpack.h poly.h verify.h cbd.h SABER_indcpa.h kem.
 
 
 test/test_kex: $(SOURCES) $(HEADERS) test/test_kex.c 
-	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/test_kex.c -lcrypto
+	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/test_kex.c -lcrypto -lpapi
 
 test/test_sample_matrix: $(SOURCES) $(HEADERS) test/sample_matrix_test.c 
 	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/sample_matrix_test.c -lcrypto
@@ -57,10 +57,10 @@ test:
 
 
 clean:
-	-$(RM) *.o
 	-$(RM) -r test/test_sample_matrix
 	-$(RM) -r test/test_kex
 	-$(RM) -r test/PQCgenKAT_kem
-	-$(RM) -r keccak4x/KeccakP-1600-times4-SIMD256.o
+	-$(RM) -r test/*.req
+	-$(RM) -r test/*.rsp
 
 
