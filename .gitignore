@@ -3,3 +3,4 @@
 *.elf
 *.a
 *.d
+AVX/papi_hl_output/*
