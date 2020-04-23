@@ -37,8 +37,8 @@
 	c.val[1] = vsubq_u16(a.val[1], b.val[1])
 
 #define COPY(c, b)                                  \
-	c->val[0] = vextq_u16(b->val[0], b->val[0], 0); \
-	c->val[1] = vextq_u16(b->val[1], b->val[1], 0)
+	c.val[0] = veorq_u16(a->val[0], int0_avx); \
+	c.val[1] = veorq_u16(a->val[1], int0_avx)
 
 #define SLLDOT_DOT(c, a, value)              \
 	c.val[0] = vshlq_n_u16(a.val[0], value); \
@@ -447,8 +447,8 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 		SLLDOT_DOT(th_b_avx[i], th_b_avx[i], 1);
 
 		//t_h_x_avx contains x[1]
-		COPY(t_h_a_avx + i, a1_avx[small_len_avx * 1 + i]);
-		COPY(t_h_b_avx + i, b1_avx[small_len_avx * 1 + i]);
+		COPY(t_h_a_avx[i], a1_avx[small_len_avx * 1 + i]);
+		COPY(t_h_b_avx[i], b1_avx[small_len_avx * 1 + i]);
 
 		//t_h_x_avx contains 4*x[1]
 		SLLDOT_DOT(t_h_a_avx[i], t_h_a_avx[i], 2);
@@ -508,8 +508,8 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 
 	for (i = 0; i < small_len_avx; i++)
 	{ //x_avx contains x[3]
-		COPY(a6_ph_avx + i, a1_avx[small_len_avx * 3 + i]);
-		COPY(b6_ph_avx + i, b1_avx[small_len_avx * 3 + i]);
+		COPY(a6_ph_avx[i], a1_avx[small_len_avx * 3 + i]);
+		COPY(b6_ph_avx[i], b1_avx[small_len_avx * 3 + i]);
 	}
 
 	//-------------------t_inf ends----------------------
@@ -559,7 +559,7 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	for (i = 0; i < 2 * small_len_avx; i++)
 	{
 
-		ADDDOT_DOT(w2_avx[i, w2_avx[i],w5_avx[i]);//w2 <- w2+w5
+		ADDDOT_DOT(w2_avx[i], w2_avx[i],w5_avx[i]);//w2 <- w2+w5
 		SUBDOT_DOT(w6_avx[i], w6_avx[i], w5_avx[i]); // w6 <- w6-w5
 		SUBDOT_DOT(w4_avx[i], w4_avx[i], w3_avx[i]); // w4 <- w4-w3
 
@@ -568,10 +568,10 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 		SUBDOT_DOT(w5_avx[i], w5_avx[i], temp1_avx[i]); // w5 <- w5-64*w7
 
 		SRLDOT_DOT(w4_avx[i], w4_avx[i], 1);	  //w4 <- w4/2
-		ADDDOT_DOT(w3_avx[i, w3_avx[i],w4_avx[i]);//w3 <- w3+w4
+		ADDDOT_DOT(w3_avx[i], w3_avx[i],w4_avx[i]);//w3 <- w3+w4
 
 		SLLDOT_DOT(temp1_avx[i], w5_avx[i], 1);		 //temp <- 2*w5
-		ADDDOT_DOT(w5_avx[i, w6_avx[i],temp1_avx[i]);//w5 <- 2*w5+w6
+		ADDDOT_DOT(w5_avx[i], w6_avx[i],temp1_avx[i]);//w5 <- 2*w5+w6
 
 		SLLDOT_DOT(temp1_avx[i], w3_avx[i], 6);			   //temp <- 64*w3
 		ADDDOT_DOT(temp1_avx[i], w3_avx[i], temp1_avx[i]); //temp <- 65*w3
@@ -600,7 +600,9 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 
 		ADDDOT_DOT(w4_avx[i], w4_avx[i], w2_avx[i]); //w4 <- w4+w2
 
-		SUBDOT_DOT(w4_avx[i], int0_avx, w4_avx[i]); //w4 <- -(w4+w2)
+		// SUBDOT_DOT(w4_avx[i], int0_avx, w4_avx[i]); //w4 <- -(w4+w2)
+		w4_avx[i].val[0] = vsubq_u16(int0_avx, w4_avx[i].val[0]);
+		w4_avx[i].val[1] = vsubq_u16(int0_avx, w4_avx[i].val[1]);
 
 		MULDOT_DOT(temp1_avx[i], w2_avx[i], 30);		//temp <- w2*30
 		SUBDOT_DOT(w6_avx[i], temp1_avx[i], w6_avx[i]); //w6 <- 30*w2-w6
@@ -630,6 +632,6 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	// Reduction by X^256 + 1
 	for (i = 0; i < 16; i++)
 	{
-		SUBDOT(res_avx_output[i], res_avx[i], res_avx[i + 16]);
+		SUB_DOT(res_avx_output[i], res_avx[i], res_avx[i + 16]);
 	}
 }
