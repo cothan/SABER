@@ -1,9 +1,9 @@
 #include "asimd_scm_avx.c"
 // // #include "asimd_matrix.c"
-// #include "../../SABER_params.h"
-// #include "../../SABER_indcpa.h"
+#include "../../SABER_params.h"
+#include "../../SABER_indcpa.h"
 
-// #include <arm_neon.h>
+#include <arm_neon.h>
 #include <stdint.h>
 
 // TODO: chagne "avx" in function name to "neon"
