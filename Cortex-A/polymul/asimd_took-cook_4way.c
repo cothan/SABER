@@ -11,14 +11,41 @@
 #define ADD(c, a, b)  c->val[0] = vaddq_u16(a->val[0], b->val[0]);\
                       c->val[1] = vaddq_u16(a->val[1], b->val[1])
 
+#define ADDDOT_DOT(c, a, b)  c.val[0] = vaddq_u16(a.val[0], b.val[0]);\
+                             c.val[1] = vaddq_u16(a.val[1], b.val[1])
+
+#define ADDDOT(c, a, b)   c.val[0] = vaddq_u16(a->val[0], b->val[0]);\
+                          c.val[1] = vaddq_u16(a->val[1], b->val[1])
+
+#define ADD_DOT(c, a, b)  c.val[0] = vaddq_u16(a.val[0], b->val[0]);\
+                          c.val[1] = vaddq_u16(a.val[1], b->val[1])
+
+
 #define SUB(c, a, b)  c->val[0] = vsubq_u16(a->val[0], b->val[0]);\
                       c->val[1] = vsubq_u16(a->val[1], b->val[1])
 
-#define STORE(mem, a) vst2q_u16(mem, a);
-                      
+#define SUB_DOT(c, a, b) c->val[0] = vsubq_u16(a.val[0], b.val[0]);\
+                         c->val[1] = vsubq_u16(a.val[1], b.val[1])
+
+#define SUBDOT_DOT(c, a, b)  c.val[0] = vsubq_u16(a.val[0], b.val[0]);\
+                             c.val[1] = vsubq_u16(a.val[1], b.val[1])                      
 
 #define COPY(c, b)  c->val[0] = vextq_u16(b->val[0], b->val[0], 0);\
                     c->val[1] = vextq_u16(b->val[1], b->val[1], 0)
+
+#define SLLDOT_DOT(c, a, value) c.val[0] = vshlq_n_u16(a.val[0], value);\
+                                c.val[1] = vshlq_n_u16(c.val[1], value)
+
+#define SRLDOT_DOT(c, a, value) c.val[0] = vshrq_n_u16(a.val[0], value);\
+                                c.val[1] = vshrq_n_u16(c.val[1], value)
+
+#define XORDOT_DOT(c, a, b) c.val[0] = veorq_u16(a.val[0], b.val[0]);\
+                            c.val[1] = veorq_u16(a.val[1], b.val[1])
+
+#define MULDOT_DOT(c, a, value) c.val[0] = vmulq_n_u16(a.val[0], value);\
+                                c.val[1] = vmulq_n_u16(a.val[1], value)
+
+
 
 uint16x8x2_t a_extra[2], b_extra[2];
 
@@ -177,8 +204,8 @@ void batch_64coefficient_multiplications(
     // KS splitting of 1st 64-coeff multiplication
 		for(i=0; i<2; i++)
 		{
-			ADD(a_lu_temp[i], a0[i], a0[2+i]);		
-			ADD(b_lu_temp[i], b0[i], b0[2+i]);
+			ADDDOT(a_lu_temp[i], a0[i], a0[2+i]);		
+			ADDDOT(b_lu_temp[i], b0[i], b0[2+i]);
 		}
 		karatsuba32_fork_avx_new(&a0[0], &b0[0], 0);	
 		karatsuba32_fork_avx_new(&a0[2], &b0[2], 3);
@@ -187,8 +214,8 @@ void batch_64coefficient_multiplications(
 		// KS splitting of 2nd 64-coeff multiplication
 		for(i=0; i<2; i++)
 		{
-			ADD(a_lu_temp[i] , a1[i], a1[2+i]);		
-			ADD(b_lu_temp[i] , b1[i], b1[2+i]);
+			ADDDOT(a_lu_temp[i] , a1[i], a1[2+i]);		
+			ADDDOT(b_lu_temp[i] , b1[i], b1[2+i]);
 		}
 		karatsuba32_fork_avx_new(&a1[0], &b1[0], 9);    
 		karatsuba32_fork_avx_new(&a1[2], &b1[2], 12);  
@@ -224,8 +251,8 @@ void batch_64coefficient_multiplications(
 		// Fork multiplication of a2*b2
 		for(i=0; i<2; i++)
 		{
-			ADD(a_lu_temp[i], a2[i], a2[2+i]);		
-			ADD(b_lu_temp[i], b2[i], b2[2+i]);
+			ADDDOT(a_lu_temp[i], a2[i], a2[2+i]);		
+			ADDDOT(b_lu_temp[i], b2[i], b2[2+i]);
 		}
 		karatsuba32_fork_avx_new(&a2[0], &b2[0], 2);   	
 		karatsuba32_fork_avx_new(&a2[2], &b2[2], 5);
@@ -234,8 +261,8 @@ void batch_64coefficient_multiplications(
 		// Fork multiplication of a3*b3
 		for(i=0; i<2; i++)
 		{
-			ADD(a_lu_temp[i], a3[i], a3[2+i]);		
-			ADD(b_lu_temp[i], b3[i], b3[2+i]);
+			ADDDOT(a_lu_temp[i], a3[i], a3[2+i]);		
+			ADDDOT(b_lu_temp[i], b3[i], b3[2+i]);
 		}
 		karatsuba32_fork_avx_new(&a3[0], &b3[0], 11);   	
 		karatsuba32_fork_avx_new(&a3[2], &b3[2], 14);		// Partial: loads only two of the three elements in the bucket
@@ -279,8 +306,8 @@ void batch_64coefficient_multiplications(
 		// Fork multiplication of a4*b4
 		for(i=0; i<2; i++)
 		{
-			ADD(a_lu_temp[i] , a4[i], a4[2+i]);		
-			ADD(b_lu_temp[i] , b4[i], b4[2+i]);
+			ADDDOT(a_lu_temp[i] , a4[i], a4[2+i]);		
+			ADDDOT(b_lu_temp[i] , b4[i], b4[2+i]);
 		}
 		karatsuba32_fork_avx_new(&a4[0], &b4[0], 4);   	
 		karatsuba32_fork_avx_new(&a4[2], &b4[2], 7);
@@ -289,8 +316,8 @@ void batch_64coefficient_multiplications(
 		// Fork multiplication of a5*b5
 		for(i=0; i<2; i++)
 		{
-			ADD(a_lu_temp[i], a5[i], a5[2+i]);		
-			ADD(b_lu_temp[i], b5[i], b5[2+i]);
+			ADDDOT(a_lu_temp[i], a5[i], a5[2+i]);		
+			ADDDOT(b_lu_temp[i], b5[i], b5[2+i]);
 		}
 		karatsuba32_fork_avx_new(&a5[0], &b5[0], 13);   	
 
@@ -328,8 +355,8 @@ void batch_64coefficient_multiplications(
 		// Fork multiplication of a6*b6
 		for(i=0; i<2; i++)
 		{
-			a_lu_temp[i] = _mm256_add_epi16(a6[i], a6[2+i]);		
-			b_lu_temp[i] = _mm256_add_epi16(b6[i], b6[2+i]);
+			ADDDOT(a_lu_temp[i], a6[i], a6[2+i]);		
+			ADDDOT(b_lu_temp[i], b6[i], b6[2+i]);
 		}
 
 		karatsuba32_fork_avx_new(&a6[0], &b6[0], 6);   	
@@ -381,7 +408,7 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	uint16x8x2_t temp1_avx[2*small_len_avx];
 
 	//--------------------these data are created for place holding---------
-
+    // This is memory or register ? For now, let's compiler optimize it
 	uint16x8x2_t a1_ph_avx[small_len_avx],b1_ph_avx[small_len_avx];
 	uint16x8x2_t a2_ph_avx[small_len_avx],b2_ph_avx[small_len_avx];
 	uint16x8x2_t a3_ph_avx[small_len_avx],b3_ph_avx[small_len_avx];
@@ -390,6 +417,9 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	uint16x8x2_t a6_ph_avx[small_len_avx],b6_ph_avx[small_len_avx];
 
 	//--------------------these data are created for place holding ends---------
+
+	// Add for NEON
+	uint16x8_t int0_avx = vdupq_n_u16(0);
 
 	//-----AVX data declaration ends------------
 
@@ -406,8 +436,8 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	//create a(0)*b(0)
 
 	for(i=0;i<small_len_avx;i++){
-		STORE (a1_ph_avx+i, a1_avx[0+i]);
-		STORE (b1_ph_avx+i, b1_avx[0+i]);
+		COPY (a1_ph_avx[i], a1_avx[0+i]);
+		COPY (b1_ph_avx[i], b1_avx[0+i]);
 	}
 
 
@@ -417,42 +447,42 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	//create partial sum for th and t_h
 	
 	for(i=0;i<small_len_avx;i++){//th_x_avx contains 4*x[0]
-		th_a_avx[i]= _mm256_slli_epi16(a1_ph_avx[i],2);
-		th_b_avx[i]= _mm256_slli_epi16(b1_ph_avx[i],2);
+		SLLDOT_DOT(th_a_avx[i] , a1_ph_avx[i],2);
+		SLLDOT_DOT(th_b_avx[i] , b1_ph_avx[i],2);
 	
 	//th_x_avx contains 4*x[0]+x[2]
-		th_a_avx[i]= _mm256_add_epi16(th_a_avx[i],a1_avx[small_len_avx*2+i]);
-		th_b_avx[i]= _mm256_add_epi16(th_b_avx[i],b1_avx[small_len_avx*2+i]);
+		ADD_DOT(th_a_avx[i], th_a_avx[i],a1_avx[small_len_avx*2+i]);
+		ADD_DOT(th_b_avx[i], th_b_avx[i],b1_avx[small_len_avx*2+i]);
 	
 	//th_x_avx contains 8*x[0]+2*x[2]
-		th_a_avx[i]= _mm256_slli_epi16(th_a_avx[i],1);
-		th_b_avx[i]= _mm256_slli_epi16(th_b_avx[i],1);
+		SLLDOT_DOT( th_a_avx[i] ,th_a_avx[i],1);
+		SLLDOT_DOT( th_b_avx[i] ,th_b_avx[i],1);
 	
 	//t_h_x_avx contains x[1]
-		_mm256_store_si256 (t_h_a_avx+i, a1_avx[small_len_avx*1+i]);
-		_mm256_store_si256 (t_h_b_avx+i, b1_avx[small_len_avx*1+i]);
+		COPY (t_h_a_avx+i, a1_avx[small_len_avx*1+i]);
+		COPY (t_h_b_avx+i, b1_avx[small_len_avx*1+i]);
 	
 	//t_h_x_avx contains 4*x[1]
-		t_h_a_avx[i]= _mm256_slli_epi16(t_h_a_avx[i],2);
-		t_h_b_avx[i]= _mm256_slli_epi16(t_h_b_avx[i],2);
+		SLLDOT_DOT(t_h_a_avx[i], t_h_a_avx[i],2);
+		SLLDOT_DOT(t_h_b_avx[i], t_h_b_avx[i],2);
 
 	//th_x_avx contains 4*x[1]+x[3]
-		t_h_a_avx[i]= _mm256_add_epi16(t_h_a_avx[i],a1_avx[small_len_avx*3+i]);
-		t_h_b_avx[i]= _mm256_add_epi16(t_h_b_avx[i],b1_avx[small_len_avx*3+i]);
+		ADD_DOT( t_h_a_avx[i] , t_h_a_avx[i],a1_avx[small_len_avx*3+i]);
+		ADD_DOT( t_h_b_avx[i] , t_h_b_avx[i],b1_avx[small_len_avx*3+i]);
 	}
 
 	//create th
 
 	for(i=0;i<small_len_avx;i++){
-		a2_ph_avx[i]= _mm256_add_epi16(th_a_avx[i],t_h_a_avx[i]);
-		b2_ph_avx[i]= _mm256_add_epi16(th_b_avx[i],t_h_b_avx[i]);
+		ADDDOT_DOT(a2_ph_avx[i], th_a_avx[i],t_h_a_avx[i]);
+		ADDDOT_DOT(b2_ph_avx[i], th_b_avx[i],t_h_b_avx[i]);
 	}
 
 	//create t_h
 
 	for(i=0;i<small_len_avx;i++){
-		a3_ph_avx[i]= _mm256_sub_epi16(th_a_avx[i],t_h_a_avx[i]);
-		b3_ph_avx[i]= _mm256_sub_epi16(th_b_avx[i],t_h_b_avx[i]);
+		SUBDOT_DOT(a3_ph_avx[i], th_a_avx[i],t_h_a_avx[i]);
+		SUBDOT_DOT(b3_ph_avx[i], th_b_avx[i],t_h_b_avx[i]);
 	}
 
 
@@ -461,25 +491,25 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	//create partial sum for t_1 and t1
 	
 	for(i=0;i<small_len_avx;i++){//th_x_avx contains x[2]+x[0]
-		th_a_avx[i]= _mm256_add_epi16(a1_avx[small_len_avx*2+i],a1_avx[small_len_avx*0+i]);
-		th_b_avx[i]= _mm256_add_epi16(b1_avx[small_len_avx*2+i],b1_avx[small_len_avx*0+i]);
+		ADDDOT( th_a_avx[i] , a1_avx[small_len_avx*2+i],a1_avx[small_len_avx*0+i]);
+		ADDDOT( th_b_avx[i] , b1_avx[small_len_avx*2+i],b1_avx[small_len_avx*0+i]);
 		
 		//th_x_avx contains x[3]+x[1]
-		t_h_a_avx[i]= _mm256_add_epi16(a1_avx[small_len_avx*3+i],a1_avx[small_len_avx*1+i]);
-		t_h_b_avx[i]= _mm256_add_epi16(b1_avx[small_len_avx*3+i],b1_avx[small_len_avx*1+i]);
+		ADDDOT( t_h_a_avx[i] , a1_avx[small_len_avx*3+i],a1_avx[small_len_avx*1+i]);
+		ADDDOT( t_h_b_avx[i] , b1_avx[small_len_avx*3+i],b1_avx[small_len_avx*1+i]);
 	}	
 	
 
 	//create t1
 	for(i=0;i<small_len_avx;i++){// x[0]+x[1]+x[2]+x[3]
-		a4_ph_avx[i]= _mm256_add_epi16(th_a_avx[i],t_h_a_avx[i]);
-		b4_ph_avx[i]= _mm256_add_epi16(th_b_avx[i],t_h_b_avx[i]);
+		ADDDOT_DOT(a4_ph_avx[i] , th_a_avx[i],t_h_a_avx[i]);
+		ADDDOT_DOT(b4_ph_avx[i] , th_b_avx[i],t_h_b_avx[i]);
 	}
 
 	//create t_1
 	for(i=0;i<small_len_avx;i++){//-x[3]+x[2]-x[1]+x[0]
-		a5_ph_avx[i]= _mm256_sub_epi16(th_a_avx[i],t_h_a_avx[i]);
-		b5_ph_avx[i]= _mm256_sub_epi16(th_b_avx[i],t_h_b_avx[i]);
+		SUBDOT_DOT(a5_ph_avx[i] , th_a_avx[i],t_h_a_avx[i]);
+		SUBDOT_DOT(b5_ph_avx[i] , th_b_avx[i],t_h_b_avx[i]);
 	}
 
 
@@ -487,8 +517,8 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	//create t_inf
 
 	for(i=0;i<small_len_avx;i++){//x_avx contains x[3]
-		_mm256_store_si256 (a6_ph_avx+i, a1_avx[small_len_avx*3+i]);
-		_mm256_store_si256 (b6_ph_avx+i, b1_avx[small_len_avx*3+i]);
+		COPY (a6_ph_avx+i, a1_avx[small_len_avx*3+i]);
+		COPY (b6_ph_avx+i, b1_avx[small_len_avx*3+i]);
 	}	
 
 
@@ -496,28 +526,28 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	
 	//-------------------t2-------------------------
 	for(i=0;i<small_len_avx;i++){// 2*x[3]
-		a_avx[i]= _mm256_add_epi16(a6_ph_avx[i],a1_avx[small_len_avx*3+i]);
-		b_avx[i]= _mm256_add_epi16(b6_ph_avx[i],b1_avx[small_len_avx*3+i]);
+		ADD_DOT(a_avx[i], a6_ph_avx[i],a1_avx[small_len_avx*3+i]);
+		ADD_DOT(b_avx[i], b6_ph_avx[i],b1_avx[small_len_avx*3+i]);
 
 		// 2*x[3]+x[2]
-		a_avx[i]= _mm256_add_epi16(a_avx[i],a1_avx[small_len_avx*2+i]);
-		b_avx[i]= _mm256_add_epi16(b_avx[i],b1_avx[small_len_avx*2+i]);
+		ADD_DOT(a_avx[i], a_avx[i],a1_avx[small_len_avx*2+i]);
+		ADD_DOT(b_avx[i], b_avx[i],b1_avx[small_len_avx*2+i]);
 		
 		// 4*x[3]+2*x[2]
-		a_avx[i]= _mm256_slli_epi16(a_avx[i],1);
-		b_avx[i]= _mm256_slli_epi16(b_avx[i],1);
+		SLLDOT_DOT(a_avx[i], a_avx[i],1);
+		SLLDOT_DOT(b_avx[i], b_avx[i],1);
 		
 		// 4*x[3]+2*x[2]+x[1]
-		a_avx[i]= _mm256_add_epi16(a_avx[i],a1_avx[small_len_avx*1+i]);
-		b_avx[i]= _mm256_add_epi16(b_avx[i],b1_avx[small_len_avx*1+i]);
+		ADD_DOT(a_avx[i], a_avx[i],a1_avx[small_len_avx*1+i]);
+		ADD_DOT(b_avx[i], b_avx[i],b1_avx[small_len_avx*1+i]);
 		
 		// 8*x[3]+4*x[2]+2*x[1]
-		a_avx[i]= _mm256_slli_epi16(a_avx[i],1);
-		b_avx[i]= _mm256_slli_epi16(b_avx[i],1);
+		SLLDOT_DOT(a_avx[i], a_avx[i],1);
+		SLLDOT_DOT(b_avx[i], b_avx[i],1);
 		
 		// 8*x[3]+8*x[2]+2*x[1]+x[0]
-		a_avx[i]= _mm256_add_epi16(a_avx[i],a1_avx[small_len_avx*0+i]);
-		b_avx[i]= _mm256_add_epi16(b_avx[i],b1_avx[small_len_avx*0+i]);
+		ADD_DOT(a_avx[i], a_avx[i],a1_avx[small_len_avx*0+i]);
+		ADD_DOT(b_avx[i], b_avx[i],b1_avx[small_len_avx*0+i]);
 	}
 	
 
@@ -541,76 +571,81 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 
 	for(i=0;i<2*small_len_avx;i++){
 			
-		w2_avx[i]= _mm256_add_epi16(w2_avx[i],w5_avx[i]);//w2 <- w2+w5
-		w6_avx[i]= _mm256_sub_epi16(w6_avx[i],w5_avx[i]);// w6 <- w6-w5
-		w4_avx[i]= _mm256_sub_epi16(w4_avx[i],w3_avx[i]);// w4 <- w4-w3
+		ADDDOT_DOT(w2_avx[i, w2_avx[i],w5_avx[i]);//w2 <- w2+w5
+		SUBDOT_DOT(w6_avx[i], w6_avx[i],w5_avx[i]);// w6 <- w6-w5
+		SUBDOT_DOT(w4_avx[i], w4_avx[i],w3_avx[i]);// w4 <- w4-w3
 		
-		w5_avx[i]= _mm256_sub_epi16(w5_avx[i],w1_avx[i]);// w5 <- w5-w1
-		temp1_avx[i] = _mm256_slli_epi16(w7_avx[i],6); //temp <- 64*w7
-		w5_avx[i]= _mm256_sub_epi16(w5_avx[i],temp1_avx[i]);// w5 <- w5-64*w7
+		SUBDOT_DOT(w5_avx[i], w5_avx[i],w1_avx[i]);// w5 <- w5-w1
+		SLLDOT_DOT(temp1_avx[i] , w7_avx[i],6); //temp <- 64*w7
+		SUBDOT_DOT(w5_avx[i], w5_avx[i],temp1_avx[i]);// w5 <- w5-64*w7
 
-		w4_avx[i] = _mm256_srli_epi16(w4_avx[i],1); //w4 <- w4/2
-		w3_avx[i]= _mm256_add_epi16(w3_avx[i],w4_avx[i]);//w3 <- w3+w4
+		SRLDOT_DOT(w4_avx[i] , w4_avx[i],1); //w4 <- w4/2
+		ADDDOT_DOT(w3_avx[i, w3_avx[i],w4_avx[i]);//w3 <- w3+w4
 
-		temp1_avx[i] = _mm256_slli_epi16(w5_avx[i],1); //temp <- 2*w5
-		w5_avx[i]= _mm256_add_epi16(w6_avx[i],temp1_avx[i]);//w5 <- 2*w5+w6
+		SLLDOT_DOT(temp1_avx[i] , w5_avx[i],1); //temp <- 2*w5
+		ADDDOT_DOT(w5_avx[i, w6_avx[i],temp1_avx[i]);//w5 <- 2*w5+w6
 
-		temp1_avx[i] = _mm256_slli_epi16(w3_avx[i],6); //temp <- 64*w3
-		temp1_avx[i] = _mm256_add_epi16(w3_avx[i],temp1_avx[i]); //temp <- 65*w3
-		w2_avx[i]= _mm256_sub_epi16(w2_avx[i],temp1_avx[i]);// w2 <- w2-65*w3
+		SLLDOT_DOT(temp1_avx[i] , w3_avx[i],6); //temp <- 64*w3
+		ADDDOT_DOT(temp1_avx[i], w3_avx[i],temp1_avx[i]); //temp <- 65*w3
+		SUBDOT_DOT(w2_avx[i], w2_avx[i],temp1_avx[i]);// w2 <- w2-65*w3
 
-		w3_avx[i]= _mm256_sub_epi16(w3_avx[i],w7_avx[i]);// w3 <- w3-w7
-		w3_avx[i]= _mm256_sub_epi16(w3_avx[i],w1_avx[i]);// w3 <- w3-w1
+		SUBDOT_DOT(w3_avx[i], w3_avx[i],w7_avx[i]);// w3 <- w3-w7
+		SUBDOT_DOT(w3_avx[i], w3_avx[i],w1_avx[i]);// w3 <- w3-w1
 
-		temp1_avx[i] = _mm256_mullo_epi16 (w3_avx[i],int45_avx); //temp <- 45*w3
-		w2_avx[i] = _mm256_add_epi16(w2_avx[i],temp1_avx[i]); //w2 <- w2+45*w3
+		MULDOT_DOT( temp1_avx[i] , w3_avx[i], 45); //temp <- 45*w3
+		ADDDOT_DOT(w2_avx[i], w2_avx[i],temp1_avx[i]); //w2 <- w2+45*w3
 
-		temp1_avx[i] = _mm256_slli_epi16(w3_avx[i],3); //temp <- 8*w3
-		w5_avx[i]= _mm256_sub_epi16(w5_avx[i],temp1_avx[i]);//w5 <- w5-8*w3
+		SLLDOT_DOT(temp1_avx[i] , w3_avx[i],3); //temp <- 8*w3
+		SUBDOT_DOT(w5_avx[i], w5_avx[i],temp1_avx[i]);//w5 <- w5-8*w3
 
-		w5_avx[i] = _mm256_mullo_epi16 (w5_avx[i],inv3_avx); //w5 <- w5*1/3
-		w5_avx[i] = _mm256_srli_epi16 (w5_avx[i],3); //w5 <- w5*1/8 ---> w5=w5/24
+		MULDOT_DOT( w5_avx[i] , w5_avx[i],43691); //w5 <- w5*1/3
+		SRLDOT_DOT(w5_avx[i] , w5_avx[i],3); //w5 <- w5*1/8 ---> w5=w5/24
 
-		w6_avx[i] = _mm256_add_epi16(w2_avx[i],w6_avx[i]); //w6 <- w6+w2
-		temp1_avx[i] = _mm256_slli_epi16(w4_avx[i],4); //temp <- 16*w4
-		w2_avx[i] = _mm256_add_epi16(w2_avx[i],temp1_avx[i]); //w2 <- w2+16*w4
+		ADDDOT_DOT(w6_avx[i], w2_avx[i],w6_avx[i]); //w6 <- w6+w2
+		SLLDOT_DOT(temp1_avx[i] , w4_avx[i],4); //temp <- 16*w4
+		ADDDOT_DOT(w2_avx[i], w2_avx[i],temp1_avx[i]); //w2 <- w2+16*w4
 
-		w2_avx[i] = _mm256_mullo_epi16 (w2_avx[i],inv9_avx); //w2 <- w2*1/9
-		w2_avx[i] = _mm256_srli_epi16 (w2_avx[i],1); //w2 <- w2*1/2 ---> w2=w2/18
+		MULDOT_DOT( w2_avx[i] , w2_avx[i],36409); //w2 <- w2*1/9
+		SRLDOT_DOT(w2_avx[i] , w2_avx[i],1); //w2 <- w2*1/2 ---> w2=w2/18
 
-		w3_avx[i]= _mm256_sub_epi16(w3_avx[i],w5_avx[i]);//w3 <- w3-w5
+		SUBDOT_DOT(w3_avx[i], w3_avx[i],w5_avx[i]);//w3 <- w3-w5
 		
-		w4_avx[i] = _mm256_add_epi16(w4_avx[i],w2_avx[i]); //w4 <- w4+w2
+		ADDDOT_DOT(w4_avx[i], w4_avx[i],w2_avx[i]); //w4 <- w4+w2
 
-		w4_avx[i] = _mm256_sub_epi16(int0_avx,w4_avx[i]); //w4 <- -(w4+w2)
+		
 
-		temp1_avx[i] = _mm256_mullo_epi16 (w2_avx[i],int30_avx); //temp <- w2*30
-		w6_avx[i]= _mm256_sub_epi16(temp1_avx[i],w6_avx[i]);//w6 <- 30*w2-w6
+		SUBDOT_DOT(w4_avx[i] , int0_avx,w4_avx[i]); //w4 <- -(w4+w2)
 
-		w6_avx[i] = _mm256_mullo_epi16 (w6_avx[i],inv15_avx); //w6 <- w6*1/15
-		w6_avx[i] = _mm256_srli_epi16 (w6_avx[i],2); //w6 <- w6*1/4 ---> w6=w6/60
+		MULDOT_DOT( temp1_avx[i] , w2_avx[i],30); //temp <- w2*30
+		SUBDOT_DOT(w6_avx[i], temp1_avx[i],w6_avx[i]);//w6 <- 30*w2-w6
 
-		w2_avx[i]= _mm256_sub_epi16(w2_avx[i],w6_avx[i]);//w2 <- w2-w6
+		MULDOT_DOT( w6_avx[i] , w6_avx[i],61167); //w6 <- w6*1/15
+		SRLDOT_DOT(w6_avx[i] , w6_avx[i],2); //w6 <- w6*1/4 ---> w6=w6/60
+
+		SUBDOT_DOT(w2_avx[i], w2_avx[i],w6_avx[i]);//w2 <- w2-w6
 
 	}
 
 	for(i=0; i<2*AVX_N; i++){
-		res_avx[i]=_mm256_xor_si256 (res_avx[i], res_avx[i]);
+		XORDOT_DOT(res_avx[i] ,res_avx[i], res_avx[i]);
 	}	
 
 	for(i=0;i<2*small_len_avx;i++){	
-		res_avx[0*small_len_avx+i]=_mm256_add_epi16 (res_avx[0*small_len_avx+i], w7_avx[i]);
-		res_avx[1*small_len_avx+i]=_mm256_add_epi16 (res_avx[1*small_len_avx+i], w6_avx[i]);
-		res_avx[2*small_len_avx+i]=_mm256_add_epi16 (res_avx[2*small_len_avx+i], w5_avx[i]);
-		res_avx[3*small_len_avx+i]=_mm256_add_epi16 (res_avx[3*small_len_avx+i], w4_avx[i]);
-		res_avx[4*small_len_avx+i]=_mm256_add_epi16 (res_avx[4*small_len_avx+i], w3_avx[i]);
-		res_avx[5*small_len_avx+i]=_mm256_add_epi16 (res_avx[5*small_len_avx+i], w2_avx[i]);
-		res_avx[6*small_len_avx+i]=_mm256_add_epi16 (res_avx[6*small_len_avx+i], w1_avx[i]);
+		ADDDOT_DOT(res_avx[0*small_len_avx+i], res_avx[0*small_len_avx+i], w7_avx[i]);
+		ADDDOT_DOT(res_avx[1*small_len_avx+i], res_avx[1*small_len_avx+i], w6_avx[i]);
+		ADDDOT_DOT(res_avx[2*small_len_avx+i], res_avx[2*small_len_avx+i], w5_avx[i]);
+		ADDDOT_DOT(res_avx[3*small_len_avx+i], res_avx[3*small_len_avx+i], w4_avx[i]);
+		ADDDOT_DOT(res_avx[4*small_len_avx+i], res_avx[4*small_len_avx+i], w3_avx[i]);
+		ADDDOT_DOT(res_avx[5*small_len_avx+i], res_avx[5*small_len_avx+i], w2_avx[i]);
+		ADDDOT_DOT(res_avx[6*small_len_avx+i], res_avx[6*small_len_avx+i], w1_avx[i]);
 	}	
 
 
 	// Reduction by X^256 + 1
 	for(i=0; i<16; i++)
-	res_avx_output[i] = _mm256_sub_epi16(res_avx[i], res_avx[i+16]);
+	{
+	SUBDOT(res_avx_output[i], res_avx[i], res_avx[i+16]);
+
+	}
 
 }
