@@ -1,3 +1,5 @@
+#include <arm_neon.h>
+
 #define SCM_SIZE 16
 
 uint16x8x2_t c_avx[2*SCM_SIZE]; 
