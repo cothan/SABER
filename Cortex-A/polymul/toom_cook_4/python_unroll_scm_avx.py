@@ -10,24 +10,24 @@ def vmul(ci, ai, bi):
     # ci = ai * b*
     # p("c_avx[{}] = vmulq_u16(a[{}], b[{}]);".format(ci, ai, bi))
 
-    p("c_avx[{}]->val[0] = vmulq_u16(a[{}]->val[0], b[{}]->val[0]);".format(ci, ai, bi))
-    p("c_avx[{}]->val[1] = vmulq_u16(a[{}]->val[1], b[{}]->val[1]);".format(ci, ai, bi))
+    p("c_avx[{}].val[0] = vmulq_u16(a[{}].val[0], b[{}].val[0]);".format(ci, ai, bi))
+    p("c_avx[{}].val[1] = vmulq_u16(a[{}].val[1], b[{}].val[1]);".format(ci, ai, bi))
 
 
 def vmla(ci, ai, bi):
     #  ci = ci + ai*bi
     # p("c_avx[{}] = vmlaq_u16(c_avx[{}], a[{}], b[{}]);".format(ci, ci, ai, bi))
 
-    p("c_avx[{}]->val[0] = vmlaq_u16(c_avx[{}]->val[0], a[{}]->val[0], b[{}]->val[0]);".format(ci, ci, ai, bi))
-    p("c_avx[{}]->val[1] = vmlaq_u16(c_avx[{}]->val[1], a[{}]->val[1], b[{}]->val[1]);".format(ci, ci, ai, bi))
+    p("c_avx[{}].val[0] = vmlaq_u16(c_avx[{}].val[0], a[{}].val[0], b[{}].val[0]);".format(ci, ci, ai, bi))
+    p("c_avx[{}].val[1] = vmlaq_u16(c_avx[{}].val[1], a[{}].val[1], b[{}].val[1]);".format(ci, ci, ai, bi))
 
 
 def vconst(ci, value):
     # c = value
     # p("c_avx[{}] = vdupq_n_u16({});".format(ci, value))
 
-    p("c_avx[{}]->val[0] = vdupq_n_u16({});".format(ci, value))
-    p("c_avx[{}]->val[1] = vdupq_n_u16({});".format(ci, value))
+    p("c_avx[{}].val[0] = vdupq_n_u16({});".format(ci, value))
+    p("c_avx[{}].val[1] = vdupq_n_u16({});".format(ci, value))
 
 
 def schoolbook_avx_new():
