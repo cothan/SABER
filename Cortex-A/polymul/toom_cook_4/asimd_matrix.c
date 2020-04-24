@@ -1,10 +1,10 @@
 #define PERMUTE0(c, a, b, value)                                                                   \
-  c->val[0] = (uint16x8_t)a.val[0];                                                                \
-  c->val[1] = (uint16x8_t)b.val[0]
+  c.val[0] = (uint16x8_t)a.val[0];                                                                \
+  c.val[1] = (uint16x8_t)b.val[0]
 
 #define PERMUTE1(c, a, b)                                                                          \
-  c->val[0] = (uint16x8_t)a.val[1];                                                                \
-  c->val[1] = (uint16x8_t)b.val[1]
+  c.val[0] = (uint16x8_t)a.val[1];                                                                \
+  c.val[1] = (uint16x8_t)b.val[1]
 
 void transpose(uint16x8x2_t *M) {
   int i;
@@ -14,13 +14,13 @@ void transpose(uint16x8x2_t *M) {
 
   for (i = 0; i < 8; i = i + 1) {
     // Lower half
-    tL[i].val[0] = vzip2q_u16(M[2 * i]->val[0], M[2 * i + 1]->val[0]);
+    tL[i].val[0] = vzip2q_u16(M[2 * i].val[0], M[2 * i + 1].val[0]);
     // Uper half
-    tL[i].val[1] = vzip1q_u16(M[2 * i]->val[0], M[2 * i + 1]->val[0]);
+    tL[i].val[1] = vzip1q_u16(M[2 * i].val[0], M[2 * i + 1].val[0]);
     // Lower half
-    tH[i].val[0] = vzip2q_u16(M[2 * i]->val[1], M[2 * i + 1]->val[1]);
+    tH[i].val[0] = vzip2q_u16(M[2 * i].val[1], M[2 * i + 1].val[1]);
     // Uper half
-    tH[i].val[1] = vzip1q_u16(M[2 * i]->val[1], M[2 * i + 1]->val[1]);
+    tH[i].val[1] = vzip1q_u16(M[2 * i].val[1], M[2 * i + 1].val[1]);
   }
   //-----------------------------------
   for (i = 0; i < 4; i = i + 1) {
@@ -51,8 +51,8 @@ void transpose(uint16x8x2_t *M) {
     eL[i].val[0] = vzip2q_u64((uint64x2_t)bH[2 * i].val[0], (uint64x2_t)bH[2 * i + 1].val[0]);
     eL[i].val[1] = vzip1q_u64((uint64x2_t)bH[2 * i].val[0], (uint64x2_t)bH[2 * i + 1].val[0]);
 
-    eH[i].val[] = vzip2q_u64((uint64x2_t)bH[2 * i].val[1], (uint64x2_t)bH[2 * i + 1].val[1]);
-    eH[i].val[] = vzip1q_u64((uint64x2_t)bH[2 * i].val[1], (uint64x2_t)bH[2 * i + 1].val[1]);
+    eH[i].val[0] = vzip2q_u64((uint64x2_t)bH[2 * i].val[1], (uint64x2_t)bH[2 * i + 1].val[1]);
+    eH[i].val[1] = vzip1q_u64((uint64x2_t)bH[2 * i].val[1], (uint64x2_t)bH[2 * i + 1].val[1]);
   }
   //-------------------------------------
   for (i = 0; i < 2; i = i + 1) {
