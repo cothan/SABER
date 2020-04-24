@@ -6,6 +6,8 @@
 #include <arm_neon.h>
 #include <stdint.h>
 
+uint16x8_t int0_avx = vdupq_n_u16(0);
+
 // TODO: chagne "avx" in function name to "neon"
 // -> | -> ->
 #define ADD(c, a, b)                             \
@@ -438,7 +440,7 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	//--------------------these data are created for place holding ends---------
 
 	// Add for NEON
-	uint16x8_t int0_avx = vdupq_n_u16(0);
+	// uint16x8_t int0_avx = vdupq_n_u16(0);
 
 	//-----AVX data declaration ends------------
 
