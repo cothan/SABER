@@ -6,8 +6,6 @@
 #include <arm_neon.h>
 #include <stdint.h>
 
-const uint16x8_t int0_avx = vdupq_n_u16(0);
-
 // TODO: chagne "avx" in function name to "neon"
 // -> | -> ->
 #define ADD(c, a, b)                             \
@@ -43,20 +41,20 @@ const uint16x8_t int0_avx = vdupq_n_u16(0);
 	c.val[1] = vsubq_u16(a.val[1], b.val[1])
 // -> | ->
 #define COPY(c, b)                                  \
-	c.val[0] = veorq_u16(b->val[0], int0_avx); \
-	c.val[1] = veorq_u16(b->val[1], int0_avx)
+	c.val[0] = veorq_u16(b->val[0], vdupq_n_u16(0)); \
+	c.val[1] = veorq_u16(b->val[1], vdupq_n_u16(0))
 // . | .
 #define COPYDOT_DOT(c, b)                                  \
-	c.val[0] = veorq_u16(b.val[0], int0_avx); \
-	c.val[1] = veorq_u16(b.val[1], int0_avx)
+	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
+	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
 // -> | .
 #define COPY_DOT(c, b)                                  \
-	c->val[0] = veorq_u16(b.val[0], int0_avx); \
-	c->val[1] = veorq_u16(b.val[1], int0_avx)
+	c->val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
+	c->val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
 // . | ->
 #define COPYDOT(c, b)                                  \
-	c->val[0] = veorq_u16(b.val[0], int0_avx); \
-	c->val[1] = veorq_u16(b.val[1], int0_avx)
+	c->val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
+	c->val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
 
 #define SLLDOT_DOT(c, a, value)              \
 	c.val[0] = vshlq_n_u16(a.val[0], value); \
@@ -578,13 +576,13 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	}
 	// TODO: check this
 	batch_64coefficient_multiplications(
-		a1_ph_avx, b1_ph_avx, w7_avx,
-		a2_ph_avx, b2_ph_avx, w5_avx,
-		a3_ph_avx, b3_ph_avx, w6_avx,
-		a4_ph_avx, b4_ph_avx, w3_avx,
-		a5_ph_avx, b5_ph_avx, w4_avx,
-		a6_ph_avx, b6_ph_avx, w1_avx,
-		a_avx, b_avx, w2_avx);
+		a1_ph_avx, b1_ph_avx, &w7_avx,
+		a2_ph_avx, b2_ph_avx, &w5_avx,
+		a3_ph_avx, b3_ph_avx, &w6_avx,
+		a4_ph_avx, b4_ph_avx, &w3_avx,
+		a5_ph_avx, b5_ph_avx, &w4_avx,
+		a6_ph_avx, b6_ph_avx, &w1_avx,
+		a_avx, b_avx, &w2_avx);
 
 	/*	--------------------------------------------
 		---------------Solution starts--------------
