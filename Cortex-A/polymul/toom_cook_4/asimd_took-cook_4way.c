@@ -1,5 +1,5 @@
 #include "asimd_scm_avx.c"
-// // #include "asimd_matrix.c"
+#include "asimd_matrix.c"
 #include "../../SABER_params.h"
 #include "../../SABER_indcpa.h"
 
