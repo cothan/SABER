@@ -4,3 +4,4 @@
 *.a
 *.d
 AVX/papi_hl_output/*
+.vscode/settings.json
