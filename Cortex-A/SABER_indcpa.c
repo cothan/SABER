@@ -5,7 +5,6 @@
 #include "SABER_params.h"
 #include "./polymul/toom_cook_4/asimd_toom-cook_4way.c"
 #include "fips202.h"
-#include "fips202x4.h"
 
 #define h1 4 //2^(EQ-EP-1)
 
@@ -19,17 +18,17 @@ define XORDOT_DOT(c, a, b)                   \
 	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vaddq_u16(a.val[1], b.val[1])
 
-#define ADDDOT_DOTVAL(c, a, b)                   \
-	c.val[0] = vaddq_u16(a.val[0], b); \
-	c.val[1] = vaddq_u16(a.val[1], b)
+#define ADDDOT_DOTVAL(c, a, value)                   \
+	c.val[0] = vaddq_u16(a.val[0], value); \
+	c.val[1] = vaddq_u16(a.val[1], value)
 
 #define ANDDOT_DOT(c, a, b)\
     c.val[0] = vandq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vandq_u16(a.val[1], b.val[1])
 
-#define ANDDOT_DOTVAL(c, a, b)\
-    c.val[0] = vandq_u16(a.val[0], b); \
-	c.val[1] = vandq_u16(a.val[1], b)
+#define ANDDOT_DOTVAL(c, a, value)\
+    c.val[0] = vandq_u16(a.val[0], value); \
+	c.val[1] = vandq_u16(a.val[1], value)
 
 
 #define SRLDOT_DOT(c, a, value)              \
