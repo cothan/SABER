@@ -3,7 +3,7 @@
 #include "rng.h"
 #include "cbd.h"
 #include "SABER_params.h"
-#include "./polymul/toom_cook_4/toom-cook_4way.c"
+#include "./polymul/toom_cook_4/asimd_toom-cook_4way.c"
 #include "fips202.h"
 #include "fips202x4.h"
 
