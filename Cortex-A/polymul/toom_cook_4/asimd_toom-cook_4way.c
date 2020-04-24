@@ -74,8 +74,8 @@
 
 uint16x8x2_t a_extra[2], b_extra[2];
 
-void karatsuba32_fork_avx_new(uint16x8x2_t **a1,
-							  uint16x8x2_t **b1,
+void karatsuba32_fork_avx_new(uint16x8x2_t *a1,
+							  uint16x8x2_t *b1,
 							  uint8_t position)
 {
 	COPYDOT_DOT(a[position], a1[0]);
@@ -223,13 +223,13 @@ void join_32coefficient_results(uint16x8x2_t *result_d0[],
 }
 
 void batch_64coefficient_multiplications(
-	uint16x8x2_t *a0, uint16x8x2_t *b0, uint16x8x2_t *result_final0,
-	uint16x8x2_t *a1, uint16x8x2_t *b1, uint16x8x2_t *result_final1,
-	uint16x8x2_t *a2, uint16x8x2_t *b2, uint16x8x2_t *result_final2,
-	uint16x8x2_t *a3, uint16x8x2_t *b3, uint16x8x2_t *result_final3,
-	uint16x8x2_t *a4, uint16x8x2_t *b4, uint16x8x2_t *result_final4,
-	uint16x8x2_t *a5, uint16x8x2_t *b5, uint16x8x2_t *result_final5,
-	uint16x8x2_t *a6, uint16x8x2_t *b6, uint16x8x2_t *result_final6)
+	uint16x8x2_t *a0, uint16x8x2_t *b0, uint16x8x2_t **result_final0,
+	uint16x8x2_t *a1, uint16x8x2_t *b1, uint16x8x2_t **result_final1,
+	uint16x8x2_t *a2, uint16x8x2_t *b2, uint16x8x2_t **result_final2,
+	uint16x8x2_t *a3, uint16x8x2_t *b3, uint16x8x2_t **result_final3,
+	uint16x8x2_t *a4, uint16x8x2_t *b4, uint16x8x2_t **result_final4,
+	uint16x8x2_t *a5, uint16x8x2_t *b5, uint16x8x2_t **result_final5,
+	uint16x8x2_t *a6, uint16x8x2_t *b6, uint16x8x2_t **result_final6)
 {
 	uint16x8x2_t a_lu_temp[2], b_lu_temp[2];
 	uint16x8x2_t result_d0[16], result_d1[16], result_d01[16];
