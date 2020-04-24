@@ -86,36 +86,36 @@ void karatsuba32_fork_avx_new(uint16x8x2_t *a1,
 		COPYDOT_DOT(a_extra[0] , a1[1]);
 		COPYDOT_DOT(b_extra[0] , b1[1]);
 
-		ADDDOT(a_extra[1], a1[0], a1[1]);
-		ADDDOT(b_extra[1], b1[0], b1[1]);
+		ADDDOT_DOT(a_extra[1], a1[0], a1[1]);
+		ADDDOT_DOT(b_extra[1], b1[0], b1[1]);
 	}
 	else
 	{
 		COPYDOT_DOT(a[position + 1] , a1[1]);
 		COPYDOT_DOT(b[position + 1] , b1[1]);
 
-		ADDDOT(a[position + 2], a1[0], a1[1]);
-		ADDDOT(b[position + 2], b1[0], b1[1]);
+		ADDDOT_DOT(a[position + 2], a1[0], a1[1]);
+		ADDDOT_DOT(b[position + 2], b1[0], b1[1]);
 	}
 }
 
-void karatsuba32_fork_avx_partial(uint16x8x2_t **a1,
-								  uint16x8x2_t **b1,
+void karatsuba32_fork_avx_partial(uint16x8x2_t *a1,
+								  uint16x8x2_t *b1,
 								  uint8_t position)
 {
 	COPYDOT_DOT(a[position], a1[1]);
 	COPYDOT_DOT(b[position], b1[1]);
 
-	ADDDOT(a[position + 1], a1[0], a1[1]);
-	ADDDOT(b[position + 1], b1[0], b1[1]);
+	ADDDOT_DOT(a[position + 1], a1[0], a1[1]);
+	ADDDOT_DOT(b[position + 1], b1[0], b1[1]);
 }
 
-void karatsuba32_fork_avx_partial1(uint16x8x2_t **a1,
-								   uint16x8x2_t **b1,
+void karatsuba32_fork_avx_partial1(uint16x8x2_t *a1,
+								   uint16x8x2_t *b1,
 								   uint8_t position)
 {
-	ADDDOT(a[position], a1[0], a1[1]);
-	ADDDOT(b[position], b1[0], b1[1]);
+	ADDDOT_DOT(a[position], a1[0], a1[1]);
+	ADDDOT_DOT(b[position], b1[0], b1[1]);
 }
 
 void karatsuba32_join_avx_new(uint16x8x2_t **result_final,
