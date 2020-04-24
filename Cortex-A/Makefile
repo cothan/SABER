@@ -10,12 +10,12 @@ RM 		  = /bin/rm
 all: test/PQCgenKAT_kem \
      test/test_kex 
 
-SOURCES = pack_unpack.c poly.c verify.c fips202.c fips202x4.c SABER_indcpa.c kem.c \
+SOURCES = pack_unpack.c poly.c verify.c fips202.c SABER_indcpa.c kem.c \
 					cbd.c rng.c
 #rng.o
 #randombytes.c
 
-SOURCES2 = pack_unpack.c rng.c poly.c verify.c fips202x4.c SABER_indcpa.c kem.c \
+SOURCES2 = pack_unpack.c rng.c poly.c verify.c SABER_indcpa.c kem.c \
 					cbd.c
 
 HEADERS = SABER_params.h pack_unpack.h poly.h verify.h cbd.h SABER_indcpa.h kem.h rng.h fips202.h api.h randombytes.h
