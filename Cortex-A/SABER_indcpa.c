@@ -226,7 +226,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 	// Now truncation
 	for(i=0;i<SABER_K;i++){ //shift right EQ-EP bits
 		for(j=0;j<SABER_N/16;j++){
-			ADDDOT_DOT( res_avx[i][j], res_avx[i][j], H1_avx);
+			ADDDOT_DOTVAL( res_avx[i][j], res_avx[i][j], H1_avx);
 			SRLDOT_DOT( res_avx[i][j], res_avx[i][j], (SABER_EQ-SABER_EP) );
 			ANDDOT_DOTVAL( res_avx[i][j], res_avx[i][j], mod);			
 		}
