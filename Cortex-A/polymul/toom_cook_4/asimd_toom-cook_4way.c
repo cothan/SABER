@@ -31,10 +31,10 @@
 #define SUBDOT(c, a, b)                         \
 	c.val[0] = vsubq_u16(a->val[0], b->val[0]); \
 	c.val[1] = vsubq_u16(a->val[1], b->val[1])
-// . | . ->
+// . | . -> // TODO: fix
 #define SUB_DOT(c, a, b)                       \
-	c.val[0] = vsubq_u16(a.val[0], b->val[0]); \
-	c.val[1] = vsubq_u16(a.val[1], b->val[1])
+	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
+	c.val[1] = vsubq_u16(a.val[1], b.val[1])
 // . | . . 
 #define SUBDOT_DOT(c, a, b)                   \
 	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
@@ -47,10 +47,10 @@
 #define COPYDOT_DOT(c, b)                                  \
 	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
 	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
-// -> | .
+// -> | . TODO: fix
 #define COPY_DOT(c, b)                                  \
-	c->val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
-	c->val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
+	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
+	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
 // . | -> TODO: fix
 #define COPYDOT(c, b)                                  \
 	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
@@ -207,19 +207,19 @@ void join_32coefficient_results(uint16x8x2_t result_d0[],
 	ADDDOT(b[7], result_d01[3], result_d1[1]);
 
 	// {b[7],b[6],b[5],b[4]} <-- {b[7],b[6],b[5],b[4]} - {a[3],a[2],a[1],a[0]} - {a[7],a[6],a[5],a[4]}
-	SUB(result_64ks[2], (&b[4]), result_d0[0]);
-	SUB(result_64ks[2], result_64ks[2], result_d1[0]);
-	SUB(result_64ks[3], (&b[5]), result_d0[1]);
-	SUB(result_64ks[3], result_64ks[3], result_d1[1]);
-	SUB(result_64ks[4], (&b[6]), result_d0[2]);
-	SUB(result_64ks[4], result_64ks[4], result_d1[2]);
-	SUB(result_64ks[5], (&b[7]), result_d0[3]);
-	SUB(result_64ks[5], result_64ks[5], result_d1[3]);
+	SUBDOT_DOT(result_64ks[2], (&b[4]), result_d0[0]);
+	SUBDOT_DOT(result_64ks[2], result_64ks[2], result_d1[0]);
+	SUBDOT_DOT(result_64ks[3], (&b[5]), result_d0[1]);
+	SUBDOT_DOT(result_64ks[3], result_64ks[3], result_d1[1]);
+	SUBDOT_DOT(result_64ks[4], (&b[6]), result_d0[2]);
+	SUBDOT_DOT(result_64ks[4], result_64ks[4], result_d1[2]);
+	SUBDOT_DOT(result_64ks[5], (&b[7]), result_d0[3]);
+	SUBDOT_DOT(result_64ks[5], result_64ks[5], result_d1[3]);
 
-	COPY(result_64ks[0], result_d0[0]);
-	COPY(result_64ks[1], result_d0[1]);
-	COPY(result_64ks[6], result_d1[2]);
-	COPY(result_64ks[7], result_d1[3]);
+	COPYDOT_DOT(result_64ks[0], result_d0[0]);
+	COPYDOT_DOT(result_64ks[1], result_d0[1]);
+	COPYDOT_DOT(result_64ks[6], result_d1[2]);
+	COPYDOT_DOT(result_64ks[7], result_d1[3]);
 }
 
 void batch_64coefficient_multiplications(
