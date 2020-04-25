@@ -7,6 +7,14 @@
 #include "verify.h"
 #include "rng.h"
 #include "fips202.h"
+
+#if __aarch64__
+#include <libkeccak.so.headers/SimpleFIPS202.h>
+#else
+#error "Install SIMD Keccak"
+#endif
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
