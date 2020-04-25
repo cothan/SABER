@@ -23,10 +23,10 @@ HEADERS = SABER_params.h pack_unpack.h poly.h verify.h cbd.h SABER_indcpa.h kem.
 
 
 test/test_kex: $(SOURCES) $(HEADERS) test/test_kex.c 
-	$(CC) $(CFLAGS5) -o $@ $(SOURCES) test/test_kex.c 
+	$(CC) $(CFLAGS5) -o $@ $(SOURCES) test/test_kex.c -lkeccak
 
 test/PQCgenKAT_kem: $(SOURCES2) $(HEADERS) test/PQCgenKAT_kem.c 
-	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c 
+	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c -lkeccak
 
 
 rng.o: rng.c
