@@ -242,9 +242,9 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a0[i], a0[2 + i]);
 		ADDDOT(b_lu_temp[i], b0[i], b0[2 + i]);
 	}
-	karatsuba32_fork_avx_new(a0[0], b0[0], 0);
-	karatsuba32_fork_avx_new(a0[2], b0[2], 3);
-	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 6); // TODO: check this
+	karatsuba32_fork_avx_new(&a0[0], &b0[0], 0);
+	karatsuba32_fork_avx_new(&a0[2], &b0[2], 3);
+	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 6); // TODO: check this
 
 	// KS splitting of 2nd 64-coeff multiplication
 	for (i = 0; i < 2; i++)
@@ -252,16 +252,16 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a1[i], a1[2 + i]);
 		ADDDOT(b_lu_temp[i], b1[i], b1[2 + i]);
 	}
-	karatsuba32_fork_avx_new(a1[0], b1[0], 9);
-	karatsuba32_fork_avx_new(a1[2], b1[2], 12);
-	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 15); // Partial: loads only one of the three elements in the bucket
+	karatsuba32_fork_avx_new(&a1[0], &b1[0], 9);
+	karatsuba32_fork_avx_new(&a1[2], &b1[2], 12);
+	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 15); // Partial: loads only one of the three elements in the bucket
 
 	// Compute 16 school-book multiplications in a batch.
 	transpose(a);
 	transpose(b);
 	schoolbook_avx_new();
-	transpose(c_avx[0]);
-	transpose(c_avx[16]);
+	transpose(&c_avx[0]);
+	transpose(&c_avx[16]);
 
 	// store the partial multiplication result.
 	COPYDOT_DOT(c_avx_extra[0], c_avx[15]);
@@ -289,9 +289,9 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a2[i], a2[2 + i]);
 		ADDDOT(b_lu_temp[i], b2[i], b2[2 + i]);
 	}
-	karatsuba32_fork_avx_new(a2[0], b2[0], 2);
-	karatsuba32_fork_avx_new(a2[2], b2[2], 5);
-	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 8);
+	karatsuba32_fork_avx_new(&a2[0], &b2[0], 2);
+	karatsuba32_fork_avx_new(&a2[2], &b2[2], 5);
+	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 8);
 
 	// Fork multiplication of a3*b3
 	for (i = 0; i < 2; i++)
@@ -299,15 +299,15 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a3[i], a3[2 + i]);
 		ADDDOT(b_lu_temp[i], b3[i], b3[2 + i]);
 	}
-	karatsuba32_fork_avx_new(a3[0], b3[0], 11);
-	karatsuba32_fork_avx_new(a3[2], b3[2], 14); // Partial: loads only two of the three elements in the bucket
+	karatsuba32_fork_avx_new(&a3[0], &b3[0], 11);
+	karatsuba32_fork_avx_new(&a3[2], &b3[2], 14); // Partial: loads only two of the three elements in the bucket
 
 	transpose(a);
 	transpose(b);
 	schoolbook_avx_new();
 
-	transpose(c_avx[0]);
-	transpose(c_avx[16]);
+	transpose(&c_avx[0]);
+	transpose(&c_avx[16]);
 
 	karatsuba32_join_avx_partial(result_d01, 0); // Combine results of this computation with previous computation
 	// Final result of 2nd 64-coeff multiplication
@@ -336,8 +336,8 @@ void batch_64coefficient_multiplications(
 	karatsuba32_join_avx_new(result_d0, 11);
 
 	// Fork 1 part of previous operands
-	karatsuba32_fork_avx_partial1(a3[2], b3[2], 0);
-	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 1);
+	karatsuba32_fork_avx_partial1(&a3[2], &b3[2], 0);
+	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 1);
 
 	// Fork multiplication of a4*b4
 	for (i = 0; i < 2; i++)
@@ -345,9 +345,9 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a4[i], a4[2 + i]);
 		ADDDOT(b_lu_temp[i], b4[i], b4[2 + i]);
 	}
-	karatsuba32_fork_avx_new(a4[0], b4[0], 4);
-	karatsuba32_fork_avx_new(a4[2], b4[2], 7);
-	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 10);
+	karatsuba32_fork_avx_new(&a4[0], &b4[0], 4);
+	karatsuba32_fork_avx_new(&a4[2], &b4[2], 7);
+	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 10);
 
 	// Fork multiplication of a5*b5
 	for (i = 0; i < 2; i++)
@@ -355,14 +355,14 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a5[i], a5[2 + i]);
 		ADDDOT(b_lu_temp[i], b5[i], b5[2 + i]);
 	}
-	karatsuba32_fork_avx_new(a5[0], b5[0], 13);
+	karatsuba32_fork_avx_new(&a5[0], &b5[0], 13);
 
 	transpose(a);
 	transpose(b);
 	schoolbook_avx_new();
 
-	transpose(c_avx[0]);
-	transpose(c_avx[16]);
+	transpose(&c_avx[0]);
+	transpose(&c_avx[16]);
 
 	karatsuba32_join_avx_partial2(result_d1, 0);
 	karatsuba32_join_avx_new(result_d01, 1);
@@ -386,8 +386,8 @@ void batch_64coefficient_multiplications(
 	karatsuba32_join_avx_new(result_d0, 13);
 
 	// Fork remaining 2 parts of a5*b5
-	karatsuba32_fork_avx_new(a5[2], b5[2], 0);
-	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 3);
+	karatsuba32_fork_avx_new(&a5[2], &b5[2], 0);
+	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 3);
 
 	// Fork multiplication of a6*b6
 	for (i = 0; i < 2; i++)
@@ -396,16 +396,16 @@ void batch_64coefficient_multiplications(
 		ADDDOT(b_lu_temp[i], b6[i], b6[2 + i]);
 	}
 
-	karatsuba32_fork_avx_new(a6[0], b6[0], 6);
-	karatsuba32_fork_avx_new(a6[2], b6[2], 9);
-	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 12);
+	karatsuba32_fork_avx_new(&a6[0], &b6[0], 6);
+	karatsuba32_fork_avx_new(&a6[2], &b6[2], 9);
+	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 12);
 
 	transpose(a);
 	transpose(b);
 	schoolbook_avx_new();
 
-	transpose(c_avx[0]);
-	transpose(c_avx[16]);
+	transpose(&c_avx[0]);
+	transpose(&c_avx[16]);
 
 	karatsuba32_join_avx_new(result_d1, 0);
 	karatsuba32_join_avx_new(result_d01, 3);
