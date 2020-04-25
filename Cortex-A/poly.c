@@ -28,9 +28,13 @@ void poly_getnoise4x(uint16_t *r0, uint16_t *r1, uint16_t *r2, const unsigned ch
   unsigned char buf0[SHAKE128_RATE*nblocks];
   unsigned char buf1[SHAKE128_RATE*nblocks];
   unsigned char buf2[SHAKE128_RATE*nblocks];
-  unsigned char buf3[SHAKE128_RATE*nblocks];
+  // unsigned char buf3[SHAKE128_RATE*nblocks];
 
-  cshake128_simple4x(buf0,buf1,buf2,buf3,SHAKE128_RATE*nblocks,nonce0,nonce1,nonce2,nonce3,seed,SABER_NOISESEEDBYTES);
+  // cshake128_simple4x(buf0,buf1,buf2,buf3,SHAKE128_RATE*nblocks,nonce0,nonce1,nonce2,nonce3,seed,SABER_NOISESEEDBYTES);
+  cshake128_simple(buf0,SABER_N,nonce0,seed,SABER_NOISESEEDBYTES);
+  cshake128_simple(buf1,SABER_N,nonce1,seed,SABER_NOISESEEDBYTES);
+  cshake128_simple(buf2,SABER_N,nonce2,seed,SABER_NOISESEEDBYTES);
+
 
   	
   cbd( r0, buf0);
