@@ -7,31 +7,31 @@
 #include <stdint.h>
 
 // TODO: chagne "avx" in function name to "neon"
-// -> | -> ->
+// . | . .
 #define ADD(c, a, b)                             \
-	c->val[0] = vaddq_u16(a->val[0], b->val[0]); \
-	c->val[1] = vaddq_u16(a->val[1], b->val[1])
+	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
+	c.val[1] = vaddq_u16(a.val[1], b.val[1])
 // . | . . 
 #define ADDDOT_DOT(c, a, b)                   \
 	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vaddq_u16(a.val[1], b.val[1])
-// . | -> -> TODO: fix
+// . | . . TODO: fix
 #define ADDDOT(c, a, b)                         \
 	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vaddq_u16(a.val[1], b.val[1])
-// . | . -> TODO: fix
+// . | . . TODO: fix
 #define ADD_DOT(c, a, b)                       \
 	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vaddq_u16(a.val[1], b.val[1])
-// -> | -> ->
+// . | . .
 #define SUB(c, a, b)                             \
-	c->val[0] = vsubq_u16(a->val[0], b->val[0]); \
-	c->val[1] = vsubq_u16(a->val[1], b->val[1])
-// . | -> -> 
+	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
+	c.val[1] = vsubq_u16(a.val[1], b.val[1])
+// . | . . 
 #define SUBDOT(c, a, b)                         \
-	c.val[0] = vsubq_u16(a->val[0], b->val[0]); \
-	c.val[1] = vsubq_u16(a->val[1], b->val[1])
-// . | . -> // TODO: fix
+	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
+	c.val[1] = vsubq_u16(a.val[1], b.val[1])
+// . | . . // TODO: fix
 #define SUB_DOT(c, a, b)                       \
 	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vsubq_u16(a.val[1], b.val[1])
@@ -39,19 +39,19 @@
 #define SUBDOT_DOT(c, a, b)                   \
 	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vsubq_u16(a.val[1], b.val[1])
-// -> | ->
+// . | .
 #define COPY(c, b)                                  \
-	c->val[0] = veorq_u16(b->val[0], vdupq_n_u16(0)); \
-	c->val[1] = veorq_u16(b->val[1], vdupq_n_u16(0))
+	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
+	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
 // . | .
 #define COPYDOT_DOT(c, b)                                  \
 	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
 	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
-// -> | . TODO: fix
+// . | . TODO: fix
 #define COPY_DOT(c, b)                                  \
 	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
 	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
-// . | -> TODO: fix
+// . | . TODO: fix
 #define COPYDOT(c, b)                                  \
 	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
 	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
@@ -138,8 +138,8 @@ void karatsuba32_join_avx_new(uint16x8x2_t *result_final,
 	// b[1] = b[1] - a[1] - a[3]
 	SUBDOT_DOT(b[2], b[1], c_avx[position + 16]);
 	// SUB(result_final[2], b[2], result_final[3]);
-	result_final[2].val[0] = vsubq_u16(b[2].val[0], result_final[3]->val[0]);
-	result_final[2].val[1] = vsubq_u16(b[2].val[1], result_final[3]->val[1]);
+	result_final[2].val[0] = vsubq_u16(b[2].val[0], result_final[3].val[0]);
+	result_final[2].val[1] = vsubq_u16(b[2].val[1], result_final[3].val[1]);
 }
 
 void karatsuba32_join_avx_partial(uint16x8x2_t *result_final,
@@ -157,14 +157,14 @@ void karatsuba32_join_avx_partial(uint16x8x2_t *result_final,
 	// b[0] = b[0] - a[0] - a[2]
 	SUB_DOT(b[2], b[0], result_final[0]);
 	// SUB_DOT(result_final[1], b[2], c_avx[position]);
-	result_final[1]->val[0] = vsubq_u16(b[2].val[0], c_avx[position].val[0]);
-	result_final[1]->val[1] = vsubq_u16(b[2].val[1], c_avx[position].val[1]);
+	result_final[1].val[0] = vsubq_u16(b[2].val[0], c_avx[position].val[0]);
+	result_final[1].val[1] = vsubq_u16(b[2].val[1], c_avx[position].val[1]);
 	
 	// b[1] = b[1] - a[1] - a[3]
 	SUBDOT_DOT(b[2], b[1], c_avx_extra[1]);
 	// SUB(result_final[2], b[2], result_final[3]);
-	result_final[2]->val[0] = vsubq_u16(b[2].val[0], result_final[3]->val[0]);
-	result_final[2]->val[1] = vsubq_u16(b[2].val[1], result_final[3]->val[1]);
+	result_final[2].val[0] = vsubq_u16(b[2].val[0], result_final[3].val[0]);
+	result_final[2].val[1] = vsubq_u16(b[2].val[1], result_final[3].val[1]);
 }
 
 void karatsuba32_join_avx_partial2(uint16x8x2_t *result_final,
@@ -182,15 +182,15 @@ void karatsuba32_join_avx_partial2(uint16x8x2_t *result_final,
 	// b[0] = b[0] - a[0] - a[2]
 	SUB_DOT(b[2], b[0], result_final[0]);
 	// SUB(result_final[1], b[2], c_avx_extra[2]);
-	result_final[1]->val[0] = vsubq_u16(b[2].val[0], c_avx_extra[2].val[0]);
-	result_final[1]->val[1] = vsubq_u16(b[2].val[1], c_avx_extra[2].val[1]);
+	result_final[1].val[0] = vsubq_u16(b[2].val[0], c_avx_extra[2].val[0]);
+	result_final[1].val[1] = vsubq_u16(b[2].val[1], c_avx_extra[2].val[1]);
 	
 
 	// b[1] = b[1] - a[1] - a[3]
 	SUBDOT_DOT(b[2], b[1], c_avx_extra[1]);
 	// SUB(result_final[2], b[2], result_final[3]);
-	result_final[2]->val[0] = vsubq_u16(b[2].val[0], result_final[3]->val[0]);
-	result_final[2]->val[1] = vsubq_u16(b[2].val[1], result_final[3]->val[1]);
+	result_final[2].val[0] = vsubq_u16(b[2].val[0], result_final[3].val[0]);
+	result_final[2].val[1] = vsubq_u16(b[2].val[1], result_final[3].val[1]);
 }
 
 void join_32coefficient_results(uint16x8x2_t result_d0[],
@@ -636,14 +636,14 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 		SUBDOT_DOT(w5_avx[i], w5_avx[i], temp1_avx[i]); //w5 <- w5-8*w3
 
 		MULNDOT_DOT(w5_avx[i], w5_avx[i], 43691); //w5 <- w5*1/3
-		SRLDOT_DOT(w5_avx[i], w5_avx[i], 3);	 //w5 <- w5*1/8 ---> w5=w5/24
+		SRLDOT_DOT(w5_avx[i], w5_avx[i], 3);	 //w5 <- w5*1/8 --. w5=w5/24
 
 		ADDDOT_DOT(w6_avx[i], w2_avx[i], w6_avx[i]);	//w6 <- w6+w2
 		SLLDOT_DOT(temp1_avx[i], w4_avx[i], 4);			//temp <- 16*w4
 		ADDDOT_DOT(w2_avx[i], w2_avx[i], temp1_avx[i]); //w2 <- w2+16*w4
 
 		MULNDOT_DOT(w2_avx[i], w2_avx[i], 36409); //w2 <- w2*1/9
-		SRLDOT_DOT(w2_avx[i], w2_avx[i], 1);	 //w2 <- w2*1/2 ---> w2=w2/18
+		SRLDOT_DOT(w2_avx[i], w2_avx[i], 1);	 //w2 <- w2*1/2 --. w2=w2/18
 
 		SUBDOT_DOT(w3_avx[i], w3_avx[i], w5_avx[i]); //w3 <- w3-w5
 
@@ -657,7 +657,7 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 		SUBDOT_DOT(w6_avx[i], temp1_avx[i], w6_avx[i]); //w6 <- 30*w2-w6
 
 		MULNDOT_DOT(w6_avx[i], w6_avx[i], 61167); //w6 <- w6*1/15
-		SRLDOT_DOT(w6_avx[i], w6_avx[i], 2);	 //w6 <- w6*1/4 ---> w6=w6/60
+		SRLDOT_DOT(w6_avx[i], w6_avx[i], 2);	 //w6 <- w6*1/4 --. w6=w6/60
 
 		SUBDOT_DOT(w2_avx[i], w2_avx[i], w6_avx[i]); //w2 <- w2-w6
 	}
@@ -681,7 +681,7 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	// Reduction by X^256 + 1
 	for (i = 0; i < 16; i++)
 	{
-		res_avx_output[i]->val[0] = vsubq_u16(res_avx[i].val[0], res_avx[i + 16].val[0]);
-		res_avx_output[i]->val[1] = vsubq_u16(res_avx[i].val[1], res_avx[i + 16].val[1]);
+		res_avx_output[i].val[0] = vsubq_u16(res_avx[i].val[0], res_avx[i + 16].val[0]);
+		res_avx_output[i].val[1] = vsubq_u16(res_avx[i].val[1], res_avx[i + 16].val[1]);
 	}
 }
