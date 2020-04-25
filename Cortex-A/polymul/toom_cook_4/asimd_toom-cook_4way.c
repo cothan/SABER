@@ -41,8 +41,8 @@
 	c.val[1] = vsubq_u16(a.val[1], b.val[1])
 // -> | ->
 #define COPY(c, b)                                  \
-	c.val[0] = veorq_u16(b->val[0], vdupq_n_u16(0)); \
-	c.val[1] = veorq_u16(b->val[1], vdupq_n_u16(0))
+	c->val[0] = veorq_u16(b->val[0], vdupq_n_u16(0)); \
+	c->val[1] = veorq_u16(b->val[1], vdupq_n_u16(0))
 // . | .
 #define COPYDOT_DOT(c, b)                                  \
 	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
