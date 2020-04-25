@@ -1,9 +1,10 @@
+#include <stdint.h>
+
 #include "../kem.h"
 #include "../api.h"
 #include "../rng.h"
 
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
