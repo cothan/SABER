@@ -16,8 +16,8 @@ SOURCES = pack_unpack.c poly.c verify.c fips202.c SABER_indcpa.c kem.c \
 #rng.o
 #randombytes.c
 
-SOURCES2 = pack_unpack.c rng.c poly.c verify.c SABER_indcpa.c kem.c \
-					cbd.c
+SOURCES2 =  pack_unpack.c rng.c poly.c verify.c SABER_indcpa.c kem.c \
+			cbd.c fips202.c 
 
 HEADERS = SABER_params.h pack_unpack.h poly.h verify.h cbd.h SABER_indcpa.h kem.h rng.h fips202.h api.h randombytes.h
 
