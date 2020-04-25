@@ -430,7 +430,7 @@ void batch_64coefficient_multiplications(
 void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 						uint16x8x2_t *b1_avx,
 						uint64_t p_mod,
-						uint16x8x2_t **res_avx_output)
+						uint16x8x2_t *res_avx_output)
 {
 	int16_t AVX_N = SABER_N / 16;
 	int16_t i;
