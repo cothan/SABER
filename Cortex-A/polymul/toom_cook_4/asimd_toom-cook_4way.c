@@ -74,8 +74,8 @@
 
 uint16x8x2_t a_extra[2], b_extra[2];
 
-void karatsuba32_fork_avx_new(uint16x8x2_t **a1,
-							  uint16x8x2_t **b1,
+void karatsuba32_fork_avx_new(uint16x8x2_t *a1,
+							  uint16x8x2_t *b1,
 							  uint8_t position)
 {
 	COPYDOT(a[position], a1[0]);
@@ -99,8 +99,8 @@ void karatsuba32_fork_avx_new(uint16x8x2_t **a1,
 	}
 }
 
-void karatsuba32_fork_avx_partial(uint16x8x2_t **a1,
-								  uint16x8x2_t **b1,
+void karatsuba32_fork_avx_partial(uint16x8x2_t *a1,
+								  uint16x8x2_t *b1,
 								  uint8_t position)
 {
 	COPYDOT(a[position], a1[1]);
@@ -110,15 +110,15 @@ void karatsuba32_fork_avx_partial(uint16x8x2_t **a1,
 	ADDDOT(b[position + 1], b1[0], b1[1]);
 }
 
-void karatsuba32_fork_avx_partial1(uint16x8x2_t **a1,
-								   uint16x8x2_t **b1,
+void karatsuba32_fork_avx_partial1(uint16x8x2_t *a1,
+								   uint16x8x2_t *b1,
 								   uint8_t position)
 {
 	ADDDOT(a[position], a1[0], a1[1]);
 	ADDDOT(b[position], b1[0], b1[1]);
 }
 
-void karatsuba32_join_avx_new(uint16x8x2_t **result_final,
+void karatsuba32_join_avx_new(uint16x8x2_t *result_final,
 							  uint8_t position)
 {
 	COPY_DOT(result_final[0], c_avx[position]);
@@ -142,7 +142,7 @@ void karatsuba32_join_avx_new(uint16x8x2_t **result_final,
 	result_final[2]->val[1] = vsubq_u16(b[2].val[1], result_final[3]->val[1]);
 }
 
-void karatsuba32_join_avx_partial(uint16x8x2_t **result_final,
+void karatsuba32_join_avx_partial(uint16x8x2_t *result_final,
 								  uint8_t position)
 {
 	COPY_DOT(result_final[0] , c_avx_extra[0]);
@@ -167,7 +167,7 @@ void karatsuba32_join_avx_partial(uint16x8x2_t **result_final,
 	result_final[2]->val[1] = vsubq_u16(b[2].val[1], result_final[3]->val[1]);
 }
 
-void karatsuba32_join_avx_partial2(uint16x8x2_t **result_final,
+void karatsuba32_join_avx_partial2(uint16x8x2_t *result_final,
 								   uint8_t position)
 {
 	COPY_DOT(result_final[0], c_avx_extra[0]);
@@ -193,10 +193,10 @@ void karatsuba32_join_avx_partial2(uint16x8x2_t **result_final,
 	result_final[2]->val[1] = vsubq_u16(b[2].val[1], result_final[3]->val[1]);
 }
 
-void join_32coefficient_results(uint16x8x2_t *result_d0[],
-								uint16x8x2_t *result_d1[],
-								uint16x8x2_t *result_d01[],
-								uint16x8x2_t *result_64ks[])
+void join_32coefficient_results(uint16x8x2_t result_d0[],
+								uint16x8x2_t result_d1[],
+								uint16x8x2_t result_d01[],
+								uint16x8x2_t result_64ks[])
 {
 	// {b[5],b[4]} = resultd0[63:32] + resultd01[31:0]
 	ADDDOT(b[4], result_d0[2], result_d01[0]);
@@ -223,13 +223,13 @@ void join_32coefficient_results(uint16x8x2_t *result_d0[],
 }
 
 void batch_64coefficient_multiplications(
-	uint16x8x2_t **a0, uint16x8x2_t **b0, uint16x8x2_t **result_final0,
-	uint16x8x2_t **a1, uint16x8x2_t **b1, uint16x8x2_t **result_final1,
-	uint16x8x2_t **a2, uint16x8x2_t **b2, uint16x8x2_t **result_final2,
-	uint16x8x2_t **a3, uint16x8x2_t **b3, uint16x8x2_t **result_final3,
-	uint16x8x2_t **a4, uint16x8x2_t **b4, uint16x8x2_t **result_final4,
-	uint16x8x2_t **a5, uint16x8x2_t **b5, uint16x8x2_t **result_final5,
-	uint16x8x2_t **a6, uint16x8x2_t **b6, uint16x8x2_t **result_final6)
+	uint16x8x2_t *a0, uint16x8x2_t *b0, uint16x8x2_t *result_final0,
+	uint16x8x2_t *a1, uint16x8x2_t *b1, uint16x8x2_t *result_final1,
+	uint16x8x2_t *a2, uint16x8x2_t *b2, uint16x8x2_t *result_final2,
+	uint16x8x2_t *a3, uint16x8x2_t *b3, uint16x8x2_t *result_final3,
+	uint16x8x2_t *a4, uint16x8x2_t *b4, uint16x8x2_t *result_final4,
+	uint16x8x2_t *a5, uint16x8x2_t *b5, uint16x8x2_t *result_final5,
+	uint16x8x2_t *a6, uint16x8x2_t *b6, uint16x8x2_t *result_final6)
 {
 	uint16x8x2_t a_lu_temp[2], b_lu_temp[2];
 	uint16x8x2_t result_d0[16], result_d1[16], result_d01[16];
@@ -242,9 +242,9 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a0[i], a0[2 + i]);
 		ADDDOT(b_lu_temp[i], b0[i], b0[2 + i]);
 	}
-	karatsuba32_fork_avx_new(&a0[0], &b0[0], 0);
-	karatsuba32_fork_avx_new(&a0[2], &b0[2], 3);
-	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 6); // TODO: check this
+	karatsuba32_fork_avx_new(a0[0], b0[0], 0);
+	karatsuba32_fork_avx_new(a0[2], b0[2], 3);
+	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 6); // TODO: check this
 
 	// KS splitting of 2nd 64-coeff multiplication
 	for (i = 0; i < 2; i++)
@@ -252,36 +252,36 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a1[i], a1[2 + i]);
 		ADDDOT(b_lu_temp[i], b1[i], b1[2 + i]);
 	}
-	karatsuba32_fork_avx_new(&a1[0], &b1[0], 9);
-	karatsuba32_fork_avx_new(&a1[2], &b1[2], 12);
-	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 15); // Partial: loads only one of the three elements in the bucket
+	karatsuba32_fork_avx_new(a1[0], b1[0], 9);
+	karatsuba32_fork_avx_new(a1[2], b1[2], 12);
+	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 15); // Partial: loads only one of the three elements in the bucket
 
 	// Compute 16 school-book multiplications in a batch.
-	transpose(&a);
-	transpose(&b);
+	transpose(a);
+	transpose(b);
 	schoolbook_avx_new();
-	transpose(&c_avx[0]);
-	transpose(&c_avx[16]);
+	transpose(c_avx[0]);
+	transpose(c_avx[16]);
 
 	// store the partial multiplication result.
 	COPYDOT_DOT(c_avx_extra[0], c_avx[15]);
 	COPYDOT_DOT(c_avx_extra[1], c_avx[15 + 16]);
 
-	karatsuba32_join_avx_new(&result_d0, 0);
-	karatsuba32_join_avx_new(&result_d1, 3);
-	karatsuba32_join_avx_new(&result_d01, 6);
+	karatsuba32_join_avx_new(result_d0, 0);
+	karatsuba32_join_avx_new(result_d1, 3);
+	karatsuba32_join_avx_new(result_d01, 6);
 
 	// Final result of 1st 64-coeff multiplication
-	join_32coefficient_results(&result_d0, 
-							   &result_d1, 
-							   &result_d01, 
+	join_32coefficient_results(result_d0, 
+							   result_d1, 
+							   result_d01, 
 							   result_final0);
 
-	karatsuba32_join_avx_new(&result_d0, 9);
-	karatsuba32_join_avx_new(&result_d1, 12);
+	karatsuba32_join_avx_new(result_d0, 9);
+	karatsuba32_join_avx_new(result_d1, 12);
 
 	// Fork 2 parts of previous operands
-	karatsuba32_fork_avx_partial(&a_lu_temp, &b_lu_temp, 0);
+	karatsuba32_fork_avx_partial(a_lu_temp, b_lu_temp, 0);
 
 	// Fork multiplication of a2*b2
 	for (i = 0; i < 2; i++)
@@ -289,9 +289,9 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a2[i], a2[2 + i]);
 		ADDDOT(b_lu_temp[i], b2[i], b2[2 + i]);
 	}
-	karatsuba32_fork_avx_new(&a2[0], &b2[0], 2);
-	karatsuba32_fork_avx_new(&a2[2], &b2[2], 5);
-	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 8);
+	karatsuba32_fork_avx_new(a2[0], b2[0], 2);
+	karatsuba32_fork_avx_new(a2[2], b2[2], 5);
+	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 8);
 
 	// Fork multiplication of a3*b3
 	for (i = 0; i < 2; i++)
@@ -299,21 +299,21 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a3[i], a3[2 + i]);
 		ADDDOT(b_lu_temp[i], b3[i], b3[2 + i]);
 	}
-	karatsuba32_fork_avx_new(&a3[0], &b3[0], 11);
-	karatsuba32_fork_avx_new(&a3[2], &b3[2], 14); // Partial: loads only two of the three elements in the bucket
+	karatsuba32_fork_avx_new(a3[0], b3[0], 11);
+	karatsuba32_fork_avx_new(a3[2], b3[2], 14); // Partial: loads only two of the three elements in the bucket
 
-	transpose(&a);
-	transpose(&b);
+	transpose(a);
+	transpose(b);
 	schoolbook_avx_new();
 
-	transpose(&c_avx[0]);
-	transpose(&c_avx[16]);
+	transpose(c_avx[0]);
+	transpose(c_avx[16]);
 
-	karatsuba32_join_avx_partial(&result_d01, 0); // Combine results of this computation with previous computation
+	karatsuba32_join_avx_partial(result_d01, 0); // Combine results of this computation with previous computation
 	// Final result of 2nd 64-coeff multiplication
-	join_32coefficient_results( &result_d0, 
-								&result_d1, 
-								&result_d01, 
+	join_32coefficient_results( result_d0, 
+								result_d1, 
+								result_d01, 
 								result_final1);
 
 	// store the partial multiplication result. they will be combined after next batch multiplication
@@ -322,22 +322,22 @@ void batch_64coefficient_multiplications(
 	COPYDOT_DOT(c_avx_extra[2], c_avx[15]);
 	COPYDOT_DOT(c_avx_extra[3], c_avx[15 + 16]);
 
-	karatsuba32_join_avx_new(&result_d0, 2);
-	karatsuba32_join_avx_new(&result_d1, 5);
-	karatsuba32_join_avx_new(&result_d01, 8);
+	karatsuba32_join_avx_new(result_d0, 2);
+	karatsuba32_join_avx_new(result_d1, 5);
+	karatsuba32_join_avx_new(result_d01, 8);
 
 	// Final result of 3rd 64-coeff multiplication
-	join_32coefficient_results( &result_d0, 
-								&result_d1, 
-								&result_d01, 
+	join_32coefficient_results( result_d0, 
+								result_d1, 
+								result_d01, 
 								result_final2);
 
 	// Join d0 of 4th 64-coeff multiplication
-	karatsuba32_join_avx_new(&result_d0, 11);
+	karatsuba32_join_avx_new(result_d0, 11);
 
 	// Fork 1 part of previous operands
-	karatsuba32_fork_avx_partial1(&a3[2], &b3[2], 0);
-	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 1);
+	karatsuba32_fork_avx_partial1(a3[2], b3[2], 0);
+	karatsuba32_fork_avx_new(a_lu_temp, &b_lu_temp, 1);
 
 	// Fork multiplication of a4*b4
 	for (i = 0; i < 2; i++)
@@ -345,9 +345,9 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a4[i], a4[2 + i]);
 		ADDDOT(b_lu_temp[i], b4[i], b4[2 + i]);
 	}
-	karatsuba32_fork_avx_new(&a4[0], &b4[0], 4);
-	karatsuba32_fork_avx_new(&a4[2], &b4[2], 7);
-	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 10);
+	karatsuba32_fork_avx_new(a4[0], b4[0], 4);
+	karatsuba32_fork_avx_new(a4[2], b4[2], 7);
+	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 10);
 
 	// Fork multiplication of a5*b5
 	for (i = 0; i < 2; i++)
@@ -355,39 +355,39 @@ void batch_64coefficient_multiplications(
 		ADDDOT(a_lu_temp[i], a5[i], a5[2 + i]);
 		ADDDOT(b_lu_temp[i], b5[i], b5[2 + i]);
 	}
-	karatsuba32_fork_avx_new(&a5[0], &b5[0], 13);
+	karatsuba32_fork_avx_new(a5[0], b5[0], 13);
 
-	transpose(&a);
-	transpose(&b);
+	transpose(a);
+	transpose(b);
 	schoolbook_avx_new();
 
-	transpose(&c_avx[0]);
-	transpose(&c_avx[16]);
+	transpose(c_avx[0]);
+	transpose(c_avx[16]);
 
-	karatsuba32_join_avx_partial2(&result_d1, 0);
-	karatsuba32_join_avx_new(&result_d01, 1);
+	karatsuba32_join_avx_partial2(result_d1, 0);
+	karatsuba32_join_avx_new(result_d01, 1);
 
 	// Final result of 4th 64-coeff multiplication
-	join_32coefficient_results( &result_d0, 
-								&result_d1, 
-								&result_d01, 
+	join_32coefficient_results( result_d0, 
+								result_d1, 
+								result_d01, 
 								result_final3);
 
-	karatsuba32_join_avx_new(&result_d0, 4);
-	karatsuba32_join_avx_new(&result_d1, 7);
-	karatsuba32_join_avx_new(&result_d01, 10);
+	karatsuba32_join_avx_new(result_d0, 4);
+	karatsuba32_join_avx_new(result_d1, 7);
+	karatsuba32_join_avx_new(result_d01, 10);
 
 	// Final result of 5th 64-coeff multiplication
-	join_32coefficient_results(&result_d0, 
-							   &result_d1, 
-							   &result_d01, 
+	join_32coefficient_results(result_d0, 
+							   result_d1, 
+							   result_d01, 
 							   result_final4);
 
-	karatsuba32_join_avx_new(&result_d0, 13);
+	karatsuba32_join_avx_new(result_d0, 13);
 
 	// Fork remaining 2 parts of a5*b5
-	karatsuba32_fork_avx_new(&a5[2], &b5[2], 0);
-	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 3);
+	karatsuba32_fork_avx_new(a5[2], b5[2], 0);
+	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 3);
 
 	// Fork multiplication of a6*b6
 	for (i = 0; i < 2; i++)
@@ -396,34 +396,34 @@ void batch_64coefficient_multiplications(
 		ADDDOT(b_lu_temp[i], b6[i], b6[2 + i]);
 	}
 
-	karatsuba32_fork_avx_new(&a6[0], &b6[0], 6);
-	karatsuba32_fork_avx_new(&a6[2], &b6[2], 9);
-	karatsuba32_fork_avx_new(&a_lu_temp, &b_lu_temp, 12);
+	karatsuba32_fork_avx_new(a6[0], b6[0], 6);
+	karatsuba32_fork_avx_new(a6[2], b6[2], 9);
+	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 12);
 
-	transpose(&a);
-	transpose(&b);
+	transpose(a);
+	transpose(b);
 	schoolbook_avx_new();
 
-	transpose(&c_avx[0]);
-	transpose(&c_avx[16]);
+	transpose(c_avx[0]);
+	transpose(c_avx[16]);
 
-	karatsuba32_join_avx_new(&result_d1, 0);
-	karatsuba32_join_avx_new(&result_d01, 3);
+	karatsuba32_join_avx_new(result_d1, 0);
+	karatsuba32_join_avx_new(result_d01, 3);
 
 	// Final result of 6th 64-coeff multiplication
-	join_32coefficient_results( &result_d0, 
-								&result_d1, 
-								&result_d01, 
+	join_32coefficient_results( result_d0, 
+								result_d1, 
+								result_d01, 
 								result_final5);
 
-	karatsuba32_join_avx_new(&result_d0, 6);
-	karatsuba32_join_avx_new(&result_d1, 9);
-	karatsuba32_join_avx_new(&result_d01, 12);
+	karatsuba32_join_avx_new(result_d0, 6);
+	karatsuba32_join_avx_new(result_d1, 9);
+	karatsuba32_join_avx_new(result_d01, 12);
 
 	// Final result of 6th 64-coeff multiplication
-	join_32coefficient_results(	&result_d0, 
-								&result_d1, 
-								&result_d01, 
+	join_32coefficient_results(	result_d0, 
+								result_d1, 
+								result_d01, 
 								result_final6);
 }
 
@@ -591,13 +591,13 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	}
 	// TODO: check this
 	batch_64coefficient_multiplications(
-		&a1_ph_avx, &b1_ph_avx, &w7_avx,
-		&a2_ph_avx, &b2_ph_avx, &w5_avx,
-		&a3_ph_avx, &b3_ph_avx, &w6_avx,
-		&a4_ph_avx, &b4_ph_avx, &w3_avx,
-		&a5_ph_avx, &b5_ph_avx, &w4_avx,
-		&a6_ph_avx, &b6_ph_avx, &w1_avx,
-		&a_avx, &b_avx, &w2_avx);
+		a1_ph_avx, b1_ph_avx, w7_avx,
+		a2_ph_avx, b2_ph_avx, w5_avx,
+		a3_ph_avx, b3_ph_avx, w6_avx,
+		a4_ph_avx, b4_ph_avx, w3_avx,
+		a5_ph_avx, b5_ph_avx, w4_avx,
+		a6_ph_avx, b6_ph_avx, w1_avx,
+		a_avx, b_avx, w2_avx);
 
 	/*	--------------------------------------------
 		---------------Solution starts--------------
