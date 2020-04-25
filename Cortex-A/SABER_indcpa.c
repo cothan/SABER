@@ -9,36 +9,36 @@
 #define h1 4 //2^(EQ-EP-1)
 
 #define h2 ( (1<<(SABER_EP-2)) - (1<<(SABER_EP-SABER_ET-1)) + (1<<(SABER_EQ-SABER_EP-1)) )
-
-define XORDOT_DOT(c, a, b)                   \
+// . | . . 
+#define XORDOT_DOT(c, a, b)                   \
 	c.val[0] = veorq_u16(a.val[0], b.val[0]); \
 	c.val[1] = veorq_u16(a.val[1], b.val[1])
-
+// . | . . 
 #define ADDDOT_DOT(c, a, b)                   \
 	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vaddq_u16(a.val[1], b.val[1])
-
+//  . | .
 #define ADDDOT_DOTVAL(c, a, value)                   \
 	c.val[0] = vaddq_u16(a.val[0], value); \
 	c.val[1] = vaddq_u16(a.val[1], value)
-
+// . | . . 
 #define ANDDOT_DOT(c, a, b)\
     c.val[0] = vandq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vandq_u16(a.val[1], b.val[1])
-
+//  . | . 
 #define ANDDOT_DOTVAL(c, a, value)\
     c.val[0] = vandq_u16(a.val[0], value); \
 	c.val[1] = vandq_u16(a.val[1], value)
 
-
+// . | . 
 #define SRLDOT_DOT(c, a, value)              \
 	c.val[0] = vshrq_n_u16(a.val[0], value); \
 	c.val[1] = vshrq_n_u16(c.val[1], value)
-
+// . | . 
 #define SLLDOT_DOT(c, a, value)              \
 	c.val[0] = vshlq_n_u16(a.val[0], value); \
 	c.val[1] = vshlq_n_u16(c.val[1], value)
-
+// . | . 
 #define SUBDOT_DOT(c, a, b)                   \
 	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
 	c.val[1] = vsubq_u16(a.val[1], b.val[1])
@@ -48,7 +48,18 @@ define XORDOT_DOT(c, a, b)                   \
 
 
 
-void POL2MSG(uint16_t *message_dec_unpacked, unsigned char *message_dec);
+void POL2MSG(uint16_t *message_dec_unpacked, unsigned char *message_dec){
+
+	int32_t i,j;
+
+	for(j=0; j<SABER_KEYBYTES; j++)
+	{
+		message_dec[j] = 0;
+		for(i=0; i<8; i++)
+		message_dec[j] = message_dec[j] | (message_dec_unpacked[j*8 + i] <<i);
+	} 
+
+}
 
 /*--------------------------------------------------------------------------------------
 	This routine loads the constant values for Toom-Cook multiplication 
@@ -524,18 +535,5 @@ void indcpa_kem_dec(const unsigned char *sk,
 
 
 	POL2MSG(message_dec_unpacked, message_dec);
-}
-
-void POL2MSG(uint16_t *message_dec_unpacked, unsigned char *message_dec){
-
-	int32_t i,j;
-
-	for(j=0; j<SABER_KEYBYTES; j++)
-	{
-		message_dec[j] = 0;
-		for(i=0; i<8; i++)
-		message_dec[j] = message_dec[j] | (message_dec_unpacked[j*8 + i] <<i);
-	} 
-
 }
 
