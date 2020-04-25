@@ -427,8 +427,8 @@ void batch_64coefficient_multiplications(
 								result_final6);
 }
 
-void toom_cook_4way_avx(uint16x8x2_t **a1_avx,
-						uint16x8x2_t **b1_avx,
+void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
+						uint16x8x2_t *b1_avx,
 						uint64_t p_mod,
 						uint16x8x2_t **res_avx_output)
 {
