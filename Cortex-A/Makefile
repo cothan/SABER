@@ -9,7 +9,7 @@ RM 		  = /bin/rm
 
 
 all: test/PQCgenKAT_kem \
-     test/test_kex 
+     test/test_speed
 
 SOURCES = pack_unpack.c poly.c verify.c fips202.c SABER_indcpa.c kem.c \
 					cbd.c rng.c
@@ -22,8 +22,8 @@ SOURCES2 =  pack_unpack.c rng.c poly.c verify.c SABER_indcpa.c kem.c \
 HEADERS = SABER_params.h pack_unpack.h poly.h verify.h cbd.h SABER_indcpa.h kem.h rng.h fips202.h api.h randombytes.h
 
 
-test/test_kex: $(SOURCES) $(HEADERS) test/test_kex.c 
-	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/test_kex.c -lkeccak
+test/test_speed: $(SOURCES2) $(HEADERS) test/test_speed.c 
+	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/test_speed.c -lkeccak
 
 test/PQCgenKAT_kem: $(SOURCES2) $(HEADERS) test/PQCgenKAT_kem.c 
 	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c -lkeccak
@@ -38,12 +38,12 @@ fips202.o: fips202.c
 .PHONY: clean test
 
 test:
-	./test/test_kex
+	./test/test_speed
 	./test/PQCgenKAT_kem
 
 
 clean:
-	-$(RM) -r test/test_kex
+	-$(RM) -r test/test_speed
 	-$(RM) -r test/PQCgenKAT_kem
 	-$(RM) -r test/*.req
 	-$(RM) -r test/*.rsp
