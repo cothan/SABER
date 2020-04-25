@@ -9,7 +9,7 @@
 #define SHA3_512_RATE 72
 
 #if __aarch64__
-#include <libkeccak.a.headers/SimpleFIPS202.h>
+#include <libkeccak.so.headers/SimpleFIPS202.h>
 #else
 #error "Install SIMD Keccak"
 #endif
