@@ -53,8 +53,8 @@
 	c->val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
 // . | ->
 #define COPYDOT(c, b)                                  \
-	c->val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
-	c->val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
+	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
+	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
 
 #define SLLDOT_DOT(c, a, value)              \
 	c.val[0] = vshlq_n_u16(a.val[0], value); \
