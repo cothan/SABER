@@ -16,10 +16,10 @@ HEADERS = SABER_params.h pack_unpack.h poly.h rng.h fips202.h verify.h cbd.h SAB
 
 
 test/test_kex: $(SOURCES) $(HEADERS) test/test_kex.c
-	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/test_kex.c -lcrypto
+	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/test_kex.c -lcrypto -lkeccak -lpapi
 
 test/PQCgenKAT_kem: $(SOURCES) $(HEADERS) test/PQCgenKAT_kem.c 
-	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/PQCgenKAT_kem.c -lcrypto
+	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/PQCgenKAT_kem.c -lcrypto -lkeccak -lpapi
 
 test/kem: $(SOURCES) $(HEADERS) test/kem.c
 	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/kem.c -lcrypto
