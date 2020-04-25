@@ -41,20 +41,20 @@
 	c.val[1] = vsubq_u16(a.val[1], b.val[1])
 // . | .
 #define COPY(c, b)                                  \
-	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
-	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
+	c.val[0] = b.val[0]; \
+	c.val[1] = b.val[1]
 // . | .
 #define COPYDOT_DOT(c, b)                                  \
-	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
-	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
+	c.val[0] = b.val[0]; \
+	c.val[1] = b.val[1]
 // . | . TODO: fix
 #define COPY_DOT(c, b)                                  \
-	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
-	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
+	c.val[0] = b.val[0]; \
+	c.val[1] = b.val[1]
 // . | . TODO: fix
 #define COPYDOT(c, b)                                  \
-	c.val[0] = veorq_u16(b.val[0], vdupq_n_u16(0)); \
-	c.val[1] = veorq_u16(b.val[1], vdupq_n_u16(0))
+	c.val[0] = b.val[0]; \
+	c.val[1] = b.val[1]
 
 #define SLLDOT_DOT(c, a, value)              \
 	c.val[0] = vshlq_n_u16(a.val[0], value); \
@@ -430,7 +430,7 @@ void batch_64coefficient_multiplications(
 void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 						uint16x8x2_t *b1_avx,
 						uint64_t p_mod,
-						uint16x8x2_t *res_avx_output[32])
+						uint16x8x2_t *res_avx_output)
 {
 	int16_t AVX_N = SABER_N / 16;
 	int16_t i;
@@ -681,7 +681,7 @@ void toom_cook_4way_avx(uint16x8x2_t *a1_avx,
 	// Reduction by X^256 + 1
 	for (i = 0; i < 16; i++)
 	{
-		res_avx_output[i]->val[0] = vsubq_u16(res_avx[i].val[0], res_avx[i + 16].val[0]);
-		res_avx_output[i]->val[1] = vsubq_u16(res_avx[i].val[1], res_avx[i + 16].val[1]);
+		res_avx_output[i].val[0] = vsubq_u16(res_avx[i].val[0], res_avx[i + 16].val[0]);
+		res_avx_output[i].val[1] = vsubq_u16(res_avx[i].val[1], res_avx[i + 16].val[1]);
 	}
 }
