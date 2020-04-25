@@ -133,13 +133,13 @@ void karatsuba32_join_avx_new(uint16x8x2_t *result_final,
 	// b[0] = b[0] - a[0] - a[2]
 	SUB_DOT(b[2], b[0], result_final[0]);
 	// SUB_DOTDOT(result_final[1], b[2], c_avx[position + 1]);
-	result_final[1]->val[0] = vsubq_u16(b[2].val[0], c_avx[position + 1].val[0]);
-	result_final[1]->val[1] = vsubq_u16(b[2].val[1], c_avx[position + 1].val[1]);
+	result_final[1].val[0] = vsubq_u16(b[2].val[0], c_avx[position + 1].val[0]);
+	result_final[1].val[1] = vsubq_u16(b[2].val[1], c_avx[position + 1].val[1]);
 	// b[1] = b[1] - a[1] - a[3]
 	SUBDOT_DOT(b[2], b[1], c_avx[position + 16]);
 	// SUB(result_final[2], b[2], result_final[3]);
-	result_final[2]->val[0] = vsubq_u16(b[2].val[0], result_final[3]->val[0]);
-	result_final[2]->val[1] = vsubq_u16(b[2].val[1], result_final[3]->val[1]);
+	result_final[2].val[0] = vsubq_u16(b[2].val[0], result_final[3]->val[0]);
+	result_final[2].val[1] = vsubq_u16(b[2].val[1], result_final[3]->val[1]);
 }
 
 void karatsuba32_join_avx_partial(uint16x8x2_t *result_final,
@@ -207,13 +207,13 @@ void join_32coefficient_results(uint16x8x2_t result_d0[],
 	ADDDOT(b[7], result_d01[3], result_d1[1]);
 
 	// {b[7],b[6],b[5],b[4]} <-- {b[7],b[6],b[5],b[4]} - {a[3],a[2],a[1],a[0]} - {a[7],a[6],a[5],a[4]}
-	SUBDOT_DOT(result_64ks[2], (&b[4]), result_d0[0]);
+	SUBDOT_DOT(result_64ks[2], (b[4]), result_d0[0]);
 	SUBDOT_DOT(result_64ks[2], result_64ks[2], result_d1[0]);
-	SUBDOT_DOT(result_64ks[3], (&b[5]), result_d0[1]);
+	SUBDOT_DOT(result_64ks[3], (b[5]), result_d0[1]);
 	SUBDOT_DOT(result_64ks[3], result_64ks[3], result_d1[1]);
-	SUBDOT_DOT(result_64ks[4], (&b[6]), result_d0[2]);
+	SUBDOT_DOT(result_64ks[4], (b[6]), result_d0[2]);
 	SUBDOT_DOT(result_64ks[4], result_64ks[4], result_d1[2]);
-	SUBDOT_DOT(result_64ks[5], (&b[7]), result_d0[3]);
+	SUBDOT_DOT(result_64ks[5], (b[7]), result_d0[3]);
 	SUBDOT_DOT(result_64ks[5], result_64ks[5], result_d1[3]);
 
 	COPYDOT_DOT(result_64ks[0], result_d0[0]);
@@ -337,7 +337,7 @@ void batch_64coefficient_multiplications(
 
 	// Fork 1 part of previous operands
 	karatsuba32_fork_avx_partial1(a3[2], b3[2], 0);
-	karatsuba32_fork_avx_new(a_lu_temp, &b_lu_temp, 1);
+	karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 1);
 
 	// Fork multiplication of a4*b4
 	for (i = 0; i < 2; i++)
