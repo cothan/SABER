@@ -259,7 +259,7 @@ void batch_64coefficient_multiplications(
 	// Compute 16 school-book multiplications in a batch.
 	transpose(&a);
 	transpose(&b);
-	schoolbook_avx_new1();
+	schoolbook_avx_new();
 	transpose(&c_avx[0]);
 	transpose(&c_avx[16]);
 
@@ -304,7 +304,7 @@ void batch_64coefficient_multiplications(
 
 	transpose(&a);
 	transpose(&b);
-	schoolbook_avx_new1();
+	schoolbook_avx_new();
 
 	transpose(&c_avx[0]);
 	transpose(&c_avx[16]);
@@ -359,7 +359,7 @@ void batch_64coefficient_multiplications(
 
 	transpose(&a);
 	transpose(&b);
-	schoolbook_avx_new1();
+	schoolbook_avx_new();
 
 	transpose(&c_avx[0]);
 	transpose(&c_avx[16]);
@@ -402,7 +402,7 @@ void batch_64coefficient_multiplications(
 
 	transpose(&a);
 	transpose(&b);
-	schoolbook_avx_new1();
+	schoolbook_avx_new();
 
 	transpose(&c_avx[0]);
 	transpose(&c_avx[16]);
