@@ -13,10 +13,10 @@ void transpose(uint16x8x2_t *M) {
   uint64x2x2_t dL[2], dH[2], eL[2], eH[2], fL[2], fH[2], gL[2], gH[2];
 
   for (i = 0; i < 8; i = i + 1) {
-    tL[i].val[0] = vzip2q_u16(M[2 * i]->val[0], M[2 * i + 1].val[0]);
-    tL[i].val[1] = vzip1q_u16(M[2 * i]->val[0], M[2 * i + 1].val[0]);
-    tH[i].val[0] = vzip2q_u16(M[2 * i]->val[1], M[2 * i + 1].val[1]);
-    tH[i].val[1] = vzip1q_u16(M[2 * i]->val[1], M[2 * i + 1].val[1]);
+    tL[i].val[0] = vzip2q_u16(M[2 * i].val[0], M[2 * i + 1].val[0]);
+    tL[i].val[1] = vzip1q_u16(M[2 * i].val[0], M[2 * i + 1].val[0]);
+    tH[i].val[0] = vzip2q_u16(M[2 * i].val[1], M[2 * i + 1].val[1]);
+    tH[i].val[1] = vzip1q_u16(M[2 * i].val[1], M[2 * i + 1].val[1]);
   }
   //-----------------------------------
   for (i = 0; i < 4; i = i + 1) {
