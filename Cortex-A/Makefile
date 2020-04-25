@@ -3,6 +3,7 @@ CFLAGS   = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -lcrypto
 CFLAGS2  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -std=c11 
 CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native
 CFLAGS4  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lpapi -lkeccak -g3
+CFLAGS5  = -march=native -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -lkeccak -g3
 CLANG   = clang -march=native -O3 -fomit-frame-pointer -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -lkeccak -g3
 RM 		  = /bin/rm
 
@@ -22,10 +23,10 @@ HEADERS = SABER_params.h pack_unpack.h poly.h verify.h cbd.h SABER_indcpa.h kem.
 
 
 test/test_kex: $(SOURCES) $(HEADERS) test/test_kex.c 
-	$(CC) $(CFLAGS4) -o $@ $(SOURCES) test/test_kex.c -lcrypto -lpapi -g3
+	$(CC) $(CFLAGS5) -o $@ $(SOURCES) test/test_kex.c 
 
 test/PQCgenKAT_kem: $(SOURCES2) $(HEADERS) test/PQCgenKAT_kem.c 
-	$(CC) $(CFLAGS4) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c -lcrypto  
+	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c 
 
 
 rng.o: rng.c
