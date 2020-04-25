@@ -1,26 +1,22 @@
 #define PERMUTE0(c, a, b, value)                                                                   \
-  c.val[0] = (uint16x8_t)a.val[0];                                                                \
-  c.val[1] = (uint16x8_t)b.val[0]
+  c->val[0] = (uint16x8_t)a.val[0];                                                                \
+  c->val[1] = (uint16x8_t)b.val[0]
 
 #define PERMUTE1(c, a, b, value)                                                                          \
-  c.val[0] = (uint16x8_t)a.val[1];                                                                \
-  c.val[1] = (uint16x8_t)b.val[1]
+  c->val[0] = (uint16x8_t)a.val[1];                                                                \
+  c->val[1] = (uint16x8_t)b.val[1]
 
-void transpose(uint16x8x2_t *M) {
+void transpose(uint16x8x2_t **M) {
   int i;
   uint16x8x2_t tL[8], tH[8];
   uint32x4x2_t bL[4], bH[4], cL[4], cH[4];
   uint64x2x2_t dL[2], dH[2], eL[2], eH[2], fL[2], fH[2], gL[2], gH[2];
 
   for (i = 0; i < 8; i = i + 1) {
-    // Lower half
-    tL[i].val[0] = vzip2q_u16(M[2 * i].val[0], M[2 * i + 1].val[0]);
-    // Uper half
-    tL[i].val[1] = vzip1q_u16(M[2 * i].val[0], M[2 * i + 1].val[0]);
-    // Lower half
-    tH[i].val[0] = vzip2q_u16(M[2 * i].val[1], M[2 * i + 1].val[1]);
-    // Uper half
-    tH[i].val[1] = vzip1q_u16(M[2 * i].val[1], M[2 * i + 1].val[1]);
+    tL[i].val[0] = vzip2q_u16(M[2 * i]->val[0], M[2 * i + 1]->val[0]);
+    tL[i].val[1] = vzip1q_u16(M[2 * i]->val[0], M[2 * i + 1]->val[0]);
+    tH[i].val[0] = vzip2q_u16(M[2 * i]->val[1], M[2 * i + 1]->val[1]);
+    tH[i].val[1] = vzip1q_u16(M[2 * i]->val[1], M[2 * i + 1]->val[1]);
   }
   //-----------------------------------
   for (i = 0; i < 4; i = i + 1) {
