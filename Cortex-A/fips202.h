@@ -8,11 +8,11 @@
 #define SHA3_256_RATE 136
 #define SHA3_512_RATE 72
 
-// #if __aarch64__
+#if __aarch64__
 #include <libkeccak.so.headers/SimpleFIPS202.h>
-// #else
-// #error "Install SIMD Keccak"
-// #endif
+#else
+#error "Install SIMD Keccak"
+#endif
 
 #define shake128 SHAKE128
 #define sha3_256 SHA3_256
