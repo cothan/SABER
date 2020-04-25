@@ -6,6 +6,12 @@
 #include "polymul/toom_cook_4/asimd_toom-cook_4way.c"
 #include "fips202.h"
 
+#if __aarch64__
+#include <libkeccak.so.headers/SimpleFIPS202.h>
+#else
+#error "Install SIMD Keccak"
+#endif
+
 #define h1 4 //2^(EQ-EP-1)
 
 #define h2 ( (1<<(SABER_EP-2)) - (1<<(SABER_EP-SABER_ET-1)) + (1<<(SABER_EQ-SABER_EP-1)) )

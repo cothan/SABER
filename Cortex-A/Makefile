@@ -39,7 +39,7 @@ fips202.o: fips202.c
 
 test:
 	./test/test_kex
-#	./test/PQCgenKAT_kem
+	./test/PQCgenKAT_kem
 
 
 clean:
