@@ -3,6 +3,7 @@
 #include "../kem.h"
 #include "../api.h"
 #include "../rng.h"
+#include "../SABER_params.h"
 
 #include <stdio.h>
 #include <stdlib.h>
