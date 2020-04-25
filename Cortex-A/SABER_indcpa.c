@@ -218,7 +218,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 	// Matrix-vector multiplication; Matrix in transposed order
 	for(i=0;i<SABER_K;i++){
 		for(j=0;j<SABER_K;j++){
-			toom_cook_4way_avx(a_avx[j][i], sk_avx[j], SABER_Q, acc);
+			toom_cook_4way_avx(a_avx[j][i], sk_avx[j], SABER_Q, &acc);
 
 			for(k=0;k<SABER_N/16;k++){
 				ADDDOT_DOT( res_avx[i][k], res_avx[i][k],acc[k]);
@@ -246,7 +246,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 	
 	for(i=0;i<SABER_K;i++){ // reuses skpv1[] for unpacking avx of public-key
 		  for(j=0;j<SABER_N/16;j++){
-		  	vst2q_u16 ((int *) (skpv1[i]+j*16), res_avx[i][j]);
+		  	vst2q_u16 ((uint16_t *) (skpv1[i]+j*16), res_avx[i][j]);
 		  }
 	  }
 	POLVEC2BS(pk,skpv1,SABER_P); // load the public-key into pk byte string 	
@@ -335,7 +335,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 	for(i=0;i<SABER_K;i++){
 		for(j=0;j<SABER_K;j++){
 
-			toom_cook_4way_avx(a_avx[i][j], sk_avx[j], SABER_Q, acc);
+			toom_cook_4way_avx(a_avx[i][j], sk_avx[j], SABER_Q, &acc);
 
 			for(k=0;k<SABER_N/16;k++){
 				ADDDOT_DOT(res_avx[i][k], res_avx[i][k],acc[k]);
@@ -361,7 +361,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 	//-----this result should be put in b_prime for later use in server.
 	for(i=0;i<SABER_K;i++){ // first store in 16 bit arrays
 		  for(j=0;j<SABER_N/16;j++){
-			vst2q_u16  ((int *)(temp[i]+j*16), res_avx[i][j]);
+			vst2q_u16  ((uint16_t *)(temp[i]+j*16), res_avx[i][j]);
 		  }
 	  }
 	
@@ -389,7 +389,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 	
 	
 	for(j=0;j<SABER_K;j++){
-		toom_cook_4way_avx(pkcl_avx[j], sk_avx[j], SABER_P, acc);
+		toom_cook_4way_avx(pkcl_avx[j], sk_avx[j], SABER_P, &acc);
 
 			for(k=0;k<SABER_N/16;k++){
 				ADDDOT_DOT(vprime_avx[k] , vprime_avx[k],acc[k]);
@@ -431,7 +431,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 	// Unpack avx
 	for(j=0;j<SABER_N/16;j++)
 	{
-			vst2q_u16  ((int *) (temp[0]+j*16), vprime_avx[j]);
+			vst2q_u16  ((uint16_t *) (temp[0]+j*16), vprime_avx[j]);
 	}
 	
 	#if Saber_type == 1
@@ -507,7 +507,7 @@ void indcpa_kem_dec(const unsigned char *sk,
 	// InnerProduct(b', s, mod p)
 	for(j=0;j<SABER_K;j++){
 
-		toom_cook_4way_avx(pksv_avx[j], sksv_avx[j], SABER_P, acc);
+		toom_cook_4way_avx(pksv_avx[j], sksv_avx[j], SABER_P, &acc);
 
 			for(k=0;k<SABER_N/16;k++){
 				ADDDOT_DOT(v_avx[k], v_avx[k],acc[k]);
@@ -517,7 +517,7 @@ void indcpa_kem_dec(const unsigned char *sk,
 	}
 
 	for(i=0; i<SABER_N/16; i++){
-		vst2q_u16 ((int *)(message_dec_unpacked+i*16), v_avx[i]);
+		vst2q_u16 ((uint16_t *)(message_dec_unpacked+i*16), v_avx[i]);
 	}
 
 
