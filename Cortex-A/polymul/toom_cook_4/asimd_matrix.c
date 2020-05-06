@@ -6,12 +6,19 @@
   c.val[0] = (uint16x8_t)a.val[1];                                                                \
   c.val[1] = (uint16x8_t)b.val[1]
 
+/*
+ * tranpose 
+ * Input: Memory uint16_t *M
+ * Output: Memory uint16_t *M
+ */
+static inline 
 void transpose(uint16x8x2_t *M) {
   int i;
   uint16x8x2_t tL[8], tH[8];
   uint32x4x2_t bL[4], bH[4], cL[4], cH[4];
   uint64x2x2_t dL[2], dH[2], eL[2], eH[2], fL[2], fH[2], gL[2], gH[2];
 
+#pragma clang loop unroll(full)
   for (i = 0; i < 8; i = i + 1) {
     tL[i].val[0] = vzip2q_u16(M[2 * i].val[0], M[2 * i + 1].val[0]);
     tL[i].val[1] = vzip1q_u16(M[2 * i].val[0], M[2 * i + 1].val[0]);
@@ -19,6 +26,7 @@ void transpose(uint16x8x2_t *M) {
     tH[i].val[1] = vzip1q_u16(M[2 * i].val[1], M[2 * i + 1].val[1]);
   }
   //-----------------------------------
+  #pragma clang loop unroll(full)
   for (i = 0; i < 4; i = i + 1) {
     bL[i].val[0] = vzip2q_u32((uint32x4_t)tL[2 * i].val[0], (uint32x4_t)tL[2 * i + 1].val[0]);
     bL[i].val[1] = vzip1q_u32((uint32x4_t)tL[2 * i].val[0], (uint32x4_t)tL[2 * i + 1].val[0]);
@@ -27,6 +35,7 @@ void transpose(uint16x8x2_t *M) {
     bH[i].val[1] = vzip1q_u32((uint32x4_t)tL[2 * i].val[1], (uint32x4_t)tL[2 * i + 1].val[1]);
   }
   //-----------------------------------
+  #pragma clang loop unroll(full)
   for (i = 0; i < 4; i = i + 1) {
     cL[i].val[0] = vzip2q_u32((uint32x4_t)tH[2 * i].val[0], (uint32x4_t)tH[2 * i + 1].val[0]);
     cL[i].val[1] = vzip1q_u32((uint32x4_t)tH[2 * i].val[0], (uint32x4_t)tH[2 * i + 1].val[0]);
@@ -35,6 +44,7 @@ void transpose(uint16x8x2_t *M) {
     cH[i].val[1] = vzip1q_u32((uint32x4_t)tH[2 * i].val[1], (uint32x4_t)tH[2 * i + 1].val[1]);
   }
   //------------------------------------
+  #pragma clang loop unroll(full)
   for (i = 0; i < 2; i = i + 1) {
     dL[i].val[0] = vzip2q_u64((uint64x2_t)bL[2 * i].val[0], (uint64x2_t)bL[2 * i + 1].val[0]);
     dL[i].val[1] = vzip1q_u64((uint64x2_t)bL[2 * i].val[0], (uint64x2_t)bL[2 * i + 1].val[0]);
@@ -43,6 +53,7 @@ void transpose(uint16x8x2_t *M) {
     dH[i].val[1] = vzip1q_u64((uint64x2_t)bL[2 * i].val[1], (uint64x2_t)bL[2 * i + 1].val[1]);
   }
   //------------------------------------
+  #pragma clang loop unroll(full)
   for (i = 0; i < 2; i = i + 1) {
     eL[i].val[0] = vzip2q_u64((uint64x2_t)bH[2 * i].val[0], (uint64x2_t)bH[2 * i + 1].val[0]);
     eL[i].val[1] = vzip1q_u64((uint64x2_t)bH[2 * i].val[0], (uint64x2_t)bH[2 * i + 1].val[0]);
@@ -51,6 +62,7 @@ void transpose(uint16x8x2_t *M) {
     eH[i].val[1] = vzip1q_u64((uint64x2_t)bH[2 * i].val[1], (uint64x2_t)bH[2 * i + 1].val[1]);
   }
   //-------------------------------------
+  #pragma clang loop unroll(full)
   for (i = 0; i < 2; i = i + 1) {
     fL[i].val[0] = vzip2q_u64((uint64x2_t)cL[2 * i].val[0], (uint64x2_t)cL[2 * i + 1].val[0]);
     fL[i].val[1] = vzip1q_u64((uint64x2_t)cL[2 * i].val[0], (uint64x2_t)cL[2 * i + 1].val[0]);
@@ -58,6 +70,7 @@ void transpose(uint16x8x2_t *M) {
     fH[i].val[0] = vzip2q_u64((uint64x2_t)cL[2 * i].val[1], (uint64x2_t)cL[2 * i + 1].val[1]);
     fH[i].val[1] = vzip1q_u64((uint64x2_t)cL[2 * i].val[1], (uint64x2_t)cL[2 * i + 1].val[1]);
   }
+  #pragma clang loop unroll(full)
   for (i = 0; i < 2; i = i + 1) {
     gL[i].val[0] = vzip2q_u64((uint64x2_t)cH[2 * i].val[0], (uint64x2_t)cH[2 * i + 1].val[0]);
     gL[i].val[1] = vzip1q_u64((uint64x2_t)cH[2 * i].val[0], (uint64x2_t)cH[2 * i + 1].val[0]);
