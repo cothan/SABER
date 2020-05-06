@@ -3,8 +3,8 @@
 #define SCM_SIZE 16
 
 uint16x8x2_t c_avx[2*SCM_SIZE]; 
-uint16x8x2_t a[SCM_SIZE+2]; 
-uint16x8x2_t b[SCM_SIZE+2]; 
+uint16x8x2_t a[SCM_SIZE]; 
+uint16x8x2_t b[SCM_SIZE]; 
 uint16x8x2_t c_avx_extra[4];
 
 /*
