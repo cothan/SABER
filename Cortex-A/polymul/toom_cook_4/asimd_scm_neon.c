@@ -1,5 +1,5 @@
 #include <arm_neon.h>
-#include <asimd_scm_neon.h>
+#include "asimd_scm_neon.h"
 
 static inline
 void vmul(uint16x8_t c, uint16x8_t a, uint16x8_t b)

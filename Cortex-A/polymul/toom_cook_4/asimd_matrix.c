@@ -1,17 +1,17 @@
 static inline 
-void permute0(uint16_t *c, uint16x8x2_t a, uint16x8x2_t b, int16_t value)
+void permute0(uint16_t *c, uint64x2x2_t a, uint64x2x2_t b, int16_t value)
 {
   (void) value;
-  vst1q_u16(c, a.val[0]);
-  vst1q_u16(c + 8, b.val[0]);
+  vst1q_u16( c,     (uint16x8_t) a.val[0]);
+  vst1q_u16( c + 8, (uint16x8_t) b.val[0]);
 }
 
 static inline 
-void permute1(uint16_t *c, uint16x8x2_t a, uint16x8x2_t b, int16_t value)
+void permute1(uint16_t *c, uint64x2x2_t a, uint64x2x2_t b, int16_t value)
 {
   (void) value;
-  vst1q_u16(c, a.val[1]);
-  vst1q_u16(c + 8, b.val[1]);
+  vst1q_u16(c,     (uint16x8_t) a.val[1]);
+  vst1q_u16(c + 8, (uint16x8_t) b.val[1]);
 }
 
 /*

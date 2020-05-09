@@ -24,7 +24,7 @@ void vcopy(uint16_t *c, uint16_t *a)
 }
 
 static inline 
-void vsl(uint16x8x2_t c, uint16x8x2_t a, uint16_t value)
+void vsl(uint16x8x2_t c, uint16x8x2_t a, const uint16_t value)
 {
     // c = a << value 
     c.val[0] = vshlq_n_u16(a.val[0], value);
@@ -32,7 +32,7 @@ void vsl(uint16x8x2_t c, uint16x8x2_t a, uint16_t value)
 }
 
 static inline 
-void vsr(uint16x8x2_t c, uint16x8x2_t a, uint16_t value)
+void vsr(uint16x8x2_t c, uint16x8x2_t a, const uint16_t value)
 {
 	// c = a >> value 
 	c.val[0] = vshrq_n_u16(a.val[0], value);
