@@ -20,7 +20,7 @@ void permute1(uint16_t *c, uint16x8x2_t a, uint16x8x2_t b, int16_t value)
  * Output: Memory uint16_t *M
  */
 void transpose(uint16_t *M) {
-  int i;
+  uint16_t i;
   uint16x8x2_t tL[8], tH[8];
   uint32x4x2_t bL[4], bH[4], cL[4], cH[4];
   uint64x2x2_t dL[2], dH[2], eL[2], eH[2], fL[2], fH[2], gL[2], gH[2];
