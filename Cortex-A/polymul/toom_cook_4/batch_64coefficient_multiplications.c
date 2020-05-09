@@ -304,13 +304,13 @@ void join_32coefficient_results(uint16_t *result_d0, uint16_t *result_d1,
  */
 
 void batch_64coefficient_multiplications(
-    uint16_t restrict *a0, uint16_t restrict *b0, uint16_t restrict *result_final0, 
-    uint16_t restrict *a1, uint16_t restrict *b1, uint16_t restrict *result_final1, 
-    uint16_t restrict *a2, uint16_t restrict *b2, uint16_t restrict *result_final2, 
-    uint16_t restrict *a3, uint16_t restrict *b3, uint16_t restrict *result_final3,
-    uint16_t restrict *a4, uint16_t restrict *b4, uint16_t restrict *result_final4, 
-    uint16_t restrict *a5, uint16_t restrict *b5, uint16_t restrict *result_final5, 
-    uint16_t restrict *a6, uint16_t restrict *b6, uint16_t restrict *result_final6)
+    uint16_t *restrict a0, uint16_t *restrict b0, uint16_t *restrict result_final0, 
+    uint16_t *restrict a1, uint16_t *restrict b1, uint16_t *restrict result_final1, 
+    uint16_t *restrict a2, uint16_t *restrict b2, uint16_t *restrict result_final2, 
+    uint16_t *restrict a3, uint16_t *restrict b3, uint16_t *restrict result_final3,
+    uint16_t *restrict a4, uint16_t *restrict b4, uint16_t *restrict result_final4, 
+    uint16_t *restrict a5, uint16_t *restrict b5, uint16_t *restrict result_final5, 
+    uint16_t *restrict a6, uint16_t *restrict b6, uint16_t *restrict result_final6)
 {
   uint16x8x2_t a_lu_temp[2], b_lu_temp[2];
   uint16x8x2_t a_tmp[4], b_tmp[4];
