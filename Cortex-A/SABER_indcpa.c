@@ -5,6 +5,7 @@
 #include "SABER_params.h"
 #include "polymul/toom_cook_4/asimd_toom_cook_4way_neon.h"
 #include "fips202.h"
+#include <arm_neon.h>
 
 #if __aarch64__
 #include <libkeccak.so.headers/SimpleFIPS202.h>
