@@ -17,6 +17,20 @@
 
 #define h2 ( (1<<(SABER_EP-2)) - (1<<(SABER_EP-SABER_ET-1)) + (1<<(SABER_EQ-SABER_EP-1)) )
 
+static inline 
+void vload(uint16x8x2_t c, uint16_t *a)
+{
+    // load c <= a 
+    c = vld2q_u16(a);
+}
+
+static inline 
+void vstore(uint16_t *c, uint16x8x2_t a)
+{
+    // store c <= a 
+    vst2q_u16(c, a);
+}
+
 static inline
 void vxor(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
 {
