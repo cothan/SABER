@@ -23,21 +23,31 @@ void vcopy(uint16_t *c, uint16_t *a)
     vstore(c, tmp);
 }
 
-static inline 
-void vsl(uint16x8x2_t c, uint16x8x2_t a, const uint16_t value)
-{
-    // c = a << value 
-    c.val[0] = vshlq_n_u16(a.val[0], value);
-    c.val[1] = vshlq_n_u16(a.val[1], value);
-}
+// c = a << value 
+#define vsl(c, a, value) \
+    c.val[0] = vshlq_n_u16(a.val[0], value); \
+    c.val[1] = vshlq_n_u16(a.val[1], value); 
 
-static inline 
-void vsr(uint16x8x2_t c, uint16x8x2_t a, const uint16_t value)
-{
-	// c = a >> value 
-	c.val[0] = vshrq_n_u16(a.val[0], value);
+// c = a >> value 
+#define vsr(c, a, value) \
+	c.val[0] = vshrq_n_u16(a.val[0], value); \
   	c.val[1] = vshrq_n_u16(a.val[1], value);
-}
+
+// static inline 
+// void vsl(uint16x8x2_t c, uint16x8x2_t a, const uint16_t value)
+// {
+//     // c = a << value 
+//     c.val[0] = vshlq_n_u16(a.val[0], value);
+//     c.val[1] = vshlq_n_u16(a.val[1], value);
+// }
+
+// static inline 
+// void vsr(uint16x8x2_t c, uint16x8x2_t a, const uint16_t value)
+// {
+// 	// c = a >> value 
+// 	c.val[0] = vshrq_n_u16(a.val[0], value);
+//   	c.val[1] = vshrq_n_u16(a.val[1], value);
+// }
 
 static inline 
 void vadd(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
