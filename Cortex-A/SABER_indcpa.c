@@ -437,8 +437,8 @@ void indcpa_kem_dec(const unsigned char *sk,
 	  uint16x8x2_t acc_neon;
 	  uint16x8x2_t v_neon;
 	  uint16x8x2_t vh2;
-	  vh2.val[0] = vdup_n_u16(h2);
-	  vh2.val[1] = vdup_n_u16(h2);
+	  vh2.val[0] = vdupq_n_u16(h2);
+	  vh2.val[1] = vdupq_n_u16(h2);
 	//--------------NEON declaration ends------------------
 	uint16_t v_avx[SABER_N/16*16] = {0};
 	uint16_t acc[2*16*SABER_N/16];
