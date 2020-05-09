@@ -371,6 +371,6 @@ void schoolbook_neon_new(uint16_t *c, uint16_t *a_mem, uint16_t *b_mem) {
     pad = 8;
   }
   vxor(tmp, tmp, tmp);
-  vstore(&c[31*16], tmp);
-  vstore(&c[31*16 + 8], tmp);
+  vst1q_u16(&c[31*16], tmp);
+  vst1q_u16(&c[31*16 + 8], tmp);
 }
