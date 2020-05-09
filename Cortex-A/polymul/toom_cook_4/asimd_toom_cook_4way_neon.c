@@ -163,8 +163,8 @@ void toom_cook_4way_neon(uint16_t *a1_avx,
 		vsl(th_b_neon, th_b_neon, 1);
 
 		//t_h_x_avx contains x[1]
-        vload(t_h_a_neon, &a1_avx[(small_len_avx * 1 + i)*16 ] )
-        vload(t_h_b_neon, &b1_avx[(small_len_avx * 1 + i)*16 ] )
+        vload(t_h_a_neon, &a1_avx[(small_len_avx * 1 + i)*16 ] );
+        vload(t_h_b_neon, &b1_avx[(small_len_avx * 1 + i)*16 ] );
 
 		//t_h_x_avx contains 4*x[1]
 		vsl(t_h_a_neon, t_h_a_neon, 2);
@@ -183,7 +183,7 @@ void toom_cook_4way_neon(uint16_t *a1_avx,
 		vadd(b1_tmp, th_b_neon, t_h_b_neon);
 
         vstore(&a2_ph_avx[i*16], a1_tmp);
-        vstore(&b2_ph_avx[i*16], b1_tmp)
+        vstore(&b2_ph_avx[i*16], b1_tmp);
 
 	    //create t_h
 
@@ -222,7 +222,7 @@ void toom_cook_4way_neon(uint16_t *a1_avx,
 		vadd(b1_tmp, th_b_neon, t_h_b_neon);
 
         vstore(&a4_ph_avx[i*16], a1_tmp);
-        vstore(&b4_ph_avx[i*16], b1_tmp)
+        vstore(&b4_ph_avx[i*16], b1_tmp);
 	
 
 	    //create t_1
