@@ -1,7 +1,7 @@
 #include "../../SABER_indcpa.h"
 #include "../../SABER_params.h"
 #include "asimd_matrix.c"
-#include "asimd_scm_avx.c"
+#include "asimd_scm_neon.h"
 
 #include <arm_neon.h>
 #include <stdint.h>
@@ -78,75 +78,103 @@ void vxor(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
 }
 
 
-uint16x8x2_t a_extra[2], b_extra[2];
+uint16_t a_extra[2*16], b_extra[2*16];
+uint16x8x2_t tmp;
 
 // Position <= 14
 static inline 
 void karatsuba32_fork_avx_new(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t position) {
   
-  COPY(a[position], a1[0]);
-  COPY(b[position], b1[0]);
+  vstore(&a[position*16], a1[0]);
+  vstore(&b[position*16], b1[0]);
   
-  COPY(a[position + 1], a1[1]);
-  COPY(b[position + 1], b1[1]);
+  vstore(&a[(position + 1)*16], a1[1]);
+  vstore(&b[(position + 1)*16], b1[1]);
 
-  ADD(a[position + 2], a1[0], a1[1]);
-  ADD(b[position + 2], b1[0], b1[1]);
+  vadd(tmp, a1[0], a1[1]);
+  vstore(&a[(position + 2)*16], tmp);
+
+  vadd(tmp, b1[0], b1[1]);
+  vstore(&b[(position + 2)*16], b1[0], b1[1]);
 
 }
 
 // Position > 14
 static inline 
 void karatsuba32_fork_avx_new1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t position) {
-  COPY(a[position], a1[0]);
-  COPY(b[position], b1[0]);
+
+  vstore(&a[position*16], a1[0]);
+  vstore(&b[position*16], b1[0]);
   
-  COPY(a_extra[0], a1[1]);
-  COPY(b_extra[0], b1[1]);
+  vstore(&a_extra[0*16], a1[1]);
+  vstore(&b_extra[0*16], b1[1]);
 
-  ADD(a_extra[1], a1[0], a1[1]);
-  ADD(b_extra[1], b1[0], b1[1]);
+  vadd(tmp, a1[0], a1[1]);
+  vstore(&a_extra[1*16], tmp);
+
+  vadd(tmp, b1[0], b1[1]);
+  vstore(&b_extra[1*16], tmp);
 
 }
 
 static inline 
-void karatsuba32_fork_avx_partial(uint16x8x2_t *a1, uint16x8x2_t *b1,
-                                                uint8_t position) {
-  COPY(a[position], a1[1]);
-  COPY(b[position], b1[1]);
+void karatsuba32_fork_avx_partial(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t position) {
 
-  ADD(a[position + 1], a1[0], a1[1]);
-  ADD(b[position + 1], b1[0], b1[1]);
+  vstore(&a[position*16], a1[1]);
+  vstore(&b[position*16], b1[1]);
+
+  vadd(tmp, a1[0], a1[1]);
+  vstore(&a[(position + 1)*16], tmp);
+
+  vadd(tmp, b1[0], b1[1]);
+  vstore(&b[(position + 1)*16], tmp);
 }
 
 static inline 
-void karatsuba32_fork_avx_partial1(uint16x8x2_t *a1, uint16x8x2_t *b1,
-                                                 uint8_t position) {
-  ADD(a[position], a1[0], a1[1]);
-  ADD(b[position], b1[0], b1[1]);
+void karatsuba32_fork_avx_partial1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t position) {
+  
+  vadd(tmp, a1[0], a1[1]);
+  vstore(&a[position*16], tmp);
+
+  vadd(tmp, b1[0], b1[1]);
+  vstore(&b[position*16], tmp);
 }
 
 static inline 
-void karatsuba32_join_avx_new(uint16x8x2_t *result_final, uint8_t position) {
-  COPY(result_final[0], c_avx[position]);
-  COPY(result_final[3], c_avx[position + 1 + 16]);
+void karatsuba32_join_avx_new(uint16_t *result_final, uint8_t position) {
 
+  uint16x8x2_t c1_tmp, c2_tmp;
+  uint16x8x2_t b0, b1, b2;
+  uint16x8x2_t rf[4];
+
+  vload(rf[0], &c_avx[position*16 ] );
+  vload(rf[3], &c_avx[(position + 1 + 16)*16 ] );
+
+  vstore(&result_final[0*16], rf[0]);
+  vstore(&result_final[3*16], rf[3]);
+
+  vload(c1_tmp, &c_avx[(position + 16)*16]);
+  vload(c2_tmp, &c_avx[(position + 2)*16]);
   // b[0] = resultd0[n-1:n/2] + resultd01[n/2-1:0]
-  ADD(b[0], c_avx[position + 16], c_avx[position + 2]);
+  vadd(b0, c1_tmp, c2_tmp);
 
+  vload(c1_tmp, &c_avx[(position + 2 + 16)*16]);
+  vload(c2_tmp, &c_avx[(position + 1)*16]);
   // b[1] = resultd01[n-1:n/2] + resultd1[n/2-1:0]
-  ADD(b[1], c_avx[position + 2 + 16], c_avx[position + 1]);
+  vadd(b1, c1_tmp, c2_tmp);
 
   // b[0] = b[0] - a[0] - a[2]
-  SUB(b[2], b[0], result_final[0]);
-  SUB(result_final[1], b[2], c_avx[position + 1]);
-  // result_final[1].val[0] = vsubq_u16(b[2].val[0], c_avx[position + 1].val[0]);
-  // result_final[1].val[1] = vsubq_u16(b[2].val[1], c_avx[position + 1].val[1]);
+  vload(c1_tmp, c_avx[(position + 1)*16]);
+  vsub(b2, b0, rf[0]);
+  vsub(rf[1], b2, c1_tmp);
+  vstore(&result_final[1*16], rf[1]);
+
   // b[1] = b[1] - a[1] - a[3]
-  SUB(b[2], b[1], c_avx[position + 16]);
-  SUB(result_final[2], b[2], result_final[3]);
-  // result_final[2].val[0] = vsubq_u16(b[2].val[0], result_final[3].val[0]);
-  // result_final[2].val[1] = vsubq_u16(b[2].val[1], result_final[3].val[1]);
+  vload(c2_tmp, c_avx[(position + 16)*16]);
+  vsub(b2, b1, c2_tmp);
+  vsub(rf[2], b2, rf[3]);
+  vstore(&result_final[2*16], rf[2]);
+
 }
 
 static inline 
@@ -243,62 +271,52 @@ void batch_64coefficient_multiplications(
   uint16x8x2_t a_lu_temp[2], b_lu_temp[2];
   uint16x8x2_t result_d0[16], result_d1[16], result_d01[16];
 
-  uint16x8x2_t a_tmp, b_tmp;
-  uint16x8x2_t a_tmp1, b_tmp1;
-
+  uint16x8x2_t a_tmp[4], b_tmp[4];
+  
   uint16_t i;
 
   // KS splitting of 1st 64-coeff multiplication
+  for (i = 0; i < 2; i++)
+  {
+    vload(a_tmp[i], &a0[i*16]);
+    vload(a_tmp[2 + i], &a0[(2+i)*16]);
+    vadd(a_lu_temp[i], a_tmp[i], a_tmp[2+i]);
 
-  vload(a_tmp, &a0[0*16]);
-  vload(a_tmp1, &a0[(2+0)*16]);
-  vadd(a_lu_temp[0], a_tmp, a_tmp1);
+    vload(b_tmp[i], &b0[i*16]);
+    vload(b_tmp[2 + i], &b0[(2+i)*16]);
+    vadd(b_lu_temp[i], b_tmp[i], b_tmp[2 + i]);
+  }
 
-
-  vload(b_tmp, &b0[0*16]);
-  vload(b_tmp1, &b0[(2+0)*16]);
-  vadd(b_lu_temp[0], b_tmp, b_tmp1);
-
-  vload(a_tmp, &a0[1*16]);
-  vload(a_tmp1, &a0[(2+1)*16]);
-  vadd(a_lu_temp[1], a_tmp, a_tmp1);
-
-
-  vload(b_tmp, &b0[1*16]);
-  vload(b_tmp, &b0[(2+1)*16]);
-  vadd(b_lu_temp[1], b_tmp, b_tmp1);
-
-  karatsuba32_fork_avx_new(&a0[0], &b0[0], 0);
-  karatsuba32_fork_avx_new(&a0[2], &b0[2], 3);
-  // TODO: check this
+  karatsuba32_fork_avx_new(&a_tmp[0], &b_tmp[0], 0);
+  karatsuba32_fork_avx_new(&a_tmp[2], &b_tmp[2], 3);
   karatsuba32_fork_avx_new(a_lu_temp, b_lu_temp, 6); 
 
   // KS splitting of 2nd 64-coeff multiplication
-  // for (i = 0; i < 2; i++) {
-  //   ADD(a_lu_temp[i], a1[i], a1[2 + i]);
-  //   ADD(b_lu_temp[i], b1[i], b1[2 + i]);
-  // }
-  // Unroll factor 2
-  ADD(a_lu_temp[0], a1[0], a1[2 + 0]);
-  ADD(b_lu_temp[0], b1[0], b1[2 + 0]);
-  ADD(a_lu_temp[1], a1[1], a1[2 + 1]);
-  ADD(b_lu_temp[1], b1[1], b1[2 + 1]);
+  for (i = 0; i < 2; i++) {
+    vload(a_tmp[i], &a1[i*16]);
+    vload(a_tmp[2 + i], &a1[(2+i)*16]);
+    vadd(a_lu_temp[i], a_tmp[i], a_tmp[2+i]);
 
-  karatsuba32_fork_avx_new(&a1[0], &b1[0], 9);
-  karatsuba32_fork_avx_new(&a1[2], &b1[2], 12);
+    vload(b_tmp[i], &b1[i*16]);
+    vload(b_tmp[2 + i], &b1[(2+i)*16]);
+    vadd(b_lu_temp[i], b_tmp[i], b_tmp[2 + i]);
+  }
+  
+  karatsuba32_fork_avx_new(&a_tmp[0], &b_tmp[0], 9);
+  karatsuba32_fork_avx_new(&a_tmp[2], &b_tmp[2], 12);
   // Partial: loads only one of the three elements in the bucket
   karatsuba32_fork_avx_new1(a_lu_temp, b_lu_temp, 15); 
 
   // Compute 16 school-book multiplications in a batch.
   transpose(a);
   transpose(b);
-  schoolbook_avx_new();
+  schoolbook_neon_new(c_avx, a, b);
   transpose(&c_avx[0]);
-  transpose(&c_avx[16]);
+  transpose(&c_avx[16*16]);
 
   // store the partial multiplication result.
-  COPY(c_avx_extra[0], c_avx[15]);
-  COPY(c_avx_extra[1], c_avx[15 + 16]);
+  vcopy(c_avx_extra[0], c_avx[15*16]);
+  vcopy(c_avx_extra[1], c_avx[31*16]);
 
   karatsuba32_join_avx_new(result_d0, 0);
   karatsuba32_join_avx_new(result_d1, 3);
