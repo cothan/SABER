@@ -1,4 +1,5 @@
 #include <arm_neon.h>
+#include "batch_64coefficient_multiplications.h"
 
 static inline 
 void vload(uint16x8x2_t c, uint16_t *a)
