@@ -16,10 +16,34 @@ SOURCES = pack_unpack.c poly.c verify.c fips202.c SABER_indcpa.c kem.c \
 #rng.o
 #randombytes.c
 
-SOURCES2 =  pack_unpack.c rng.c poly.c verify.c SABER_indcpa.c kem.c \
-			cbd.c fips202.c 
+SOURCES2 =  pack_unpack.c \
+			rng.c \
+			poly.c \
+			verify.c \
+			polymul/toom_cook_4/asimd_scm_neon.c \
+			polymul/toom_cook_4/batch_64coefficient_multiplications.c \
+			polymul/toom_cook_4/asimd_toom_cook_4way_neon.c \
+			SABER_indcpa.c \
+			kem.c \
+			cbd.c \
+			fips202.c
+			
+			
 
-HEADERS = SABER_params.h pack_unpack.h poly.h verify.h cbd.h SABER_indcpa.h kem.h rng.h fips202.h api.h randombytes.h
+HEADERS = 	SABER_params.h  \
+			pack_unpack.h  \
+			poly.h  \
+			verify.h  \
+			polymul/toom_cook_4/asimd_scm_neon.h \
+			polymul/toom_cook_4/batch_64coefficient_multiplications.h \
+			polymul/toom_cook_4/asimd_scm_neon.h \
+			cbd.h  \
+			SABER_indcpa.h  \
+			kem.h  \
+			rng.h  \
+			fips202.h  \
+			api.h  \
+			randombytes.h \
 
 
 test/test_speed: $(SOURCES2) $(HEADERS) test/test_speed.c 
