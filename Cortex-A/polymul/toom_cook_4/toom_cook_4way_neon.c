@@ -26,15 +26,23 @@ static inline
 void vsl(uint16x8x2_t c, uint16x8x2_t a, uint16_t value)
 {
     // c = a << value 
-    c.val[0] = vshlq_n_u16(a.val[0], value);                                                         
+    c.val[0] = vshlq_n_u16(a.val[0], value);
     c.val[1] = vshlq_n_u16(a.val[1], value);
+}
+
+static inline 
+void vsr(uint16x8x2_t c, uint16x8x2_t a, uint16_t value)
+{
+	// c = a >> value 
+	c.val[0] = vshrq_n_u16(a.val[0], value);
+  	c.val[1] = vshrq_n_u16(a.val[1], value);
 }
 
 static inline 
 void vadd(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
 {
     // c = a + b
-    c.val[0] = vaddq_u16(a.val[0], b.val[0]);                                                        
+    c.val[0] = vaddq_u16(a.val[0], b.val[0]);
     c.val[1] = vaddq_u16(a.val[1], b.val[1]);
 }
 
@@ -42,11 +50,26 @@ static inline
 void vsub(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
 {
     // c = a - b
-    c.val[0] = vsubq_u16(a.val[0], b.val[0]);                                                        
+    c.val[0] = vsubq_u16(a.val[0], b.val[0]);
     c.val[1] = vsubq_u16(a.val[1], b.val[1]);
 
 }
 
+static inline
+void vmuln(uint16x8x2_t c, uint16x8x2_t a, int16_t value)
+{
+	// c = a * value 
+	c.val[0] = vmulq_n_u16(a.val[0], value);
+  	c.val[1] = vmulq_n_u16(a.val[1], value);
+}
+
+static inline
+void vxor(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
+{
+	// c = a ^ b 
+	c.val[0] = veorq_u16(a.val[0], b.val[0]);
+	c.val[1] = veorq_u16(a.val[1], b.val[1]);
+}
 
 
 /*
@@ -78,7 +101,6 @@ void toom_cook_4way_avx(uint16_t *a1_avx,
                 w6_avx[2 * 16 * small_len_avx], 
                 w7_avx[2 * 16 * small_len_avx];
 
-	uint16x8x2_t temp1_avx[2 * small_len_avx];
 
 	//--------------------these data are created for place holding---------
 	// This is memory or register ? For now, let's compiler optimize it
@@ -95,14 +117,17 @@ void toom_cook_4way_avx(uint16_t *a1_avx,
     uint16x8x2_t th_a_neon, th_b_neon;
     uint16x8x2_t t_h_a_neon, t_h_b_neon;
 
+    uint16x8x2_t w1, w2, w3, w4, w5, w6, w7;
+	uint16x8x2_t temp1_neon;
+
 	//--------------------these data are created for place holding ends---------
 
 	// Add for NEON
-	const uint16x8_t int0_avx = vdupq_n_u16(0);
+	uint16x8_t int0_avx = vdupq_n_u16(0);
 
 	//-----AVX data declaration ends------------
 
-	p_mod = p_mod * 8;
+	(void) p_mod;
 
 	//do the partial products
 
@@ -279,81 +304,104 @@ void toom_cook_4way_avx(uint16_t *a1_avx,
 
 	for (i = 0; i < 2 * small_len_avx; i++)
 	{
+		vload(w1, &w1_avx[i*16]);
+		vload(w2, &w2_avx[i*16]);
+		vload(w3, &w3_avx[i*16]);
+		vload(w4, &w4_avx[i*16]);
+		vload(w5, &w5_avx[i*16]);
+		vload(w6, &w6_avx[i*16]);
+		vload(w7, &w7_avx[i*16]);
 
-		ADD(w2_avx[i], w2_avx[i],w5_avx[i]);//w2 <- w2+w5
-		SUB(w6_avx[i], w6_avx[i], w5_avx[i]); // w6 <- w6-w5
-		SUB(w4_avx[i], w4_avx[i], w3_avx[i]); // w4 <- w4-w3
+		vadd(w2, w2, w5);//w2 <- w2+w5
+		vsub(w6, w6, w5); // w6 <- w6-w5
+		vsub(w4, w4, w3); // w4 <- w4-w3
 
-		SUB(w5_avx[i], w5_avx[i], w1_avx[i]);	// w5 <- w5-w1
-		SLL(temp1_avx[i], w7_avx[i], 6);			//temp <- 64*w7
-		SUB(w5_avx[i], w5_avx[i], temp1_avx[i]); // w5 <- w5-64*w7
+		vsub(w5, w5, w1);	// w5 <- w5-w1
+		vsl(temp1_neon, w7, 6);			//temp <- 64*w7
+		vsub(w5, w5, temp1_neon); // w5 <- w5-64*w7
 
-		SRL(w4_avx[i], w4_avx[i], 1);	  //w4 <- w4/2
-		ADD(w3_avx[i], w3_avx[i],w4_avx[i]);//w3 <- w3+w4
+		vsr(w4, w4, 1);	  //w4 <- w4/2
+		vadd(w3, w3,w4);//w3 <- w3+w4
 
-		SLL(temp1_avx[i], w5_avx[i], 1);		 //temp <- 2*w5
-		ADD(w5_avx[i], w6_avx[i],temp1_avx[i]);//w5 <- 2*w5+w6
+		vsl(temp1_neon, w5, 1);		 //temp <- 2*w5
+		vadd(w5, w6,temp1_neon);//w5 <- 2*w5+w6
 
-		SLL(temp1_avx[i], w3_avx[i], 6);			   //temp <- 64*w3
-		ADD(temp1_avx[i], w3_avx[i], temp1_avx[i]); //temp <- 65*w3
-		SUB(w2_avx[i], w2_avx[i], temp1_avx[i]);	   // w2 <- w2-65*w3
+		vsl(temp1_neon, w3, 6);			   //temp <- 64*w3
+		vadd(temp1_neon, w3, temp1_neon); //temp <- 65*w3
+		vsub(w2, w2, temp1_neon);	   // w2 <- w2-65*w3
 
-		SUB(w3_avx[i], w3_avx[i], w7_avx[i]); // w3 <- w3-w7
-		SUB(w3_avx[i], w3_avx[i], w1_avx[i]); // w3 <- w3-w1
+		vsub(w3, w3, w7); // w3 <- w3-w7
+		vsub(w3, w3, w1); // w3 <- w3-w1
 
-		MULN(temp1_avx[i], w3_avx[i], 45);		//temp <- 45*w3
-		ADD(w2_avx[i], w2_avx[i], temp1_avx[i]); //w2 <- w2+45*w3
+		vmuln(temp1_neon, w3, 45);		//temp <- 45*w3
+		vadd(w2, w2, temp1_neon); //w2 <- w2+45*w3
 
-		SLL(temp1_avx[i], w3_avx[i], 3);			//temp <- 8*w3
-		SUB(w5_avx[i], w5_avx[i], temp1_avx[i]); //w5 <- w5-8*w3
+		vsl(temp1_neon, w3, 3);			//temp <- 8*w3
+		vsub(w5, w5, temp1_neon); //w5 <- w5-8*w3
 
-		MULN(w5_avx[i], w5_avx[i], 43691); //w5 <- w5*1/3
-		SRL(w5_avx[i], w5_avx[i], 3);	 //w5 <- w5*1/8 --. w5=w5/24
+		vmuln(w5, w5, 43691); //w5 <- w5*1/3
+		vsr(w5, w5, 3);	 //w5 <- w5*1/8 --. w5=w5/24
 
-		ADD(w6_avx[i], w2_avx[i], w6_avx[i]);	//w6 <- w6+w2
-		SLL(temp1_avx[i], w4_avx[i], 4);			//temp <- 16*w4
-		ADD(w2_avx[i], w2_avx[i], temp1_avx[i]); //w2 <- w2+16*w4
+		vadd(w6, w2, w6);	//w6 <- w6+w2
+		vsl(temp1_neon, w4, 4);			//temp <- 16*w4
+		vadd(w2, w2, temp1_neon); //w2 <- w2+16*w4
 
-		MULN(w2_avx[i], w2_avx[i], 36409); //w2 <- w2*1/9
-		SRL(w2_avx[i], w2_avx[i], 1);	 //w2 <- w2*1/2 --. w2=w2/18
+		vmuln(w2, w2, 36409); //w2 <- w2*1/9
+		vsr(w2, w2, 1);	 //w2 <- w2*1/2 --. w2=w2/18
 
-		SUB(w3_avx[i], w3_avx[i], w5_avx[i]); //w3 <- w3-w5
+		vsub(w3, w3, w5); //w3 <- w3-w5
 
-		ADD(w4_avx[i], w4_avx[i], w2_avx[i]); //w4 <- w4+w2
+		vadd(w4, w4, w2); //w4 <- w4+w2
 
-		// SUB(w4_avx[i], int0_avx, w4_avx[i]); //w4 <- -(w4+w2)
-		w4_avx[i].val[0] = vsubq_u16(int0_avx, w4_avx[i].val[0]);
-		w4_avx[i].val[1] = vsubq_u16(int0_avx, w4_avx[i].val[1]);
+		// vsub(w4, int0_avx, w4); //w4 <- -(w4+w2)
+		w4.val[0] = vsubq_u16(int0_avx, w4.val[0]);
+		w4.val[1] = vsubq_u16(int0_avx, w4.val[1]);
 
-		MULN(temp1_avx[i], w2_avx[i], 30);		//temp <- w2*30
-		SUB(w6_avx[i], temp1_avx[i], w6_avx[i]); //w6 <- 30*w2-w6
+		vmuln(temp1_neon, w2, 30);		//temp <- w2*30
+		vsub(w6, temp1_neon, w6); //w6 <- 30*w2-w6
 
-		MULN(w6_avx[i], w6_avx[i], 61167); //w6 <- w6*1/15
-		SRL(w6_avx[i], w6_avx[i], 2);	 //w6 <- w6*1/4 --. w6=w6/60
+		vmuln(w6, w6, 61167); //w6 <- w6*1/15
+		vsr(w6, w6, 2);	 //w6 <- w6*1/4 --. w6=w6/60
 
-		SUB(w2_avx[i], w2_avx[i], w6_avx[i]); //w2 <- w2-w6
+		vsub(w2, w2, w6); //w2 <- w2-w6
+
+		vstore(&w1_avx[i*16], w1);
+		vstore(&w2_avx[i*16], w2);
+		vstore(&w3_avx[i*16], w3);
+		vstore(&w4_avx[i*16], w4);
+		vstore(&w5_avx[i*16], w5);
+		vstore(&w6_avx[i*16], w6);
+		vstore(&w7_avx[i*16], w7);
 	}
 
 	for (i = 0; i < 2 * AVX_N; i++)
 	{
-		XOR(res_avx[i], res_avx[i], res_avx[i]);
+		vxor(res_avx[i], res_avx[i], res_avx[i]);
 	}
 
 	for (i = 0; i < 2 * small_len_avx; i++)
 	{
-		ADD(res_avx[0 * small_len_avx + i], res_avx[0 * small_len_avx + i], w7_avx[i]);
-		ADD(res_avx[1 * small_len_avx + i], res_avx[1 * small_len_avx + i], w6_avx[i]);
-		ADD(res_avx[2 * small_len_avx + i], res_avx[2 * small_len_avx + i], w5_avx[i]);
-		ADD(res_avx[3 * small_len_avx + i], res_avx[3 * small_len_avx + i], w4_avx[i]);
-		ADD(res_avx[4 * small_len_avx + i], res_avx[4 * small_len_avx + i], w3_avx[i]);
-		ADD(res_avx[5 * small_len_avx + i], res_avx[5 * small_len_avx + i], w2_avx[i]);
-		ADD(res_avx[6 * small_len_avx + i], res_avx[6 * small_len_avx + i], w1_avx[i]);
+		vload(w1, &w1_avx[i*16]);
+		vload(w2, &w2_avx[i*16]);
+		vload(w3, &w3_avx[i*16]);
+		vload(w4, &w4_avx[i*16]);
+		vload(w5, &w5_avx[i*16]);
+		vload(w6, &w6_avx[i*16]);
+		vload(w7, &w7_avx[i*16]);
+
+		vadd(res_avx[0 * small_len_avx + i], res_avx[0 * small_len_avx + i], w7);
+		vadd(res_avx[1 * small_len_avx + i], res_avx[1 * small_len_avx + i], w6);
+		vadd(res_avx[2 * small_len_avx + i], res_avx[2 * small_len_avx + i], w5);
+		vadd(res_avx[3 * small_len_avx + i], res_avx[3 * small_len_avx + i], w4);
+		vadd(res_avx[4 * small_len_avx + i], res_avx[4 * small_len_avx + i], w3);
+		vadd(res_avx[5 * small_len_avx + i], res_avx[5 * small_len_avx + i], w2);
+		vadd(res_avx[6 * small_len_avx + i], res_avx[6 * small_len_avx + i], w1);
 	}
 
 	// Reduction by X^256 + 1
 	for (i = 0; i < 16; i++)
 	{
-		res_avx_output[i].val[0] = vsubq_u16(res_avx[i].val[0], res_avx[i + 16].val[0]);
-		res_avx_output[i].val[1] = vsubq_u16(res_avx[i].val[1], res_avx[i + 16].val[1]);
+		vsub(a1_tmp, res_avx[i], res_avx[i+16]);
+		vstore(&res_avx_output[i*16], a1_tmp);
 	}
 }
