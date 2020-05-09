@@ -103,11 +103,6 @@ void POL2MSG(uint16_t *message_dec_unpacked, unsigned char *message_dec){
 
 }
 
-/*--------------------------------------------------------------------------------------
-	This routine loads the constant values for Toom-Cook multiplication 
-----------------------------------------------------------------------------------------*/
-
-
 /*-----------------------------------------------------------------------------------
 	This routine generates a=[Matrix K x K] of 256-coefficient polynomials 
 -------------------------------------------------------------------------------------*/
@@ -195,82 +190,59 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   int32_t i,j,k;
 
 
-//--------------AVX declaration------------------
-	
-  uint16x8x2_t sk_avx[SABER_K][SABER_N/16];
-  uint16x8x2_t res_avx[SABER_K][SABER_N/16];
-  uint16x8x2_t a_avx[SABER_K][SABER_K][SABER_N/16];
-  uint16x8x2_t acc[2*SABER_N/16];
+//--------------NEON declaration------------------
 
-  const uint16x8_t mod   =vdupq_n_u16(SABER_Q-1);
-  const uint16x8_t H1_avx=vdupq_n_u16(h1);
+  uint16x8_t mod   =vdupq_n_u16(SABER_Q-1);
+  uint16x8_t H1_avx=vdupq_n_u16(h1);
+  uint16x8x2_t acc_neon;
+  uint16x8x2_t res_neon;
 
-
-//--------------AVX declaration ends------------------
+//--------------NEON declaration ends------------------
+  uint16_t res_avx[SABER_K][SABER_N/16*16] = {0};
+  uint16_t acc[2*16*SABER_N/16];
 
   randombytes(seed, SABER_SEEDBYTES);
- 
-
 
   shake128(seed, SABER_SEEDBYTES, seed, SABER_SEEDBYTES); // for not revealing system RNG state
   randombytes(noiseseed, SABER_COINBYTES);
-
   
   GenMatrix(a, seed); //sample matrix A
- 
- 
+  
   GenSecret(skpv1,noiseseed);
- 
-
- // Load sk into avx vectors		
- for(i=0;i<SABER_K;i++)
- {
-	for(j=0; j<SABER_N/16; j++){
-            sk_avx[i][j] = vld2q_u16 ( (&skpv1[i][j*16]));
-	}
-
-  }
-
-  // Load a into avx vectors	
-  for(i=0;i<SABER_K;i++){ 
-	  for(j=0;j<SABER_K;j++){
-		  for(k=0;k<SABER_N/16;k++){
-			a_avx[i][j][k]=vld2q_u16 ( (&a[i].vec[j].coeffs[k*16]));
-		  }
-	  }
-  }	
-
 
 
   //------------------------do the matrix vector multiplication and rounding------------
 
-
-	for(i=0;i<SABER_K;i++){
-		for(j=0;j<SABER_N/16;j++){
-			XORDOT_DOT(res_avx[i][j], res_avx[i][j],res_avx[i][j]);
-		}
-	}
-
 	// Matrix-vector multiplication; Matrix in transposed order
 	for(i=0;i<SABER_K;i++){
 		for(j=0;j<SABER_K;j++){
-			toom_cook_4way_avx(a_avx[j][i], sk_avx[j], SABER_Q, acc);
+			toom_cook_4way_neon(a[i].vec[j].coeffs, skpv1[j], SABER_Q, acc);
 
 			for(k=0;k<SABER_N/16;k++){
-				ADDDOT_DOT( res_avx[i][k], res_avx[i][k],acc[k]);
-				ANDDOT_DOTVAL( res_avx[i][k], res_avx[i][k],mod); //reduction mod p
-				XORDOT_DOT( acc[k], acc[k],acc[k]); //clear the accumulator
+				vload(res_neon, &res_avx[i][k*16]);
+				vload(acc_neon, &acc[k*16]);
+				// res_avx[i][k] += acc[k]
+				vadd(res_neon, res_neon, acc_neon);
+				// res_avx[i][k] &= mod 
+				vand(res_neon, res_neon, mod);
+				// acc[k] = 0
+				// vzero(&acc[k*16], acc_neon); // No Need
+				vstore(&res_avx[i][k*16], res_neon);
 			}
 		}
 	}
-
 	
 	// Now truncation
 	for(i=0;i<SABER_K;i++){ //shift right EQ-EP bits
 		for(j=0;j<SABER_N/16;j++){
-			ADDDOT_DOTVAL( res_avx[i][j], res_avx[i][j], H1_avx);
-			SRLDOT_DOT( res_avx[i][j], res_avx[i][j], (SABER_EQ-SABER_EP) );
-			ANDDOT_DOTVAL( res_avx[i][j], res_avx[i][j], mod);			
+			vload(res_neon, &res_avx[i][16*j]);
+			// res_avx[i][j] += H1_avx
+			vadd1(res_neon, res_neon, H1_avx);
+			// res_avx[i][j] >>= (SABER_EQ-SABER_EP)
+			vsr(res_neon, res_neon, (SABER_EQ-SABER_EP));
+			// res_avx[i][j] &= mod
+			vand(res_neon, res_neon, mod);
+			vstore(&res_avx[i][16*j], res_neon);
 		}
 	}
 
@@ -279,14 +251,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 	POLVEC2BS(sk,skpv1,SABER_Q);
 
 	//------------------Pack pk into byte string-------
-	
-	for(i=0;i<SABER_K;i++){ // reuses skpv1[] for unpacking avx of public-key
-		  for(j=0;j<SABER_N/16;j++){
-		  	vst2q_u16 ((uint16_t *) (skpv1[i]+j*16), res_avx[i][j]);
-		  }
-	  }
-	POLVEC2BS(pk,skpv1,SABER_P); // load the public-key into pk byte string 	
-
+	POLVEC2BS(pk,res_avx,SABER_P); // load the public-key into pk byte string 	
 
 	for(i=0;i<SABER_SEEDBYTES;i++){ // now load the seedbytes in PK. Easy since seed bytes are kept in byte format.
 		pk[SABER_POLYVECCOMPRESSEDBYTES + i]=seed[i]; 
@@ -333,6 +298,11 @@ void indcpa_kem_enc(unsigned char *message_received,
 	GenMatrix(a, seed);				
 
 	GenSecret(skpv1,noiseseed);
+
+	//-------unpack the public_key
+	BS2POLVEC(pk, pkcl, SABER_P);
+
+
 	//-----------------matrix-vector multiplication and rounding
 
 	// Matrix-vector multiplication; 
@@ -380,9 +350,6 @@ void indcpa_kem_enc(unsigned char *message_received,
 //**************client matrix-vector multiplication ends******************//
 
 	//------now calculate the v'
-
-	//-------unpack the public_key
-	BS2POLVEC(pk, pkcl, SABER_P);
 
 	// vector-vector scalar multiplication with mod p
 	
@@ -464,14 +431,14 @@ void indcpa_kem_dec(const unsigned char *sk,
 	uint8_t scale_ar[SABER_SCALEBYTES_KEM];
 	uint16_t op[SABER_N];
 
-	//--------------AVX declaration------------------
+	//--------------NEON declaration------------------
 	  uint16x8_t mod_p=vdupq_n_u16(SABER_P-1); 
 	  uint16x8x2_t acc_neon;
 	  uint16x8x2_t v_neon;
 	  uint16x8x2_t vh2;
 	  vh2.val[0] = vdup_n_u16(h2);
 	  vh2.val[1] = vdup_n_u16(h2);
-	//--------------AVX declaration ends------------------
+	//--------------NEON declaration ends------------------
 	uint16_t v_avx[SABER_N/16*16] = {0};
 	uint16_t acc[2*16*SABER_N/16];
 	
