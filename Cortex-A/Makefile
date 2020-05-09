@@ -3,8 +3,8 @@ CFLAGS   = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -lcrypto
 CFLAGS2  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -std=c11 
 CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native
 CFLAGS4  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lpapi -lkeccak -g3
-CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -lkeccak -g3
-CLANG   = clang -march=native -O3 -fomit-frame-pointer -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -lkeccak -g3
+CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -w  -lpapi -lkeccak -g3
+CLANG   = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -lkeccak -g3
 RM 		  = /bin/rm
 
 
