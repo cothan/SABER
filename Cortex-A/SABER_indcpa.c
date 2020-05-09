@@ -5,7 +5,6 @@
 #include "SABER_params.h"
 #include "polymul/toom_cook_4/asimd_toom_cook_4way_neon.c"
 #include "fips202.h"
-#include <arm_neon.h>
 
 #if __aarch64__
 #include <libkeccak.so.headers/SimpleFIPS202.h>
@@ -466,58 +465,20 @@ void indcpa_kem_dec(const unsigned char *sk,
 	uint16_t op[SABER_N];
 
 	//--------------AVX declaration------------------
-	
-
-	  
-	  uint16x8x2_t v_avx[SABER_N/16];
-	  
-	  uint16x8x2_t acc[2*SABER_N/16];
-
-	  uint16x8x2_t sksv_avx[SABER_K][SABER_N/16];
-	  uint16x8x2_t pksv_avx[SABER_K][SABER_N/16];
-	  
-
-	  const uint16x8_t mod_p=vdupq_n_u16(SABER_P-1);
-
-	  
-
-	
-
+	  uint16x8_t mod_p=vdupq_n_u16(SABER_P-1); 
+	  uint16x8x2_t acc_neon;
+	  uint16x8x2_t v_neon;
+	  uint16x8x2_t vh2;
+	  vh2.val[0] = vdup_n_u16(h2);
+	  vh2.val[1] = vdup_n_u16(h2);
 	//--------------AVX declaration ends------------------
+	uint16_t v_avx[SABER_N/16*16] = {0};
+	uint16_t acc[2*16*SABER_N/16];
 	
 	//-------unpack the public_key
 
 	BS2POLVEC(sk, sksv, SABER_Q); //sksv is the secret-key
 	BS2POLVEC(ciphertext, pksv, SABER_P); //pksv is the ciphertext
-
-	for(i=0;i<SABER_K;i++){
-		for(j=0; j<SABER_N/16; j++){
-		    sksv_avx[i][j] = vld2q_u16  ( (&sksv[i][j*16]));
-		    pksv_avx[i][j] = vld2q_u16  ( (&pksv[i][j*16]));
-		}
-	}
-
-	for(i=0;i<SABER_N/16;i++){
-		XORDOT_DOT( v_avx[i], v_avx[i],v_avx[i]);
-	}
-
-
-	// InnerProduct(b', s, mod p)
-	for(j=0;j<SABER_K;j++){
-
-		toom_cook_4way_avx(pksv_avx[j], sksv_avx[j], SABER_P, acc);
-
-			for(k=0;k<SABER_N/16;k++){
-				ADDDOT_DOT(v_avx[k], v_avx[k],acc[k]);
-				ANDDOT_DOTVAL( v_avx[k], v_avx[k],mod_p); //reduction
-				XORDOT_DOT( acc[k], acc[k],acc[k]); //clear the accumulator
-			}
-	}
-
-	for(i=0; i<SABER_N/16; i++){
-		vst2q_u16 ((uint16_t *)(message_dec_unpacked+i*16), v_avx[i]);
-	}
-
 
 	for(i=0;i<SABER_SCALEBYTES_KEM;i++){
 		scale_ar[i]=ciphertext[SABER_CIPHERTEXTBYTES+i];
@@ -531,12 +492,39 @@ void indcpa_kem_dec(const unsigned char *sk,
 		SABER_un_pack6bit(scale_ar, op);
 	#endif
 
+	// InnerProduct(b', s, mod p)
+	for(j=0;j<SABER_K;j++){
 
-	//addition of h2
-	for(i=0;i<SABER_N;i++){
-		message_dec_unpacked[i]= ( ( message_dec_unpacked[i] + h2 - (op[i]<<(SABER_EP-SABER_ET)) ) & (SABER_P-1) ) >> (SABER_EP-1);
+		// toom_cook_4way_avx(pksv_avx[j], sksv_avx[j], SABER_P, acc);
+		toom_cook_4way_neon(pksv[j], sksv[j], SABER_P, acc);
+
+		for(k=0;k<SABER_N/16;k++){
+			vload(v_neon, &v_avx[k*16]);
+			vload(acc_neon, &acc[k*16]);
+			// v_avx[k] += acc[k]
+			vadd(v_neon, v_neon, acc_neon);
+			// v_avx[k] &= mod_p 
+			vand(v_neon, v_neon, mod_p);
+			// acc[k] = 0
+			// vzero(&acc[k*16], acc_neon); // No need
+			vstore(&v_avx[k*16], v_neon);
+		}
 	}
 
+	for(i=0; i<SABER_N/16; i++){
+		//addition of h2
+		vload(v_neon, &v_avx[i*16]);
+		vadd(v_neon, v_neon, vh2);
+
+		vload(acc_neon, &op[i*16]);
+		vsl(acc_neon, acc_neon, (SABER_EP-SABER_ET));
+
+		vsub(v_neon, v_neon, acc_neon);
+		vand(v_neon, v_neon, mod_p);
+		vsr(v_neon, v_neon, (SABER_EP-1));
+
+		vstore(&message_dec_unpacked[i*16], v_neon);	
+	}
 
 	POL2MSG(message_dec_unpacked, message_dec);
 }
