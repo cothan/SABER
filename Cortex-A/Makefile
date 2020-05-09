@@ -1,4 +1,4 @@
-CC 		  = clang
+CC 		  = cc
 CFLAGS   = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -lcrypto
 CFLAGS2  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -std=c11 
 CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native
