@@ -3,7 +3,7 @@
 #include "rng.h"
 #include "cbd.h"
 #include "SABER_params.h"
-#include "polymul/toom_cook_4/asimd_toom_cook_4way_neon.c"
+#include "polymul/toom_cook_4/asimd_toom_cook_4way_neon.h"
 #include "fips202.h"
 
 #if __aarch64__
