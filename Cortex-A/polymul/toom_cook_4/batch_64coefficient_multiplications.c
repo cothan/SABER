@@ -91,7 +91,7 @@ void karatsuba32_fork_avx_new(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t positi
   vstore(&a[(position + 2)*16], tmp);
 
   vadd(tmp, b1[0], b1[1]);
-  vstore(&b[(position + 2)*16], b1[0], b1[1]);
+  vstore(&b[(position + 2)*16], tmp);
 
 }
 
@@ -245,7 +245,7 @@ void karatsuba32_join_avx_partial2(uint16_t *result_final, uint8_t position) {
   // b[1] = b[1] - a[1] - a[3]
   vsub(b2, b1, c2_tmp);
   vsub(rf[2], b2, rf[3]);
-  vstore(&result_final[2*16], rf[2])
+  vstore(&result_final[2*16], rf[2]);
 }
 
 static inline 
@@ -262,15 +262,15 @@ void join_32coefficient_results(uint16_t *result_d0, uint16_t *result_d1,
   }
 
   // {bb[5],bb[4]} = resultd0[63:32] + resultd01[31:0]
-  vload(tmp, &rd01[0*16]);
+  vload(tmp, &result_d01[0*16]);
   vadd(bb[0], rd0[2], tmp);
-  vload(tmp, &rd01[1*16]);
+  vload(tmp, &result_d01[1*16]);
   vadd(bb[1], rd0[3], tmp);
 
   // {bb[7],bb[6]} = resultd01[63:32] + resultd1[31:0]
-  vload(tmp, &rd01[2*16]);
+  vload(tmp, &result_d01[2*16]);
   vadd(bb[2], tmp, rd1[0]);
-  vload(tmp, &rd01[3*16]);
+  vload(tmp, &result_d01[3*16]);
   vadd(bb[3], tmp, rd1[1]);
 
   // {bb[7],bb[6],bb[5],bb[4]} <-- {bb[7],bb[6],bb[5],bb[4]} - {a[3],a[2],a[1],a[0]} - {a[7],a[6],a[5],a[4]}
