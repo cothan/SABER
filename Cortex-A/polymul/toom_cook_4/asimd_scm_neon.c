@@ -33,7 +33,7 @@ void vxor(uint16x8_t c, uint16x8_t a, uint16x8_t b)
  * schoolbook_neon_new
  * Assume a, b are already loaded
  */
-void schoolbook_neon_new(uint16_t *c, uint16_t *a_mem, uint16_t *b_mem) {
+void schoolbook_neon_new(uint16_t *restrict c, uint16_t *restrict a_mem, uint16_t *restrict b_mem) {
   uint16x8_t tmp, a[16], b[16];
   unsigned int i, j;
   unsigned int pad = 0;
