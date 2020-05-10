@@ -373,8 +373,8 @@ void batch_64coefficient_multiplications(
   transpose(&c_avx[16*16]);
 
   // store the partial multiplication result.
-  vcopy(&c_avx_extra[16*0], c_avx[15*16]);
-  vcopy(&c_avx_extra[16*1], c_avx[31*16]);
+  vcopy(&c_avx_extra[16*0], &c_avx[15*16]);
+  vcopy(&c_avx_extra[16*1], &c_avx[31*16]);
 
   karatsuba32_join_avx_new(result_d0, 0); // 0, 1, 2, 3
   karatsuba32_join_avx_new(result_d1, 3); // 3, 4, 5, 6
