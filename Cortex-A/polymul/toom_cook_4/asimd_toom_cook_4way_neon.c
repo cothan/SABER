@@ -64,13 +64,13 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 	uint16_t res_avx[16 * 2 * AVX_N] = {0};
 	
     // All in memory
-	uint16_t    w1_avx[2 * 16 * small_len_avx], 
-                w2_avx[2 * 16 * small_len_avx], 
-                w3_avx[2 * 16 * small_len_avx], 
-                w4_avx[2 * 16 * small_len_avx], 
-                w5_avx[2 * 16 * small_len_avx], 
-                w6_avx[2 * 16 * small_len_avx], 
-                w7_avx[2 * 16 * small_len_avx];
+	uint16_t    w1_avx[2 * 16 * small_len_avx] = {0}, 
+                w2_avx[2 * 16 * small_len_avx] = {0}, 
+                w3_avx[2 * 16 * small_len_avx] = {0}, 
+                w4_avx[2 * 16 * small_len_avx] = {0}, 
+                w5_avx[2 * 16 * small_len_avx] = {0}, 
+                w6_avx[2 * 16 * small_len_avx] = {0}, 
+                w7_avx[2 * 16 * small_len_avx] = {0};
 
 
 	//--------------------these data are created for place holding---------
@@ -157,11 +157,11 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 
 	    //create t_h
 
-        vsub(a1_tmp, th_a_neon, t_h_a_neon);
-		vsub(b1_tmp, th_b_neon, t_h_b_neon);
+        vsub(a2_tmp, th_a_neon, t_h_a_neon);
+		vsub(b2_tmp, th_b_neon, t_h_b_neon);
 
-        vstore(&a3_ph_avx[i*16], a1_tmp);
-        vstore(&b3_ph_avx[i*16], b1_tmp);
+        vstore(&a3_ph_avx[i*16], a2_tmp);
+        vstore(&b3_ph_avx[i*16], b2_tmp);
 
 	//-------------------t1 and t_1. t1 <-a(1)*b(1). t_1 <- a(-1)*b(-1) ---------------------
 
