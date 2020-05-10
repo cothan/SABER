@@ -1,6 +1,15 @@
 #include "batch_64coefficient_multiplications.h"
 #include "asimd_matrix.c"
 
+#define SCM_SIZE 16
+
+uint16_t c_avx[16 * 2 * SCM_SIZE];
+uint16_t a[16 * SCM_SIZE];
+uint16_t b[16 * SCM_SIZE];
+uint16_t c_avx_extra[16 * 4];
+
+uint16_t a_extra[2*16], b_extra[2*16];
+
 static inline 
 void vload(uint16x8x2_t c, uint16_t *a)
 {
@@ -82,10 +91,6 @@ void vxor(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
 	c.val[0] = veorq_u16(a.val[0], b.val[0]);
 	c.val[1] = veorq_u16(a.val[1], b.val[1]);
 }
-
-
-uint16_t a_extra[2*16], b_extra[2*16];
-
 
 // Position <= 14
 static inline 
