@@ -33,21 +33,6 @@ void vcopy(uint16_t *c, uint16_t *a)
 	c.val[0] = vshrq_n_u16(a.val[0], value); \
   	c.val[1] = vshrq_n_u16(a.val[1], value);
 
-// static inline 
-// void vsl(uint16x8x2_t c, uint16x8x2_t a, const uint16_t value)
-// {
-//     // c = a << value 
-//     c.val[0] = vshlq_n_u16(a.val[0], value);
-//     c.val[1] = vshlq_n_u16(a.val[1], value);
-// }
-
-// static inline 
-// void vsr(uint16x8x2_t c, uint16x8x2_t a, const uint16_t value)
-// {
-// 	// c = a >> value 
-// 	c.val[0] = vshrq_n_u16(a.val[0], value);
-//   	c.val[1] = vshrq_n_u16(a.val[1], value);
-// }
 
 static inline 
 void vadd(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
@@ -392,20 +377,25 @@ void toom_cook_4way_neon(uint16_t *restrict a1_avx,
 
 	for (i = 0; i < 2 * small_len_avx; i++)
 	{
-		vload(w1, &w1_avx[i*16]);
-		vload(w2, &w2_avx[i*16]);
-		vload(w3, &w3_avx[i*16]);
-		vload(w4, &w4_avx[i*16]);
-		vload(w5, &w5_avx[i*16]);
-		vload(w6, &w6_avx[i*16]);
 		vload(w7, &w7_avx[i*16]);
-
 		vadd(res_avx[0 * small_len_avx + i], res_avx[0 * small_len_avx + i], w7);
+
+		vload(w6, &w6_avx[i*16]);
 		vadd(res_avx[1 * small_len_avx + i], res_avx[1 * small_len_avx + i], w6);
+
+		vload(w5, &w5_avx[i*16]);
 		vadd(res_avx[2 * small_len_avx + i], res_avx[2 * small_len_avx + i], w5);
+
+		vload(w4, &w4_avx[i*16]);
 		vadd(res_avx[3 * small_len_avx + i], res_avx[3 * small_len_avx + i], w4);
+
+		vload(w3, &w3_avx[i*16]);
 		vadd(res_avx[4 * small_len_avx + i], res_avx[4 * small_len_avx + i], w3);
+
+		vload(w2, &w2_avx[i*16]);
 		vadd(res_avx[5 * small_len_avx + i], res_avx[5 * small_len_avx + i], w2);
+
+		vload(w1, &w1_avx[i*16]);
 		vadd(res_avx[6 * small_len_avx + i], res_avx[6 * small_len_avx + i], w1);
 	}
 
