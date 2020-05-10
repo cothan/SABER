@@ -1,10 +1,10 @@
 #define permute0(c, a, b, value) \
-  c.val[0] = (uint16x8_t)a.val[0]; \
-  c.val[1] = (uint16x8_t)b.val[0];
+  vst1q_u16( c,     (uint16x8_t) a.val[0]); \
+  vst1q_u16( c + 8, (uint16x8_t) b.val[0]);
 
 #define permute1(c, a, b, value)  \
-  c.val[0] = (uint16x8_t)a.val[1]; \
-  c.val[1] = (uint16x8_t)b.val[1];
+  vst1q_u16(c,     (uint16x8_t) a.val[1]); \
+  vst1q_u16(c + 8, (uint16x8_t) b.val[1]);
 
 /*
  * tranpose
