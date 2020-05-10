@@ -1,18 +1,10 @@
-static inline 
-void permute0(uint16_t *c, uint64x2x2_t a, uint64x2x2_t b, int16_t value)
-{
-  (void) value;
-  vst1q_u16( c,     (uint16x8_t) a.val[0]);
-  vst1q_u16( c + 8, (uint16x8_t) b.val[0]);
-}
+#define PERMUTE0(c, a, b, value) \
+  c.val[0] = (uint16x8_t)a.val[0]; \
+  c.val[1] = (uint16x8_t)b.val[0];
 
-static inline 
-void permute1(uint16_t *c, uint64x2x2_t a, uint64x2x2_t b, int16_t value)
-{
-  (void) value;
-  vst1q_u16(c,     (uint16x8_t) a.val[1]);
-  vst1q_u16(c + 8, (uint16x8_t) b.val[1]);
-}
+#define PERMUTE1(c, a, b, value)  \
+  c.val[0] = (uint16x8_t)a.val[1]; \
+  c.val[1] = (uint16x8_t)b.val[1];
 
 /*
  * tranpose

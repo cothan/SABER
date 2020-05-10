@@ -17,61 +17,40 @@
 
 #define h2 ( (1<<(SABER_EP-2)) - (1<<(SABER_EP-SABER_ET-1)) + (1<<(SABER_EQ-SABER_EP-1)) )
 
-static inline 
-void vload(uint16x8x2_t c, uint16_t *a)
-{
-    // load c <= a 
-    c = vld2q_u16(a);
-}
+uint16x8x2_t tmp; 
 
-static inline 
-void vstore(uint16_t *c, uint16x8x2_t a)
-{
-    // store c <= a 
-    vst2q_u16(c, a);
-}
+// load c <= a 
+#define vload(c, a) c = vld2q_u16(a);
 
-static inline
-void vxor(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
-{
-	// c = a ^ b 
-	c.val[0] = veorq_u16(a.val[0], b.val[0]);
+// store c <= a 
+#define vstore(c, a) vst2q_u16(c, a);
+
+// copy c<= a
+#define vcopy(c, a) vload(tmp, a); vstore(c, tmp);
+
+// c = a ^ b 
+#define vxor(c, a, b) \ 
+	c.val[0] = veorq_u16(a.val[0], b.val[0]); \
 	c.val[1] = veorq_u16(a.val[1], b.val[1]);
-}
 
-static inline 
-void vadd1(uint16x8x2_t c, uint16x8x2_t a, uint16x8_t b)
-{
-    // c = a + b
-    c.val[0] = vaddq_u16(a.val[0], b);
-    c.val[1] = vaddq_u16(a.val[1], b);
-}
+// c = a + b
+#define vadd1(c, a, b) \
+	c.val[0] = vaddq_u16(a.val[0], b); \
+	c.val[1] = vaddq_u16(a.val[1], b);
 
-static inline 
-void vadd(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
-{
-    // c = a + b
-    c.val[0] = vaddq_u16(a.val[0], b.val[0]);
-    c.val[1] = vaddq_u16(a.val[1], b.val[1]);
-}
+// c = a + b
+#define vadd(c, a, b) \
+	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
+	c.val[1] = vaddq_u16(a.val[1], b.val[1]);
 
-static inline
-void vsub(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
-{
-    // c = a - b
-    c.val[0] = vsubq_u16(a.val[0], b.val[0]);
-    c.val[1] = vsubq_u16(a.val[1], b.val[1]);
-
-}
-
-
-static inline
-void vand(uint16x8x2_t c, uint16x8x2_t a, uint16x8_t b)
-{
-	// c = a & b
-	c.val[0] = vandq_u16(a.val[0], b);
+// c = a - b
+#define vsub(c, a, b) \
+	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
+	c.val[1] = vsubq_u16(a.val[1], b.val[1]);
+// c = a & b
+#define vand(c, a, b) \
+	c.val[0] = vandq_u16(a.val[0], b); \
 	c.val[1] = vandq_u16(a.val[1], b);
-}
 
 // c = a << value 
 #define vsl(c, a, value) \
@@ -83,22 +62,11 @@ void vand(uint16x8x2_t c, uint16x8x2_t a, uint16x8_t b)
 	c.val[0] = vshrq_n_u16(a.val[0], value); \
   	c.val[1] = vshrq_n_u16(a.val[1], value);
 
-
-static inline 
-void vzero(uint16_t *c, uint16x8x2_t zero)
-{
-	// Zeroing 16 bytes of c
-	vxor(zero, zero, zero);
+// c = 0 
+#define vzero(c, zero) \
+	vxor(zero, zero, zero); \
 	vstore(c, zero);
-}
 
-static inline
-void vcopy(uint16_t *c, uint16_t *a)
-{
-    uint16x8x2_t tmp; 
-    vload(tmp, a);
-    vstore(c, tmp);
-}
 
 void POL2MSG(uint16_t *message_dec_unpacked, unsigned char *message_dec){
 
