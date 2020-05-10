@@ -49,15 +49,16 @@ uint16x8x2_t tmp;
  * b1_avx: In memory  [256]
  * res_avx_output: In memory [512]
  */
+
+#define AVX_N (SABER_N / 16)
+#define small_len_avx (AVX_N / 4)
+
 void toom_cook_4way_neon(uint16_t  *a1_avx,
 						uint16_t *b1_avx,
 						uint16_t p_mod,
 						uint16_t *res_avx_output)
 {
-	const int16_t AVX_N = SABER_N / 16;
-	int16_t i;
-
-	const int16_t small_len_avx = AVX_N / 4;
+	uint16_t i;
 
 	//-----Memory data declaration-----------------
 	uint16_t res_avx[16 * 2 * AVX_N] = {0};
