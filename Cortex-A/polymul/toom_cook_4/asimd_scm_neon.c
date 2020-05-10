@@ -13,34 +13,6 @@
 // c = aa ^ bb 
 #define vxor(c, aa, bb) c = veorq_u16(aa, bb);
 
-// static inline
-// void vmul(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
-// {
-//     // c = aa * bb
-//     c = vmulq_u16(aa, bb);
-// }
-
-// static inline
-// void vmla(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
-// {
-//     // c += aa*bb 
-//     c = vmlaq_u16(c, aa, bb);
-// }
-
-// static inline
-// void vload(uint16x8_t c, uint16_t *mem)
-// {
-//     // Load mem to c 
-//     c = vld1q_u16(mem);
-// }
-
-// static inline
-// void vxor(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
-// {
-// 	// c = aa ^ bb 
-// 	c = veorq_u16(aa, bb);
-// }
-
 /*
  * schoolbook_neon_new
  * Assume aa, bb are already loaded
@@ -50,30 +22,39 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
   uint16_t i, j;
   uint16_t pad = 0;
   for (i = 0; i < 2; i++) {
-    for (j = 0; j < 16; j++)
-    {
-        vload(aa[j], &a_mem[j*16 + pad]);
-        vload(bb[j], &b_mem[j*16 + pad]);
-    }
+    vload(aa[0], &a_mem[0*16 + pad]);
+    vload(bb[0], &b_mem[0*16 + pad]);
 
     vmul(tmp, aa[0], bb[0]);
     vst1q_u16(&c_mem[0 + pad], tmp);
     //----
+    vload(aa[1], &a_mem[1*16 + pad]);
+    vload(bb[1], &b_mem[1*16 + pad]);
+
     vmul(tmp, aa[0], bb[1]);
     vmla(tmp, aa[1], bb[0]);
     vst1q_u16(&c_mem[16 + pad], tmp);
     //----
+    vload(aa[2], &a_mem[2*16 + pad]);
+    vload(bb[2], &b_mem[2*16 + pad]);
+
     vmul(tmp, aa[0], bb[2]);
     vmla(tmp, aa[1], bb[1]);
     vmla(tmp, aa[2], bb[0]);
     vst1q_u16(&c_mem[32 + pad], tmp);
     //----
+    vload(aa[3], &a_mem[3*16 + pad]);
+    vload(bb[3], &b_mem[3*16 + pad]);
+
     vmul(tmp, aa[0], bb[3]);
     vmla(tmp, aa[1], bb[2]);
     vmla(tmp, aa[2], bb[1]);
     vmla(tmp, aa[3], bb[0]);
     vst1q_u16(&c_mem[48 + pad], tmp);
     //----
+    vload(aa[4], &a_mem[4*16 + pad]);
+    vload(bb[4], &b_mem[4*16 + pad]);
+
     vmul(tmp, aa[0], bb[4]);
     vmla(tmp, aa[1], bb[3]);
     vmla(tmp, aa[2], bb[2]);
@@ -81,6 +62,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[4], bb[0]);
     vst1q_u16(&c_mem[64 + pad], tmp);
     //----
+    vload(aa[5], &a_mem[5*16 + pad]);
+    vload(bb[5], &b_mem[5*16 + pad]);
+
     vmul(tmp, aa[0], bb[5]);
     vmla(tmp, aa[1], bb[4]);
     vmla(tmp, aa[2], bb[3]);
@@ -89,6 +73,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[5], bb[0]);
     vst1q_u16(&c_mem[80 + pad], tmp);
     //----
+    vload(aa[6], &a_mem[6*16 + pad]);
+    vload(bb[6], &b_mem[6*16 + pad]);
+
     vmul(tmp, aa[0], bb[6]);
     vmla(tmp, aa[1], bb[5]);
     vmla(tmp, aa[2], bb[4]);
@@ -98,6 +85,10 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[6], bb[0]);
     vst1q_u16(&c_mem[96 + pad], tmp);
     //----
+    vload(aa[7], &a_mem[7*16 + pad]);
+    vload(bb[7], &b_mem[7*16 + pad]);
+
+
     vmul(tmp, aa[0], bb[7]);
     vmla(tmp, aa[1], bb[6]);
     vmla(tmp, aa[2], bb[5]);
@@ -108,6 +99,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[7], bb[0]);
     vst1q_u16(&c_mem[112 + pad], tmp);
     //----
+    vload(aa[8], &a_mem[8*16 + pad]);
+    vload(bb[8], &b_mem[8*16 + pad]);
+
     vmul(tmp, aa[0], bb[8]);
     vmla(tmp, aa[1], bb[7]);
     vmla(tmp, aa[2], bb[6]);
@@ -119,6 +113,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[8], bb[0]);
     vst1q_u16(&c_mem[128 + pad], tmp);
     //----
+    vload(aa[9], &a_mem[9*16 + pad]);
+    vload(bb[9], &b_mem[9*16 + pad]);
+
     vmul(tmp, aa[0], bb[9]);
     vmla(tmp, aa[1], bb[8]);
     vmla(tmp, aa[2], bb[7]);
@@ -131,6 +128,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[9], bb[0]);
     vst1q_u16(&c_mem[144 + pad], tmp);
     //----
+    vload(aa[10], &a_mem[10*16 + pad]);
+    vload(bb[10], &b_mem[10*16 + pad]);
+
     vmul(tmp, aa[0], bb[10]);
     vmla(tmp, aa[1], bb[9]);
     vmla(tmp, aa[2], bb[8]);
@@ -144,6 +144,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[10], bb[0]);
     vst1q_u16(&c_mem[160 + pad], tmp);
     //----
+    vload(aa[11], &a_mem[11*16 + pad]);
+    vload(bb[11], &b_mem[11*16 + pad]);
+
     vmul(tmp, aa[0], bb[11]);
     vmla(tmp, aa[1], bb[10]);
     vmla(tmp, aa[2], bb[9]);
@@ -158,6 +161,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[11], bb[0]);
     vst1q_u16(&c_mem[176 + pad], tmp);
     //----
+    vload(aa[12], &a_mem[12*16 + pad]);
+    vload(bb[12], &b_mem[12*16 + pad]);
+
     vmul(tmp, aa[0], bb[12]);
     vmla(tmp, aa[1], bb[11]);
     vmla(tmp, aa[2], bb[10]);
@@ -173,6 +179,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[12], bb[0]);
     vst1q_u16(&c_mem[192 + pad], tmp);
     //----
+    vload(aa[13], &a_mem[13*16 + pad]);
+    vload(bb[13], &b_mem[13*16 + pad]);
+
     vmul(tmp, aa[0], bb[13]);
     vmla(tmp, aa[1], bb[12]);
     vmla(tmp, aa[2], bb[11]);
@@ -189,6 +198,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[13], bb[0]);
     vst1q_u16(&c_mem[208 + pad], tmp);
     //----
+    vload(aa[14], &a_mem[14*16 + pad]);
+    vload(bb[14], &b_mem[14*16 + pad]);
+
     vmul(tmp, aa[0], bb[14]);
     vmla(tmp, aa[1], bb[13]);
     vmla(tmp, aa[2], bb[12]);
@@ -206,6 +218,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[14], bb[0]);
     vst1q_u16(&c_mem[224 + pad], tmp);
     //----
+    vload(aa[15], &a_mem[15*16 + pad]);
+    vload(bb[15], &b_mem[15*16 + pad]);
+
     vmul(tmp, aa[0], bb[15]);
     vmla(tmp, aa[1], bb[14]);
     vmla(tmp, aa[2], bb[13]);
