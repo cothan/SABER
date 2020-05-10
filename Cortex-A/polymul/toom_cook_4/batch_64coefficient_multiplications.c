@@ -54,7 +54,7 @@ uint16x8x2_t tmp;
 
 // Position <= 14
 static inline 
-void karatsuba32_fork_avx_new(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t position) {
+void karatsuba32_fork_avx_new(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t position) {
 
   vstore(&a[position*16], a1[0]);
   vstore(&b[position*16], b1[0]);
@@ -72,7 +72,7 @@ void karatsuba32_fork_avx_new(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t positi
 
 // Position > 14
 static inline 
-void karatsuba32_fork_avx_new1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t position) {
+void karatsuba32_fork_avx_new1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t position) {
 
   vstore(&a[position*16], a1[0]);
   vstore(&b[position*16], b1[0]);
@@ -89,7 +89,7 @@ void karatsuba32_fork_avx_new1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t posit
 }
 
 static inline 
-void karatsuba32_fork_avx_partial(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t position) {
+void karatsuba32_fork_avx_partial(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t position) {
 
   vstore(&a[position*16], a1[1]);
   vstore(&b[position*16], b1[1]);
@@ -102,7 +102,7 @@ void karatsuba32_fork_avx_partial(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t po
 }
 
 static inline 
-void karatsuba32_fork_avx_partial1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t position) {
+void karatsuba32_fork_avx_partial1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t position) {
 
   vadd(tmp, a1[0], a1[1]);
   vstore(&a[position*16], tmp);
@@ -111,8 +111,8 @@ void karatsuba32_fork_avx_partial1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint8_t p
   vstore(&b[position*16], tmp);
 }
 
-static inline 
-void karatsuba32_join_avx_new(uint16_t *result_final, uint8_t position) {
+// static inline 
+void karatsuba32_join_avx_new(uint16_t *result_final, uint16_t position) {
 
   uint16x8x2_t c1_tmp, c2_tmp;
   uint16x8x2_t b0, b1, b2;
@@ -148,8 +148,8 @@ void karatsuba32_join_avx_new(uint16_t *result_final, uint8_t position) {
 
 }
 
-static inline 
-void karatsuba32_join_avx_partial(uint16_t *result_final, uint8_t position) {
+// static inline 
+void karatsuba32_join_avx_partial(uint16_t *result_final, uint16_t position) {
 
   uint16x8x2_t c1_tmp, c2_tmp;
   uint16x8x2_t b0, b1, b2;
@@ -184,8 +184,8 @@ void karatsuba32_join_avx_partial(uint16_t *result_final, uint8_t position) {
   vstore(&result_final[2*16], rf[2]);
 }
 
-static inline 
-void karatsuba32_join_avx_partial2(uint16_t *result_final, uint8_t position) {
+// static inline 
+void karatsuba32_join_avx_partial2(uint16_t *result_final, uint16_t position) {
 
   uint16x8x2_t c1_tmp, c2_tmp;
   uint16x8x2_t b0, b1, b2;
@@ -220,7 +220,7 @@ void karatsuba32_join_avx_partial2(uint16_t *result_final, uint8_t position) {
   vstore(&result_final[2*16], rf[2]);
 }
 
-static inline 
+// static inline 
 void join_32coefficient_results(uint16_t *result_d0, uint16_t *result_d1,
                                 uint16_t *result_d01, uint16_t *result_64ks) {
   
