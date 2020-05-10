@@ -84,22 +84,6 @@ void vand(uint16x8x2_t c, uint16x8x2_t a, uint16x8_t b)
   	c.val[1] = vshrq_n_u16(a.val[1], value);
 
 
-// static inline 
-// void vsl(uint16x8x2_t c, uint16x8x2_t a, uint16_t value)
-// {
-//     // c = a << value 
-//     c.val[0] = vshlq_n_u16(a.val[0], value);
-//     c.val[1] = vshlq_n_u16(a.val[1], value);
-// }
-
-// static inline 
-// void vsr(uint16x8x2_t c, uint16x8x2_t a, uint16_t value)
-// {
-// 	// c = a >> value 
-// 	c.val[0] = vshrq_n_u16(a.val[0], value);
-//   	c.val[1] = vshrq_n_u16(a.val[1], value);
-// }
-
 static inline 
 void vzero(uint16_t *c, uint16x8x2_t zero)
 {
