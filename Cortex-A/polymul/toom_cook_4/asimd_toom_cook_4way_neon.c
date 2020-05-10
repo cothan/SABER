@@ -406,10 +406,13 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 		vstore(&res_avx[(6 * small_len_avx + i)*16], a2_tmp);
 	}
 
+
 	// Reduction by X^256 + 1
 	for (i = 0; i < 16; i++)
 	{
-		vsub(a1_tmp, res_avx[i], res_avx[i+16]);
-		vstore(&res_avx_output[i*16], a1_tmp);
+		vload(a1_tmp, &res_avx[i*16]);
+		vload(b1_tmp, &res_avx[(i+16)*16]);
+		vsub(a2_tmp, a1_tmp, b1_tmp);
+		vstore(&res_avx_output[i*16], a2_tmp);
 	}
 }
