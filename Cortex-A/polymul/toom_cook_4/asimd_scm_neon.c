@@ -7,8 +7,11 @@
 // c += aa*bb 
 #define vmla(c, aa, bb) c = vmlaq_u16(c, aa, bb);
 
-// Load mem to c 
-#define vload(c, mem) c = vld1q_u16(mem);
+// load c <= a 
+#define vload(c, a) c = vld1q_u16_x2(a);
+
+// store c <= a 
+#define vstore(c, a) vst1q_u16_x2(c, a);
 
 // c = aa ^ bb 
 #define vxor(c, aa, bb) c = veorq_u16(aa, bb);
