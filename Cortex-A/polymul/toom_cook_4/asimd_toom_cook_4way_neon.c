@@ -4,10 +4,10 @@
 uint16x8x2_t tmp; 
 
 // load c <= a 
-#define vload(c, a) c = vld2q_u16(a);
+#define vload(c, a) c = vld1q_u16_x2(a);
 
 // store c <= a 
-#define vstore(c, a) vst2q_u16(c, a);
+#define vstore(c, a) vst1q_u16_x2(c, a);
 
 // copy c<= a
 #define vcopy(c, a) vload(tmp, a); vstore(c, tmp);
