@@ -1,8 +1,8 @@
-#define PERMUTE0(c, a, b, value) \
+#define permute0(c, a, b, value) \
   c.val[0] = (uint16x8_t)a.val[0]; \
   c.val[1] = (uint16x8_t)b.val[0];
 
-#define PERMUTE1(c, a, b, value)  \
+#define permute1(c, a, b, value)  \
   c.val[0] = (uint16x8_t)a.val[1]; \
   c.val[1] = (uint16x8_t)b.val[1];
 
