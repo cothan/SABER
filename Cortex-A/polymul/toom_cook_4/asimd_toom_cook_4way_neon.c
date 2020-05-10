@@ -59,8 +59,8 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 
 	const int16_t small_len_avx = AVX_N / 4;
 
-	//-----AVX data declaration-----------------
-	uint16x8x2_t res_avx[2 * AVX_N];
+	//-----Memory data declaration-----------------
+	uint16_t res_avx[16 * 2 * AVX_N] = {0};
 	
     // All in memory
 	uint16_t    w1_avx[2 * 16 * small_len_avx], 
@@ -344,33 +344,65 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 		vstore(&w7_avx[i*16], w7);
 	}
 
-	for (i = 0; i < 2 * AVX_N; i++)
-	{
-		vxor(res_avx[i], res_avx[i], res_avx[i]);
-	}
+	// for (i = 0; i < 2 * small_len_avx; i++)
+	// {
+		// vload(w7, &w7_avx[i*16]);
+		// vadd(res_avx[0 * small_len_avx + i], res_avx[0 * small_len_avx + i], w7);
 
+		// vload(w6, &w6_avx[i*16]);
+		// vadd(res_avx[1 * small_len_avx + i], res_avx[1 * small_len_avx + i], w6);
+
+		// vload(w5, &w5_avx[i*16]);
+		// vadd(res_avx[2 * small_len_avx + i], res_avx[2 * small_len_avx + i], w5);
+
+		// vload(w4, &w4_avx[i*16]);
+		// vadd(res_avx[3 * small_len_avx + i], res_avx[3 * small_len_avx + i], w4);
+
+		// vload(w3, &w3_avx[i*16]);
+		// vadd(res_avx[4 * small_len_avx + i], res_avx[4 * small_len_avx + i], w3);
+
+		// vload(w2, &w2_avx[i*16]);
+		// vadd(res_avx[5 * small_len_avx + i], res_avx[5 * small_len_avx + i], w2);
+
+		// vload(w1, &w1_avx[i*16]);
+		// vadd(res_avx[6 * small_len_avx + i], res_avx[6 * small_len_avx + i], w1);
+	// }
 	for (i = 0; i < 2 * small_len_avx; i++)
 	{
 		vload(w7, &w7_avx[i*16]);
-		vadd(res_avx[0 * small_len_avx + i], res_avx[0 * small_len_avx + i], w7);
+		vload(a1_tmp, &res_avx[(0 * small_len_avx + i)*16]);
+		vadd(a1_tmp, a1_tmp, w7);
+		vstore(&res_avx[(0 * small_len_avx + i)*16], a1_tmp);
 
 		vload(w6, &w6_avx[i*16]);
-		vadd(res_avx[1 * small_len_avx + i], res_avx[1 * small_len_avx + i], w6);
+		vload(b1_tmp, &res_avx[(1 * small_len_avx + i)*16]);
+		vadd(b1_tmp, b1_tmp, w6);
+		vstore(&res_avx[(1 * small_len_avx + i)*16], b1_tmp);
 
 		vload(w5, &w5_avx[i*16]);
-		vadd(res_avx[2 * small_len_avx + i], res_avx[2 * small_len_avx + i], w5);
+		vload(a2_tmp, &res_avx[(2 * small_len_avx + i)*16]);
+		vadd(a2_tmp, a2_tmp, w5);
+		vstore(&res_avx[(2 * small_len_avx + i)*16], a2_tmp);
 
 		vload(w4, &w4_avx[i*16]);
-		vadd(res_avx[3 * small_len_avx + i], res_avx[3 * small_len_avx + i], w4);
+		vload(b2_tmp, &res_avx[(3 * small_len_avx + i)*16]);
+		vadd(b2_tmp, b2_tmp, w4);
+		vstore(&res_avx[(3 * small_len_avx + i)*16], b2_tmp);
 
 		vload(w3, &w3_avx[i*16]);
-		vadd(res_avx[4 * small_len_avx + i], res_avx[4 * small_len_avx + i], w3);
+		vload(a1_tmp, &res_avx[(4 * small_len_avx + i)*16]);
+		vadd(a1_tmp, a1_tmp, w3);
+		vstore(&res_avx[(4 * small_len_avx + i)*16], a1_tmp);
 
 		vload(w2, &w2_avx[i*16]);
-		vadd(res_avx[5 * small_len_avx + i], res_avx[5 * small_len_avx + i], w2);
+		vload(b1_tmp, &res_avx[(5 * small_len_avx + i)*16]);
+		vadd(b1_tmp, b1_tmp, w2);
+		vstore(&res_avx[(5 * small_len_avx + i)*16], b1_tmp);
 
 		vload(w1, &w1_avx[i*16]);
-		vadd(res_avx[6 * small_len_avx + i], res_avx[6 * small_len_avx + i], w1);
+		vload(a2_tmp, &res_avx[(6 * small_len_avx + i)*16]);
+		vadd(a2_tmp, a2_tmp, w1);
+		vstore(&res_avx[(6 * small_len_avx + i)*16], a2_tmp);
 	}
 
 	// Reduction by X^256 + 1
