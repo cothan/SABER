@@ -229,8 +229,8 @@ void join_32coefficient_results(uint16_t *result_d0, uint16_t *result_d1,
   uint16_t i;
   for (i = 0; i < 4; i++)
   {
-    vload(rd0[i], &rd0[i*16]);
-    vload(rd1[i], &rd1[i*16]);
+    vload(rd0[i], &result_d0[i*16]);
+    vload(rd1[i], &result_d1[i*16]);
   }
 
   // {bb[5],bb[4]} = resultd0[63:32] + resultd01[31:0]
