@@ -3,7 +3,13 @@
 *.elf
 *.a
 *.d
+*.json
+*.req
+*.rsp
+*.gdb*
 AVX/papi_hl_output/*
 .vscode/settings.json
 .vscode/launch.json
 .vscode/tasks.json
+AVX/test/PQCgenKAT_kem
+Reference_C/test/PQCgenKAT_kem
