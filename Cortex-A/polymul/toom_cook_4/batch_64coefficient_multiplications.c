@@ -225,7 +225,6 @@ void join_32coefficient_results(uint16_t *result_d0, uint16_t *result_d1,
                                 uint16_t *result_d01, uint16_t *result_64ks) {
   
   uint16x8x2_t rd0[4], rd1[4], bb[4];
-  uint16x8x2_t tmp;
   uint16_t i;
   for (i = 0; i < 4; i++)
   {
