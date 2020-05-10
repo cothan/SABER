@@ -134,13 +134,13 @@ void karatsuba32_join_avx_new(uint16_t *result_final, uint8_t position) {
   // b[1] = resultd01[n-1:n/2] + resultd1[n/2-1:0]
   vadd(b1, c1_tmp, c2_tmp);
 
-  vload(c1_tmp, c_avx[(position + 1)*16]);
+  vload(c1_tmp, &c_avx[(position + 1)*16]);
   // b[0] = b[0] - a[0] - a[2]
   vsub(b2, b0, rf[0]);
   vsub(rf[1], b2, c1_tmp);
   vstore(&result_final[1*16], rf[1]);
 
-  vload(c2_tmp, c_avx[(position + 16)*16]);
+  vload(c2_tmp, &c_avx[(position + 16)*16]);
   // b[1] = b[1] - a[1] - a[3]
   vsub(b2, b1, c2_tmp);
   vsub(rf[2], b2, rf[3]);
