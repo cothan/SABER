@@ -1,27 +1,16 @@
 #include <arm_neon.h>
 #include "batch_64coefficient_multiplications.h"
 
-static inline 
-void vload(uint16x8x2_t c, uint16_t *a)
-{
-    // load c <= a 
-    c = vld2q_u16(a);
-}
+uint16x8x2_t tmp; 
 
-static inline 
-void vstore(uint16_t *c, uint16x8x2_t a)
-{
-    // store c <= a 
-    vst2q_u16(c, a);
-}
+// load c <= a 
+#define vload(c, a) c = vld2q_u16(a);
 
-static inline
-void vcopy(uint16_t *c, uint16_t *a)
-{
-    uint16x8x2_t tmp; 
-    vload(tmp, a);
-    vstore(c, tmp);
-}
+// store c <= a 
+#define vstore(c, a) vst2q_u16(c, a);
+
+// copy c<= a
+#define vcopy(c, a) vload(tmp, a); vstore(c, tmp);
 
 // c = a << value 
 #define vsl(c, a, value) \
@@ -33,40 +22,25 @@ void vcopy(uint16_t *c, uint16_t *a)
 	c.val[0] = vshrq_n_u16(a.val[0], value); \
   	c.val[1] = vshrq_n_u16(a.val[1], value);
 
+// c = a + b
+#define vadd(c, a, b) \
+	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
+	c.val[1] = vaddq_u16(a.val[1], b.val[1]);
 
-static inline 
-void vadd(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
-{
-    // c = a + b
-    c.val[0] = vaddq_u16(a.val[0], b.val[0]);
-    c.val[1] = vaddq_u16(a.val[1], b.val[1]);
-}
+// c = a - b
+#define vsub(c, a, b) \
+	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
+	c.val[1] = vsubq_u16(a.val[1], b.val[1]);
 
-static inline
-void vsub(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
-{
-    // c = a - b
-    c.val[0] = vsubq_u16(a.val[0], b.val[0]);
-    c.val[1] = vsubq_u16(a.val[1], b.val[1]);
-
-}
-
-static inline
-void vmuln(uint16x8x2_t c, uint16x8x2_t a, int16_t value)
-{
-	// c = a * value 
-	c.val[0] = vmulq_n_u16(a.val[0], value);
+// c = a * value 
+#define vmuln(c, a, value) \
+	c.val[0] = vmulq_n_u16(a.val[0], value); \
   	c.val[1] = vmulq_n_u16(a.val[1], value);
-}
 
-static inline
-void vxor(uint16x8x2_t c, uint16x8x2_t a, uint16x8x2_t b)
-{
-	// c = a ^ b 
-	c.val[0] = veorq_u16(a.val[0], b.val[0]);
+// c = a ^ b 
+#define vxor(c, a, b) \ 
+	c.val[0] = veorq_u16(a.val[0], b.val[0]); \
 	c.val[1] = veorq_u16(a.val[1], b.val[1]);
-}
-
 
 /*
  * toom_cook_4way_neon
