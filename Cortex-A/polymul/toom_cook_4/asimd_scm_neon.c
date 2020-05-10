@@ -1,33 +1,45 @@
 #include <arm_neon.h>
 #include "asimd_scm_neon.h"
 
-static inline
-void vmul(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
-{
-    // c = aa * bb
-    c = vmulq_u16(aa, bb);
-}
+// c = aa * bb
+#define vmul(c, aa, bb) c = vmulq_u16(aa, bb);
 
-static inline
-void vmla(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
-{
-    // c += aa*bb 
-    c = vmlaq_u16(c, aa, bb);
-}
+// c += aa*bb 
+#define vmla(c, aa, bb) c = vmlaq_u16(c, aa, bb);
 
-static inline
-void vload(uint16x8_t c, uint16_t *mem)
-{
-    // Load mem to c 
-    c = vld1q_u16(mem);
-}
+// Load mem to c 
+#define vload(c, mem) c = vld1q_u16(mem);
 
-static inline
-void vxor(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
-{
-	// c = aa ^ bb 
-	c = veorq_u16(aa, bb);
-}
+// c = aa ^ bb 
+#define vxor(c, aa, bb) c = veorq_u16(aa, bb);
+
+// static inline
+// void vmul(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
+// {
+//     // c = aa * bb
+//     c = vmulq_u16(aa, bb);
+// }
+
+// static inline
+// void vmla(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
+// {
+//     // c += aa*bb 
+//     c = vmlaq_u16(c, aa, bb);
+// }
+
+// static inline
+// void vload(uint16x8_t c, uint16_t *mem)
+// {
+//     // Load mem to c 
+//     c = vld1q_u16(mem);
+// }
+
+// static inline
+// void vxor(uint16x8_t c, uint16x8_t aa, uint16x8_t bb)
+// {
+// 	// c = aa ^ bb 
+// 	c = veorq_u16(aa, bb);
+// }
 
 /*
  * schoolbook_neon_new
