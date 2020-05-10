@@ -1,7 +1,7 @@
 CC 		  = /usr/bin/gcc
 CFLAGS  = -Wall -Wextra -O3 -fomit-frame-pointer -lcrypto -march=native 
 CFLAGS2  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -std=c99 
-CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native 
+CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native  -g3
 CLANG   = clang -march=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments
 RM 		  = /bin/rm
 
