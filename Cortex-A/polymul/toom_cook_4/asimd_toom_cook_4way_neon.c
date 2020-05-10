@@ -160,7 +160,7 @@ void toom_cook_4way_neon(uint16_t *restrict a1_avx,
 		vsub(b1_tmp, th_b_neon, t_h_b_neon);
 
         vstore(&a3_ph_avx[i*16], a1_tmp);
-        vstore(&a3_ph_avx[i*16], b1_tmp);
+        vstore(&b3_ph_avx[i*16], b1_tmp);
 
 	//-------------------t1 and t_1. t1 <-a(1)*b(1). t_1 <- a(-1)*b(-1) ---------------------
 
