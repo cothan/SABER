@@ -336,13 +336,13 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 
 		vsub(w2, w2, w6); //w2 <- w2-w6
 
-		vstore(&w1_avx[i*16], w1);
+		// vstore(&w1_avx[i*16], w1);
 		vstore(&w2_avx[i*16], w2);
 		vstore(&w3_avx[i*16], w3);
 		vstore(&w4_avx[i*16], w4);
 		vstore(&w5_avx[i*16], w5);
 		vstore(&w6_avx[i*16], w6);
-		vstore(&w7_avx[i*16], w7);
+		// vstore(&w7_avx[i*16], w7);
 	}
 
 	// for (i = 0; i < 2 * small_len_avx; i++)
