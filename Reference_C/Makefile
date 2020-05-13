@@ -24,8 +24,8 @@ test/PQCgenKAT_kem: $(SOURCES) $(HEADERS) test/PQCgenKAT_kem.c
 test/kem: $(SOURCES) $(HEADERS) test/kem.c
 	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/kem.c -lcrypto
 
-test/test_speed: $(SOURCES2) $(HEADERS) test/test_speed.c 
-	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/test_speed.c -lpapi
+test/test_speed: $(SOURCES) $(HEADERS) test/test_speed.c 
+	$(CC) $(CFLAGS5) -o $@ $(SOURCES) test/test_speed.c -lpapi
 
 rng.o: rng.c
 	$(CC) $(CFLAGS2) -c rng.c -lcrypto -o $@ 
