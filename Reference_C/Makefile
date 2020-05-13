@@ -25,7 +25,7 @@ test/kem: $(SOURCES) $(HEADERS) test/kem.c
 	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/kem.c -lcrypto
 
 test/test_speed: $(SOURCES) $(HEADERS) test/test_speed.c 
-	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/test_speed.c -lpapi
+	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/test_speed.c -lpapi  -lcrypto
 
 rng.o: rng.c
 	$(CC) $(CFLAGS2) -c rng.c -lcrypto -o $@ 
