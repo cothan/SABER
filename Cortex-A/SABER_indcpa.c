@@ -7,11 +7,6 @@
 #include "fips202.h"
 #include <arm_neon.h>
 
-#if __aarch64__
-#include <libkeccak.so.headers/SimpleFIPS202.h>
-#else
-#error "Install SIMD Keccak"
-#endif
 
 #define h1 4 //2^(EQ-EP-1)
 

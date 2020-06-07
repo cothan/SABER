@@ -4,6 +4,7 @@ CFLAGS2  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -std=c11
 CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native
 CFLAGS4  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lpapi -lkeccak -g3
 CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -w  -lpapi -lkeccak -g3
+CFLAGSDEBUG  = -Wall -Wextra -O0 -fomit-frame-pointer -mtune=native -mcpu=native -march=native -lcrypto -fwrapv -w  -lpapi -lkeccak -g3
 CLANG   = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -lkeccak -g3
 RM 		  = /bin/rm
 
@@ -50,7 +51,7 @@ test/test_speed: $(SOURCES2) $(HEADERS) test/test_speed.c
 	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/test_speed.c -lkeccak
 
 test/PQCgenKAT_kem: $(SOURCES2) $(HEADERS) test/PQCgenKAT_kem.c 
-	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c -lkeccak
+	$(CC) $(CFLAGSDEBUG) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c -lkeccak
 
 
 rng.o: rng.c
