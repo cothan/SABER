@@ -1,6 +1,0 @@
-./polymul/toom_cook_4/matrix.c: -- done 
-./polymul/toom_cook_4/scm_avx.c: -- done 
-./polymul/toom_cook_4/toom-cook_4way.c: -- done 
-SABER_indcpa.c: -- done 
-SABER_indcpa.h: -- done 
-./test/test_kex.c:
