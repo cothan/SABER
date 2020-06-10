@@ -22,7 +22,7 @@
  */
 void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uint16_t *restrict b_mem){
   uint16x8_t tmp, aa[16], bb[16];
-  uint16_t i, j;
+  uint16_t i;
   uint16_t pad = 0;
   for (i = 0; i < 2; i++) {
     vload(aa[0], &a_mem[0*16 + pad]);
