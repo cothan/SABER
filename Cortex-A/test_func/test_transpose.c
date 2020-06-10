@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <arm_neon.h>
 
-#include "../polymul/toom_cook_4/asimd_scm_neon.h"
+
+#include "../polymul/toom_cook_4/asimd_matrix.c"
 
 void readFile(uint16_t *out, char *filename, int length)
 {
@@ -42,24 +44,26 @@ void readFile(uint16_t *out, char *filename, int length)
     // assert(i == length);
 }
 
-void printArray(uint16_t *array, size_t length, char *string)
-{   
-    printf("%s: ", string);
-    for (size_t i = 0; i < length; i++)
+void printArray(uint16_t *M, char *string)
+{
+    printf("%s: \n", string);
+    for (int i = 0; i < 16; i++)
     {
-        printf("%d, ", array[i]);
+        for (int j = 0; j < 16; j++){
+            printf("%5d ", M[16*i + j]);
+        }
+        printf("\n");
     }
-    printf("\n");
 }
+
 
 int compareArray(uint16_t *a, uint16_t *b, size_t length)
 {
-    for (size_t i = 0; i < length; i++)
+    for (int i = 0; i < length; i++)
     {
         if (a[i] != b[i])
         {
             printf("Error at %d: %d != %d\n", i, a[i], b[i]);
-            i+=15;
             // return 1;
         }
     }
@@ -68,24 +72,23 @@ int compareArray(uint16_t *a, uint16_t *b, size_t length)
 
 int test1()
 {
-    uint16_t a[256], b[256], c_gold[512], c_test[512];
-    readFile(a, "test_schoolbook_a.txt", 256);
-    readFile(b, "test_schoolbook_b.txt", 256);
-    readFile(c_gold, "test_schoolbook_c.txt", 512);
+    uint16_t m[256], M_gold[256];
+    readFile(m, "test_transpose_m.txt", 256);
+    readFile(M_gold, "test_transpose_M.txt", 256);
 
-    printArray(a, 256, "A:");
-    printArray(b, 256, "B:");
-    printArray(c_gold, 512, "C:");
+    printArray(m, "m:");
+    printArray(M_gold,"M_gold:");
     printf("========\n");
-    schoolbook_neon_new(c_test, a, b);
-    printArray(c_test, 512, "C_test:");
-    return compareArray(c_test, c_gold, 512);
+    transpose(m);
+    printArray(m, "M_test:");
+    return compareArray(m, M_gold, 256);
 }
 
 int main()
 {
     int ret;
     ret = test1();
+    printf("Finish test\n");
     if (ret != 0){
         return 1;
     }
