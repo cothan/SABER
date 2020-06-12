@@ -46,7 +46,7 @@ uint16x8x2_t tmp;
   	c.val[1] = vmulq_n_u16(a.val[1], value);
 
 // c = a ^ b 
-#define vxor(c, a, b) \ 
+#define vxor(c, a, b) \
 	c.val[0] = veorq_u16(a.val[0], b.val[0]); \
 	c.val[1] = veorq_u16(a.val[1], b.val[1]);
 
@@ -479,7 +479,7 @@ void batch_64coefficient_multiplications(
     vload(a_tmp[2 + i], &a6[(2+i)*16]);
     vadd(a_lu_temp[i], a_tmp[i], a_tmp[2+i]);
 
-    vload(b_tmp[i], &b6[i*16]);16*1616*1616*1616*16
+    vload(b_tmp[i], &b6[i*16]);
     vload(b_tmp[2 + i], &b6[(2+i)*16]);
     vadd(b_lu_temp[i], b_tmp[i], b_tmp[2 + i]);
   }
