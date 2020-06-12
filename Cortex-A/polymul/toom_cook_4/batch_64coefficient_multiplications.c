@@ -4,13 +4,12 @@
 #define SCM_SIZE 16
 
 uint16_t c_avx[16 * 2 * SCM_SIZE];
-uint16_t a[16 * SCM_SIZE];
-uint16_t b[16 * SCM_SIZE];
+uint16_t a[16 * (SCM_SIZE + 2)];
+uint16_t b[16 * (SCM_SIZE + 2)];
 uint16_t c_avx_extra[16 * 4];
 
 uint16_t a_extra[2*16], b_extra[2*16];
-uint16x8x2_t tmp; 
-
+uint16x8x2_t tmp;
 
 // load c <= a 
 #define vload(c, a) c = vld1q_u16_x2(a);
@@ -55,6 +54,7 @@ uint16x8x2_t tmp;
 // Position <= 14
 static inline 
 void karatsuba32_fork_avx_new(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t position) {
+  uint16x8x2_t tmp;
 
   vstore(&a[position*16], a1[0]);
   vstore(&b[position*16], b1[0]);
@@ -73,6 +73,7 @@ void karatsuba32_fork_avx_new(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t posit
 // Position > 14
 static inline 
 void karatsuba32_fork_avx_new1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t position) {
+  uint16x8x2_t tmp;
 
   vstore(&a[position*16], a1[0]);
   vstore(&b[position*16], b1[0]);
@@ -90,6 +91,7 @@ void karatsuba32_fork_avx_new1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t posi
 
 static inline 
 void karatsuba32_fork_avx_partial(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t position) {
+  uint16x8x2_t tmp;
 
   vstore(&a[position*16], a1[1]);
   vstore(&b[position*16], b1[1]);
@@ -103,6 +105,7 @@ void karatsuba32_fork_avx_partial(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t p
 
 static inline 
 void karatsuba32_fork_avx_partial1(uint16x8x2_t *a1, uint16x8x2_t *b1, uint16_t position) {
+  uint16x8x2_t tmp;
 
   vadd(tmp, a1[0], a1[1]);
   vstore(&a[position*16], tmp);
@@ -134,10 +137,9 @@ void karatsuba32_join_avx_new(uint16_t *result_final, uint16_t position) {
   // b[1] = resultd01[n-1:n/2] + resultd1[n/2-1:0]
   vadd(b1, c1_tmp, c2_tmp);
 
-  vload(c1_tmp, &c_avx[(position + 1)*16]);
   // b[0] = b[0] - a[0] - a[2]
   vsub(b2, b0, rf[0]);
-  vsub(rf[1], b2, c1_tmp);
+  vsub(rf[1], b2, c2_tmp);
   vstore(&result_final[1*16], rf[1]);
 
   vload(c2_tmp, &c_avx[(position + 16)*16]);
@@ -171,10 +173,9 @@ void karatsuba32_join_avx_partial(uint16_t *result_final, uint16_t position) {
   // b[1] = resultd01[n-1:n/2] + resultd1[n/2-1:0]
   vadd(b1, c1_tmp, c2_tmp);
 
-  vload(c1_tmp, &c_avx[position*16]);
   // b[0] = b[0] - a[0] - a[2]
   vsub(b2, b0, rf[0]);
-  vsub(rf[1], b2, c1_tmp);
+  vsub(rf[1], b2, c2_tmp);
   vstore(&result_final[1*16], rf[1]);
   
   vload(c2_tmp, &c_avx_extra[1*16]);
@@ -207,10 +208,9 @@ void karatsuba32_join_avx_partial2(uint16_t *result_final, uint16_t position) {
   // b[1] = resultd01[n-1:n/2] + resultd1[n/2-1:0]
   vadd(b1, c1_tmp, c2_tmp);
 
-  vload(c1_tmp, &c_avx_extra[2*16]);
   // b[0] = b[0] - a[0] - a[2]
   vsub(b2, b0, rf[0]);
-  vsub(rf[1], b2, c1_tmp);
+  vsub(rf[1], b2, c2_tmp);
   vstore(&result_final[1*16], rf[1]);
   
   vload(c2_tmp, &c_avx_extra[1*16]);
@@ -224,7 +224,9 @@ void karatsuba32_join_avx_partial2(uint16_t *result_final, uint16_t position) {
 void join_32coefficient_results(uint16_t *result_d0, uint16_t *result_d1,
                                 uint16_t *result_d01, uint16_t *result_64ks) {
   
-  uint16x8x2_t rd0[4], rd1[4], bb[4];
+  uint16x8x2_t rd0[4], rd1[4];
+  uint16x8x2_t b4, b5, b6, b7;
+  uint16x8x2_t tmp;
   uint16_t i;
   for (i = 0; i < 4; i++)
   {
@@ -234,32 +236,37 @@ void join_32coefficient_results(uint16_t *result_d0, uint16_t *result_d1,
 
   // {bb[5],bb[4]} = resultd0[63:32] + resultd01[31:0]
   vload(tmp, &result_d01[0*16]);
-  vadd(bb[0], rd0[2], tmp);
+  vadd(b4, rd0[2], tmp);
   vload(tmp, &result_d01[1*16]);
-  vadd(bb[1], rd0[3], tmp);
+  vadd(b5, rd0[3], tmp);
 
   // {bb[7],bb[6]} = resultd01[63:32] + resultd1[31:0]
   vload(tmp, &result_d01[2*16]);
-  vadd(bb[2], tmp, rd1[0]);
+  vadd(b6, tmp, rd1[0]);
   vload(tmp, &result_d01[3*16]);
-  vadd(bb[3], tmp, rd1[1]);
+  vadd(b7, tmp, rd1[1]);
+
+  vstore(&b[4*16], b4);
+  vstore(&b[5*16], b5);
+  vstore(&b[6*16], b6);
+  vstore(&b[7*16], b7);
 
   // {bb[7],bb[6],bb[5],bb[4]} <-- {bb[7],bb[6],bb[5],bb[4]} - {a[3],a[2],a[1],a[0]} - {a[7],a[6],a[5],a[4]}
-  vsub(bb[0], bb[0], rd0[0]);
-  vsub(bb[0], bb[0], rd1[0]);
-  vstore(&result_64ks[2*16], bb[0]);
+  vsub(b4, b4, rd0[0]);
+  vsub(b4, b4, rd1[0]);
+  vstore(&result_64ks[2*16], b4);
 
-  vsub(bb[1], bb[1], rd0[1]);
-  vsub(bb[1], bb[1], rd1[1]);
-  vstore(&result_64ks[3*16], bb[1]);
+  vsub(b5, b5, rd0[1]);
+  vsub(b5, b5, rd1[1]);
+  vstore(&result_64ks[3*16], b5);
 
-  vsub(bb[2], bb[2], rd0[2]);
-  vsub(bb[2], bb[2], rd1[2]);
-  vstore(&result_64ks[4*16], bb[2]);
+  vsub(b6, b6, rd0[2]);
+  vsub(b6, b6, rd1[2]);
+  vstore(&result_64ks[4*16], b6);
 
-  vsub(bb[3], bb[3], rd0[3]);
-  vsub(bb[3], bb[3], rd1[3]);
-  vstore(&result_64ks[5*16], bb[3]);
+  vsub(b7, b7, rd0[3]);
+  vsub(b7, b7, rd1[3]);
+  vstore(&result_64ks[5*16], b7);
 
   vstore(&result_64ks[0*16], rd0[0]);
   vstore(&result_64ks[1*16], rd0[1]);
@@ -330,7 +337,7 @@ void batch_64coefficient_multiplications(
   schoolbook_neon_new(c_avx, a, b);
 
   transpose(&c_avx[0]);
-  transpose(&c_avx[16*16]);
+  transpose(&c_avx[256]);
 
   // store the partial multiplication result.
   vcopy(&c_avx_extra[16*0], &c_avx[15*16]);
@@ -385,7 +392,7 @@ void batch_64coefficient_multiplications(
   schoolbook_neon_new(c_avx, a, b);
 
   transpose(&c_avx[16*0]);
-  transpose(&c_avx[16*16]);
+  transpose(&c_avx[256]);
 
   karatsuba32_join_avx_partial(result_d01, 0); // Combine results of this computation with previous computation
   // Final result of 2nd 64-coeff multiplication
@@ -445,7 +452,7 @@ void batch_64coefficient_multiplications(
   schoolbook_neon_new(c_avx, a, b);
 
   transpose(&c_avx[16*0]);
-  transpose(&c_avx[16*16]);
+  transpose(&c_avx[256]);
 
   karatsuba32_join_avx_partial2(result_d1, 0);
   karatsuba32_join_avx_new(result_d01, 1);
@@ -472,7 +479,7 @@ void batch_64coefficient_multiplications(
     vload(a_tmp[2 + i], &a6[(2+i)*16]);
     vadd(a_lu_temp[i], a_tmp[i], a_tmp[2+i]);
 
-    vload(b_tmp[i], &b6[i*16]);
+    vload(b_tmp[i], &b6[i*16]);16*1616*1616*1616*16
     vload(b_tmp[2 + i], &b6[(2+i)*16]);
     vadd(b_lu_temp[i], b_tmp[i], b_tmp[2 + i]);
   }
@@ -486,7 +493,7 @@ void batch_64coefficient_multiplications(
   schoolbook_neon_new(c_avx, a, b);
 
   transpose(&c_avx[16*0]);
-  transpose(&c_avx[16*16]);
+  transpose(&c_avx[256]);
 
   karatsuba32_join_avx_new(result_d1, 0);
   karatsuba32_join_avx_new(result_d01, 3);
