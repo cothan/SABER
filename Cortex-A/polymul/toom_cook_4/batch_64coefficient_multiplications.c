@@ -293,9 +293,9 @@ void batch_64coefficient_multiplications(
   uint16x8x2_t a_lu_temp[2], b_lu_temp[2];
   uint16x8x2_t a_tmp[4], b_tmp[4];
   
-  uint16_t  result_d0 [16*16] = {0}, 
-            result_d1 [16*16] = {0}, 
-            result_d01[16*16] = {0};
+  uint16_t  result_d0 [16*16], 
+            result_d1 [16*16], 
+            result_d01[16*16];
 
   uint16_t i;
 
