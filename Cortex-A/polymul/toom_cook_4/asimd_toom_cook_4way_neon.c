@@ -76,13 +76,13 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 
 	//--------------------these data are created for place holding---------
 	// This is memory or register ? For now, let's compiler optimize it
-	uint16_t a1_ph_avx[small_len_avx*16] = {0}, b1_ph_avx[small_len_avx*16] = {0};
-	uint16_t a2_ph_avx[small_len_avx*16] = {0}, b2_ph_avx[small_len_avx*16] = {0};
-	uint16_t a3_ph_avx[small_len_avx*16] = {0}, b3_ph_avx[small_len_avx*16] = {0};
-	uint16_t a4_ph_avx[small_len_avx*16] = {0}, b4_ph_avx[small_len_avx*16] = {0};
-	uint16_t a5_ph_avx[small_len_avx*16] = {0}, b5_ph_avx[small_len_avx*16] = {0};
-	uint16_t a6_ph_avx[small_len_avx*16] = {0}, b6_ph_avx[small_len_avx*16] = {0};
-	uint16_t a_avx[small_len_avx*16] = {0}, b_avx[small_len_avx*16] = {0};
+	uint16_t a1_ph_avx[small_len_avx*16], b1_ph_avx[small_len_avx*16];
+	uint16_t a2_ph_avx[small_len_avx*16], b2_ph_avx[small_len_avx*16];
+	uint16_t a3_ph_avx[small_len_avx*16], b3_ph_avx[small_len_avx*16];
+	uint16_t a4_ph_avx[small_len_avx*16], b4_ph_avx[small_len_avx*16];
+	uint16_t a5_ph_avx[small_len_avx*16], b5_ph_avx[small_len_avx*16];
+	uint16_t a6_ph_avx[small_len_avx*16], b6_ph_avx[small_len_avx*16];
+	uint16_t     a_avx[small_len_avx*16],     b_avx[small_len_avx*16];
 
     uint16x8x2_t a1_tmp, b1_tmp;
     uint16x8x2_t a2_tmp, b2_tmp;

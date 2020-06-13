@@ -260,7 +260,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 	  uint16x8x2_t res_neon;
  
 	//--------------NEON declaration ends------------------
-	uint16_t acc[2*SABER_N];
+	uint16_t acc[SABER_N];
 	uint16_t res_avx[SABER_K][SABER_N/16*16] = {0}; 
 	uint16_t vprime_avx[SABER_N/16*16] = {0};
       
