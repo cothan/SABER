@@ -38,7 +38,7 @@ uint16x8x2_t tmp;
   	c.val[1] = vmulq_n_u16(a.val[1], value);
 
 // c = a ^ b 
-#define vxor(c, a, b) \ 
+#define vxor(c, a, b) \
 	c.val[0] = veorq_u16(a.val[0], b.val[0]); \
 	c.val[1] = veorq_u16(a.val[1], b.val[1]);
 
@@ -47,7 +47,7 @@ uint16x8x2_t tmp;
  * Main function 
  * a1_avx: In memory [256]
  * b1_avx: In memory  [256]
- * res_avx_output: In memory [512]
+ * res_avx_output: In memory [512] -- improved, in memory [256]
  */
 
 #define AVX_N (SABER_N / 16)
@@ -61,6 +61,7 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 	uint16_t i;
 
 	//-----Memory data declaration-----------------
+	// Zeroing res_avx
 	uint16_t res_avx[16 * 2 * AVX_N] = {0};
 	
     // All in memory
@@ -94,7 +95,8 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 	//--------------------these data are created for place holding ends---------
 
 	// Add for NEON
-	uint16x8_t int0_avx = vdupq_n_u16(0);
+	uint16x8x2_t int0_avx;
+	vxor(int0_avx, w1, w1);
 
 	//-----AVX data declaration ends------------
 
@@ -326,9 +328,9 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 
 		vadd(w4, w4, w2); //w4 <- w4+w2
 
-		// vsub(w4, int0_avx, w4); //w4 <- -(w4+w2)
-		w4.val[0] = vsubq_u16(int0_avx, w4.val[0]);
-		w4.val[1] = vsubq_u16(int0_avx, w4.val[1]);
+		vsub(w4, int0_avx, w4); //w4 <- -(w4+w2)
+		// w4.val[0] = vsubq_u16(int0_avx, w4.val[0]);
+		// w4.val[1] = vsubq_u16(int0_avx, w4.val[1]);
 
 		vmuln(temp1_neon, w2, 30);		//temp <- w2*30
 		vsub(w6, temp1_neon, w6); //w6 <- 30*w2-w6
