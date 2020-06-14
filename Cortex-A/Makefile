@@ -1,11 +1,12 @@
-CC 		  = cc
+CC 		  = clang
 CFLAGS   = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -lcrypto
 CFLAGS2  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -std=c11 
 CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native
-CFLAGS4  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lpapi -lkeccak -g3
-CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -w  -lpapi -lkeccak -g3
-CFLAGSDEBUG  = -Wall -Wextra -O0 -fomit-frame-pointer -mtune=native -mcpu=native -march=native -lcrypto -fwrapv -w  -lpapi -lkeccak -g3
-CLANG   = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -lkeccak -g3
+CFLAGS4  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lpapi -g3
+CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -w  -lpapi -g3 
+CFLAGS6  = -Wall -Wextra -O3 -fomit-frame-pointer -lcrypto -fwrapv -w  -lpapi -g3 
+CFLAGSDEBUG  = -Wall -Wextra -O0 -fomit-frame-pointer -mtune=native -mcpu=native -march=native -lcrypto -fwrapv -w  -lpapi -g3
+CLANG   = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -g3
 RM 		  = /bin/rm
 
 
@@ -48,10 +49,10 @@ HEADERS = 	SABER_params.h  \
 
 
 test/test_speed: $(SOURCES2) $(HEADERS) test/test_speed.c 
-	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/test_speed.c -lkeccak
+	$(CC) $(CFLAGS5) -o $@ $(SOURCES2) test/test_speed.c -lpapi
 
 test/PQCgenKAT_kem: $(SOURCES2) $(HEADERS) test/PQCgenKAT_kem.c 
-	$(CC) $(CFLAGSDEBUG) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c -lkeccak
+	$(CC) $(CFLAGS6) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c 
 
 
 rng.o: rng.c
