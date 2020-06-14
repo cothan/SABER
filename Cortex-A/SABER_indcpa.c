@@ -149,6 +149,15 @@ void GenSecret(uint16_t r[SABER_K][SABER_N],const unsigned char *seed){
 }
 
 
+void printArray(uint16_t *M, char *string, size_t length)
+{
+	for (size_t i = 0; i < length; i++)
+	{
+		printf("%d, ", M[i]);
+	}
+	printf("\n");
+}
+
 void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 {
  
@@ -171,8 +180,8 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   uint16x8x2_t res_neon;
 
 //--------------NEON declaration ends------------------
-  uint16_t res_avx[SABER_K][SABER_N/16*16] = {0};
-  uint16_t acc[2*16*SABER_N/16];
+  uint16_t res_avx[SABER_K][SABER_N] = {0};
+  uint16_t acc[SABER_N];
 
   randombytes(seed, SABER_SEEDBYTES);
 
@@ -183,13 +192,18 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   
   GenSecret(skpv1,noiseseed);
 
+//   printf("skvp1:\n");
+//   for (i = 0; i < SABER_K; i++)
+//   {
+// 	  printArray(skpv1[i], "skvp1", SABER_N);
+//   }
 
   //------------------------do the matrix vector multiplication and rounding------------
 
 	// Matrix-vector multiplication; Matrix in transposed order
 	for(i=0;i<SABER_K;i++){
 		for(j=0;j<SABER_K;j++){
-			toom_cook_4way_neon(a[i].vec[j].coeffs, skpv1[j], SABER_Q, acc);
+			toom_cook_4way_neon(a[j].vec[i].coeffs, skpv1[j], SABER_Q, acc);
 
 			for(k=0;k<SABER_N/16;k++){
 				vload(res_neon, &res_avx[i][k*16]);
@@ -222,9 +236,20 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 	//------------------Pack sk into byte string-------
 		
 	POLVEC2BS(sk,skpv1,SABER_Q);
+// 	printf("skvp1:\n");
+//   for (i = 0; i < SABER_K; i++)
+//   {
+// 	  printArray(skpv1[i], "skvp1", SABER_N);
+//   }
 
 	//------------------Pack pk into byte string-------
 	POLVEC2BS(pk,res_avx,SABER_P); // load the public-key into pk byte string 	
+
+// 	printf("skvp1:\n");
+//   for (i = 0; i < SABER_K; i++)
+//   {
+// 	  printArray(res_avx[i], "skvp1", SABER_N);
+//   }
 
 	for(i=0;i<SABER_SEEDBYTES;i++){ // now load the seedbytes in PK. Easy since seed bytes are kept in byte format.
 		pk[SABER_POLYVECCOMPRESSEDBYTES + i]=seed[i]; 
@@ -261,8 +286,8 @@ void indcpa_kem_enc(unsigned char *message_received,
  
 	//--------------NEON declaration ends------------------
 	uint16_t acc[SABER_N];
-	uint16_t res_avx[SABER_K][SABER_N/16*16] = {0}; 
-	uint16_t vprime_avx[SABER_N/16*16] = {0};
+	uint16_t res_avx[SABER_K][SABER_N] = {0}; 
+	uint16_t vprime_avx[SABER_N] = {0};
       
 	for(i=0;i<SABER_SEEDBYTES;i++){ // Load the seedbytes in the client seed from PK.
 		seed[i]=pk[ SABER_POLYVECCOMPRESSEDBYTES + i]; 
@@ -412,8 +437,8 @@ void indcpa_kem_dec(const unsigned char *sk,
 	  vh2.val[0] = vdupq_n_u16(h2);
 	  vh2.val[1] = vdupq_n_u16(h2);
 	//--------------NEON declaration ends------------------
-	uint16_t v_avx[SABER_N/16*16] = {0};
-	uint16_t acc[2*16*SABER_N/16];
+	uint16_t v_avx[SABER_N] = {0};
+	uint16_t acc[SABER_N];
 	
 	//-------unpack the public_key
 
