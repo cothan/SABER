@@ -32,6 +32,9 @@ int test_kem_cca()
     repeat = 10000;
     //repeat = 1;
 
+	// Force CPU to max frequency
+    for (i = 0; i < repeat; i++);
+
     time_t t;
     // Intializes random number generator
     srand((unsigned)time(&t));
