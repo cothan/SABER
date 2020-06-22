@@ -221,7 +221,6 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[14], bb[0]);
     vst1q_u16(&c_mem[224 + pad], tmp);
     //----
-    vload(aa[15], &a_mem[15*16 + pad]);
     vload(bb[15], &b_mem[15*16 + pad]);
 
     vmul(tmp, aa[0], bb[15]);
@@ -239,6 +238,9 @@ void schoolbook_neon_new(uint16_t *restrict c_mem, uint16_t *restrict a_mem, uin
     vmla(tmp, aa[12], bb[3]);
     vmla(tmp, aa[13], bb[2]);
     vmla(tmp, aa[14], bb[1]);
+
+    vload(aa[15], &a_mem[15*16 + pad]);
+    
     vmla(tmp, aa[15], bb[0]);
     vst1q_u16(&c_mem[240 + pad], tmp);
     //----
