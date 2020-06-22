@@ -209,10 +209,6 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 	//------------------t_inf------------------------------
 	//create t_inf
 
-	 //x_avx contains x[3]
-        // vload(a1_tmp, &a1_avx[(small_len_avx * 3 + i)*16] ); 
-        // vload(b1_tmp, &b1_avx[(small_len_avx * 3 + i)*16] ); 
-
         vstore(&a6_ph_avx[i*16], a1_tmp);
         vstore(&b6_ph_avx[i*16], b1_tmp);
 
@@ -220,11 +216,6 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 
 	//-------------------t2-------------------------
         // 2*x[3]
-        // vload(a2_tmp, &a1_avx[(small_len_avx * 3 + i)*16] );
-        // vload(b2_tmp, &b1_avx[(small_len_avx * 3 + i)*16] );
-
-        // vadd(a1_tmp, a1_tmp, a2_tmp);
-		// vadd(b1_tmp, b1_tmp, b2_tmp);
 		vsl(b1_tmp, b1_tmp, 1);
 		vsl(a1_tmp, a1_tmp, 1);
 
@@ -329,8 +320,6 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 		vadd(w4, w4, w2); //w4 <- w4+w2
 
 		vsub(w4, int0_avx, w4); //w4 <- -(w4+w2)
-		// w4.val[0] = vsubq_u16(int0_avx, w4.val[0]);
-		// w4.val[1] = vsubq_u16(int0_avx, w4.val[1]);
 
 		vmuln(temp1_neon, w2, 30);		//temp <- w2*30
 		vsub(w6, temp1_neon, w6); //w6 <- 30*w2-w6
@@ -340,18 +329,12 @@ void toom_cook_4way_neon(uint16_t  *a1_avx,
 
 		vsub(w2, w2, w6); //w2 <- w2-w6
 
-		// vstore(&w1_avx[i*16], w1);
 		vstore(&w2_avx[i*16], w2);
 		vstore(&w3_avx[i*16], w3);
 		vstore(&w4_avx[i*16], w4);
 		vstore(&w5_avx[i*16], w5);
 		vstore(&w6_avx[i*16], w6);
-		// vstore(&w7_avx[i*16], w7);
-	// }
 
-	// for (i = 0; i < 2 * small_len_avx; i++)
-	// {
-		// vload(w7, &w7_avx[i*16]);
 		vload(a1_tmp, &res_avx[(0 * small_len_avx + i)*16]);
 		vadd(a1_tmp, a1_tmp, w7);
 		vstore(&res_avx[(0 * small_len_avx + i)*16], a1_tmp);
