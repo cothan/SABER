@@ -192,12 +192,6 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   
   GenSecret(skpv1,noiseseed);
 
-//   printf("skvp1:\n");
-//   for (i = 0; i < SABER_K; i++)
-//   {
-// 	  printArray(skpv1[i], "skvp1", SABER_N);
-//   }
-
   //------------------------do the matrix vector multiplication and rounding------------
 
 	// Matrix-vector multiplication; Matrix in transposed order
@@ -236,20 +230,9 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 	//------------------Pack sk into byte string-------
 		
 	POLVEC2BS(sk,skpv1,SABER_Q);
-// 	printf("skvp1:\n");
-//   for (i = 0; i < SABER_K; i++)
-//   {
-// 	  printArray(skpv1[i], "skvp1", SABER_N);
-//   }
 
 	//------------------Pack pk into byte string-------
 	POLVEC2BS(pk,res_avx,SABER_P); // load the public-key into pk byte string 	
-
-// 	printf("skvp1:\n");
-//   for (i = 0; i < SABER_K; i++)
-//   {
-// 	  printArray(res_avx[i], "skvp1", SABER_N);
-//   }
 
 	for(i=0;i<SABER_SEEDBYTES;i++){ // now load the seedbytes in PK. Easy since seed bytes are kept in byte format.
 		pk[SABER_POLYVECCOMPRESSEDBYTES + i]=seed[i]; 
