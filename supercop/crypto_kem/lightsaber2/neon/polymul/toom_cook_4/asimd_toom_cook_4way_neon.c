@@ -1,5 +1,4 @@
-#include <arm_neon.h>
-#include "batch_64coefficient_multiplications.h"
+#include "batch_64coefficient_multiplications.c"
 
 uint16x8x2_t tmp; 
 

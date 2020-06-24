@@ -1,6 +1,3 @@
-#include <arm_neon.h>
-#include "asimd_scm_neon.h"
-
 // c = aa * bb
 #define vmul(c, aa, bb) c = vmulq_u16(aa, bb);
 
