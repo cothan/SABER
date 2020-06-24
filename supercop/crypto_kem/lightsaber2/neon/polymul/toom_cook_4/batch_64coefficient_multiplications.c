@@ -1,5 +1,9 @@
-#include "batch_64coefficient_multiplications.h"
+#include "../../SABER_indcpa.h"
+#include "../../SABER_params.h"
+
 #include "asimd_matrix.c"
+#include "asimd_scm_neon.c"
+
 
 #define SCM_SIZE 16
 

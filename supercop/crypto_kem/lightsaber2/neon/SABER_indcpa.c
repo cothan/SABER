@@ -1,10 +1,11 @@
+#include <arm_neon.h>
+
 #include "pack_unpack.h"
 #include "randombytes.h"
 #include "cbd.h"
 #include "SABER_params.h"
-#include "polymul/toom_cook_4/asimd_toom_cook_4way_neon.h"
 #include "fips202.h"
-#include <arm_neon.h>
+#include "polymul/toom_cook_4/asimd_toom_cook_4way_neon.c"
 
 
 #define h1 4 //2^(EQ-EP-1)
