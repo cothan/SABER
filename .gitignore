@@ -8,6 +8,6 @@
 *.rsp
 *.gdb*
 */papi_hl_output*/*
-.vscode/*.json
 */test/PQCgenKAT_kem
 */test/test_speed
+*/test/test_speed2
