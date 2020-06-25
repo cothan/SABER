@@ -26,50 +26,15 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 
 #define h2 ( (1<<(SABER_EP-2)) - (1<<(SABER_EP-SABER_ET-1)) + (1<<(SABER_EQ-SABER_EP-1)) )
 
-uint16x8x2_t tmp; 
-
-// load c <= a 
-#define vload(c, a) c = vld1q_u16_x2(a);
-
-// store c <= a 
-#define vstore(c, a) vst1q_u16_x2(c, a);
-
-// copy c<= a
-#define vcopy(c, a) vload(tmp, a); vstore(c, tmp);
-
-// c = a ^ b 
-#define vxor(c, a, b) \ 
-	c.val[0] = veorq_u16(a.val[0], b.val[0]); \
-	c.val[1] = veorq_u16(a.val[1], b.val[1]);
-
 // c = a + b
 #define vadd1(c, a, b) \
 	c.val[0] = vaddq_u16(a.val[0], b); \
 	c.val[1] = vaddq_u16(a.val[1], b);
 
-// c = a + b
-#define vadd(c, a, b) \
-	c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
-	c.val[1] = vaddq_u16(a.val[1], b.val[1]);
-
-// c = a - b
-#define vsub(c, a, b) \
-	c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
-	c.val[1] = vsubq_u16(a.val[1], b.val[1]);
 // c = a & b
 #define vand(c, a, b) \
 	c.val[0] = vandq_u16(a.val[0], b); \
 	c.val[1] = vandq_u16(a.val[1], b);
-
-// c = a << value 
-#define vsl(c, a, value) \
-    c.val[0] = vshlq_n_u16(a.val[0], value); \
-    c.val[1] = vshlq_n_u16(a.val[1], value); 
-
-// c = a >> value 
-#define vsr(c, a, value) \
-	c.val[0] = vshrq_n_u16(a.val[0], value); \
-  	c.val[1] = vshrq_n_u16(a.val[1], value);
 
 // c = 0 
 #define vzero(c, zero) \
