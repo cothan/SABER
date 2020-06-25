@@ -1,0 +1,51 @@
+= SABER
+SABER is a Mod-LWR based KEM submitted to NIST Post-Quantum Cryptography Process
+
+== NEON IMPLEMENTATION
+
+SABER NEON (aarch64) implementation by Duc Tri Nguyen (CERG Geogre Mason University) with improvements. 
+
+=== Cortex-A53 Benchmark
+
+* Compile flags for Reference code: `gcc -Wall -Wextra -O3 -fno-tree-vectorize -fomit-frame-pointer -mcpu=cortex-a53 -mtune=native  -g3`
+* Compile flags for NEON GCC: `gcc -Wall -Wextra -O3 -fomit-frame-pointer -march=native -mtune=native  -g3` 
+* Compile flags for NEON Clang: `clang -march=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments`
+
+* gcc version 10.1.0, aarch64-unknown-linux-gnu
+* clang version 10.0.0, aarch64-unknown-linux-gnu
+
+
+.Light Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference | 455,672 |	626,820 |	786,213
+| NEON GCC | 170,241 | 198,130 | 215,307
+| NEON Clang | 160,567 | 183,897 | 199,918
+| Ref/NEON GCC | 2.7 |	3.2	| 3.7
+| Ref/NEON Clang | 2.8 |	3.4	| 3.9
+
+|===
+
+.Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference | 946,380 |	1,209,930 |	1,453,019
+| NEON GCC | 306,544 |	354,892 |	386,246
+| NEON Clang | 279,335 |	322,512 |	350,027
+| Ref/NEON GCC | 3.1 |	3.4 |	3.8
+| Ref/NEON Clang | 3.4 |	3.8 |	4.2
+
+|===
+
+
+.Fire Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference | 1,619,635 |	1,971,942 |	2,303,857
+| NEON GCC | 487,703 |	557,291 |	605,773
+| NEON Clang | 445,264|	504,956 |	548,119
+| Ref/NEON GCC | 3.3| 	3.5	| 3.8
+| Ref/NEON Clang | 3.6| 	3.9	| 4.2
+|===
+
+
