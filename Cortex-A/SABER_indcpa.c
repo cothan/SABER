@@ -15,7 +15,8 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #include <arm_neon.h>
 
 #include "pack_unpack.h"
-#include "randombytes.h"
+// #include "randombytes.h" // Only for SUPERCOP
+#include "rng.h"
 #include "cbd.h"
 #include "SABER_params.h"
 #include "fips202.h"
