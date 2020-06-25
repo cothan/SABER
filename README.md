@@ -1,8 +1,7 @@
 # SABER
 SABER is a Mod-LWR based KEM submitted to NIST Post-Quantum Cryptography Process
 
-# ASIMD 
+# NEON IMPLEMENTATION
 
-SABER ASIMD (aarch64) port form AVX2 with improvements. 
-
+SABER NEON (aarch64) implementation by Duc Tri Nguyen (CERG Geogre Mason University) with improvements. 
 
