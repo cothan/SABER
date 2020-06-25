@@ -1,9 +1,7 @@
 CC 		  = cc
-CFLAGS4  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lpapi -g3
-CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -g3 -I/usr/include -I/usr/local/include -lpapi
-CFLAGS6  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -lpapi -g3 
-CFLAGSDEBUG  = -Wall -Wextra -O0 -fomit-frame-pointer -mtune=native -mcpu=native -march=native -lcrypto -fwrapv -w  -lpapi -g3
-CLANG   = -Wall -Wextra -O2 -fomit-frame-pointer -mtune=native -mcpu=cortex-a53 -lcrypto -fwrapv -Qunused-arguments -w  -lpapi -g3
+CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -g3 -lpapi
+CFLAGS6  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w -Qunused-arguments -lpapi -g3 -flax-vector-conversions
+CLANG    = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w -Qunused-arguments -lpapi -g3
 RM 		  = /bin/rm
 
 
