@@ -1,3 +1,17 @@
+/*=============================================================================
+This file has been adapted from the implementation 
+(available at, Public Domain https://github.com/KULeuven-COSIC/SABER) 
+of "Saber: Module-LWR based key exchange, CPA-secure encryption and CCA-secure KEM"
+by : Jan-Pieter D'Anvers, Angshuman Karmakar, Sujoy Sinha Roy, and Frederik Vercauteren
+Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso. 
+
+ * Copyright (c) 2020 by Cryptographic Engineering Research Group (CERG)
+ * ECE Department, George Mason University
+ * Fairfax, VA, U.S.A.
+ * Author: Duc Tri Nguyen
+=============================================================================*/
+
+
 #include <arm_neon.h>
 
 #include "pack_unpack.h"

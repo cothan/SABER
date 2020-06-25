@@ -1,3 +1,11 @@
+/*=============================================================================
+ * Copyright (c) 2020 by Cryptographic Engineering Research Group (CERG)
+ * ECE Department, George Mason University
+ * Fairfax, VA, U.S.A.
+ * Author: Duc Tri Nguyen
+=============================================================================*/
+
+
 #include "batch_64coefficient_multiplications.c"
 
 uint16x8x2_t tmp; 
