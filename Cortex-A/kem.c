@@ -1,14 +1,23 @@
+/*=============================================================================
+This file has been adapted from the implementation 
+(available at, Public Domain https://github.com/KULeuven-COSIC/SABER) 
+of "Saber: Module-LWR based key exchange, CPA-secure encryption and CCA-secure KEM"
+by : Jan-Pieter D'Anvers, Angshuman Karmakar, Sujoy Sinha Roy, and Frederik Vercauteren
+Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso. 
+=============================================================================*/
+
+
 #include "SABER_params.h"
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
 #include "SABER_indcpa.h"
+#include "crypto_kem.h"
 #include "kem.h"
 #include "verify.h"
+#include "randombytes.h"
 #include "rng.h"
 #include "fips202.h"
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
@@ -28,6 +37,7 @@ int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 
 int crypto_kem_enc(unsigned char *c, unsigned char *k, const unsigned char *pk)
 {
+
   unsigned char kr[64];                             	  // Will contain key, coins
   unsigned char buf[64];                          
 
@@ -40,12 +50,12 @@ int crypto_kem_enc(unsigned char *c, unsigned char *k, const unsigned char *pk)
   sha3_512(kr, buf, 64);				// kr[0:63] <-- Hash(buf[0:63]);  	
 							  								// K^ <-- kr[0:31]
 							  								// noiseseed (r) <-- kr[32:63];	
-
   indcpa_kem_enc(buf, kr+32, pk,  c);	// buf[0:31] contains message; kr[32:63] contains randomness r;  		
 
   sha3_256(kr+32, c, SABER_BYTES_CCA_DEC);              
 
   sha3_256(k, kr, 64);                          					// hash concatenation of pre-k and h(c) to k 
+
   return(0);	
 }
 
