@@ -12,10 +12,9 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #include <stdint.h>
 #include <stdio.h>
 #include "SABER_indcpa.h"
-#include "crypto_kem.h"
 #include "kem.h"
 #include "verify.h"
-#include "randombytes.h"
+// #include "randombytes.h" // Enable only for SUPERCOP
 #include "rng.h"
 #include "fips202.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
