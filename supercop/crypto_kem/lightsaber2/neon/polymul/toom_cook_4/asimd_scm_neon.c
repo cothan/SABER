@@ -1,3 +1,11 @@
+/*=============================================================================
+ * Copyright (c) 2020 by Cryptographic Engineering Research Group (CERG)
+ * ECE Department, George Mason University
+ * Fairfax, VA, U.S.A.
+ * Author: Duc Tri Nguyen
+=============================================================================*/
+
+
 // c = aa * bb
 #define vmul(c, aa, bb) c = vmulq_u16(aa, bb);
 

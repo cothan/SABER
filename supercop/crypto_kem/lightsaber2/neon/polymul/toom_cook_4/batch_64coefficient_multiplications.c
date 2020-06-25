@@ -1,3 +1,12 @@
+/*=============================================================================
+ * Copyright (c) 2020 by Cryptographic Engineering Research Group (CERG)
+ * ECE Department, George Mason University
+ * Fairfax, VA, U.S.A.
+ * Author: Duc Tri Nguyen
+=============================================================================*/
+
+
+
 #include "../../SABER_indcpa.h"
 #include "../../SABER_params.h"
 
