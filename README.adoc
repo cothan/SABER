@@ -7,12 +7,18 @@ SABER NEON (aarch64) implementation by Duc Tri Nguyen (CERG Geogre Mason Univers
 
 === Cortex-A53 Benchmark
 
-* Compile flags for Reference code: `gcc -Wall -Wextra -O3 -fno-tree-vectorize -fomit-frame-pointer -mcpu=cortex-a53 -mtune=native  -g3`
-* Compile flags for NEON GCC: `gcc -Wall -Wextra -O3 -fomit-frame-pointer -march=native -mtune=native  -g3` 
-* Compile flags for NEON Clang: `clang -march=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments`
 
-* gcc version 10.1.0, aarch64-unknown-linux-gnu
-* clang version 10.0.0, aarch64-unknown-linux-gnu
+* Compiler flags:
+** Reference code: `gcc -Wall -Wextra -O3 -fno-tree-vectorize -fomit-frame-pointer -mcpu=cortex-a53 -mtune=native  -g3`
+** NEON GCC: `gcc -Wall -Wextra -O3 -fomit-frame-pointer -march=native -mtune=native  -g3` 
+** NEON Clang: `clang -march=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments`
+
+* Compiler version: 
+** gcc version 10.1.0, aarch64-unknown-linux-gnu
+** clang version 10.0.0, aarch64-unknown-linux-gnu
+
+* Report result:
+** Unit is clock cycles at 1200 MHz.
 
 
 .Light Saber
