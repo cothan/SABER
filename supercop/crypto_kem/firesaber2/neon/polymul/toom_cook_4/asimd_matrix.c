@@ -3,6 +3,19 @@
  * ECE Department, George Mason University
  * Fairfax, VA, U.S.A.
  * Author: Duc Tri Nguyen
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
 =============================================================================*/
 
 /*
@@ -38,6 +51,7 @@ void transpose(uint16_t *M) {
   y10 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y24, (uint32x4_t)y26);
   y9 = (uint16x8_t) vtrn1q_u32((uint32x4_t)y25, (uint32x4_t)y27);
   y11 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y25, (uint32x4_t)y27);
+
   y16 = vtrn1q_u16(y4, y5);
   y17 = vtrn2q_u16(y4, y5);
   y18 = vtrn1q_u16(y6, y7);
@@ -50,6 +64,7 @@ void transpose(uint16_t *M) {
   y14 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y24, (uint32x4_t)y26);
   y13 = (uint16x8_t) vtrn1q_u32((uint32x4_t)y25, (uint32x4_t)y27);
   y15 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y25, (uint32x4_t)y27);
+
   y16 = (uint16x8_t) vtrn1q_u64((uint64x2_t)y8, (uint64x2_t)y12);
   y17 = (uint16x8_t) vtrn2q_u64((uint64x2_t)y8, (uint64x2_t)y12);
   y18 = (uint16x8_t) vtrn1q_u64((uint64x2_t)y10, (uint64x2_t)y14);
@@ -89,6 +104,7 @@ void transpose(uint16_t *M) {
   y10 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y24, (uint32x4_t)y26);
   y9 = (uint16x8_t) vtrn1q_u32((uint32x4_t)y25, (uint32x4_t)y27);
   y11 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y25, (uint32x4_t)y27);
+
   y16 = vtrn1q_u16(y4, y5);
   y18 = vtrn2q_u16(y4, y5);
   y20 = vtrn1q_u16(y6, y7);
@@ -101,6 +117,7 @@ void transpose(uint16_t *M) {
   y14 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y24, (uint32x4_t)y26);
   y13 = (uint16x8_t) vtrn1q_u32((uint32x4_t)y25, (uint32x4_t)y27);
   y15 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y25, (uint32x4_t)y27);
+
   y16 = (uint16x8_t) vtrn1q_u64((uint64x2_t)y8, (uint64x2_t)y12);
   y18 = (uint16x8_t) vtrn2q_u64((uint64x2_t)y8, (uint64x2_t)y12);
   y20 = (uint16x8_t) vtrn1q_u64((uint64x2_t)y10, (uint64x2_t)y14);
@@ -140,6 +157,7 @@ void transpose(uint16_t *M) {
   y10 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y24, (uint32x4_t)y26);
   y9 = (uint16x8_t) vtrn1q_u32((uint32x4_t)y25, (uint32x4_t)y27);
   y11 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y25, (uint32x4_t)y27);
+
   y16 = vtrn1q_u16(y4, y5);
   y20 = vtrn2q_u16(y4, y5);
   y17 = vtrn1q_u16(y6, y7);
@@ -152,6 +170,7 @@ void transpose(uint16_t *M) {
   y14 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y24, (uint32x4_t)y26);
   y13 = (uint16x8_t) vtrn1q_u32((uint32x4_t)y25, (uint32x4_t)y27);
   y15 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y25, (uint32x4_t)y27);
+
   y16 = (uint16x8_t) vtrn1q_u64((uint64x2_t)y8, (uint64x2_t)y12);
   y20 = (uint16x8_t) vtrn2q_u64((uint64x2_t)y8, (uint64x2_t)y12);
   y17 = (uint16x8_t) vtrn1q_u64((uint64x2_t)y10, (uint64x2_t)y14);
@@ -182,6 +201,7 @@ void transpose(uint16_t *M) {
   y10 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y24, (uint32x4_t)y26);
   y9 = (uint16x8_t) vtrn1q_u32((uint32x4_t)y25, (uint32x4_t)y27);
   y11 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y25, (uint32x4_t)y27);
+
   y28 = vtrn1q_u16(y4, y5);
   y29 = vtrn2q_u16(y4, y5);
   y30 = vtrn1q_u16(y6, y7);
@@ -194,6 +214,7 @@ void transpose(uint16_t *M) {
   y14 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y24, (uint32x4_t)y26);
   y13 = (uint16x8_t) vtrn1q_u32((uint32x4_t)y25, (uint32x4_t)y27);
   y15 = (uint16x8_t) vtrn2q_u32((uint32x4_t)y25, (uint32x4_t)y27);
+  
   y28 = (uint16x8_t) vtrn1q_u64((uint64x2_t)y8, (uint64x2_t)y12);
   y29 = (uint16x8_t) vtrn2q_u64((uint64x2_t)y8, (uint64x2_t)y12);
   y30 = (uint16x8_t) vtrn1q_u64((uint64x2_t)y10, (uint64x2_t)y14);
