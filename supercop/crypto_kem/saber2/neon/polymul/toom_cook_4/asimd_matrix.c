@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 =============================================================================*/
-
+#include <arm_neon.h>
 /*
  * Improved in-place tranpose, minimal spill to memory.
  * Input: Memory uint16_t *M
