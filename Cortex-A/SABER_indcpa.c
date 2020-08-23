@@ -336,11 +336,10 @@ void indcpa_kem_enc(unsigned char *message_received,
 	
 	for(j=0;j<SABER_K;j++){
 		// toom_cook_4way_avx(pkcl_avx[j], sk_avx[j], SABER_P, acc);
+<<<<<<< HEAD
 		poly_mul_neon(pkcl[j], skpv1[j], SABER_P, acc);
-
-		for(k=0;k<SABER_N/16;k++){
-			vload(acc_neon, &acc[k*16]);
-			vload(res_neon, &vprime_avx[k*16]);
+=======
+		toom_cook_4way_neon(pkcl[j], skpv1[j], SABER_P, acc);
 			// vprime_avx[k] += acc[k]
 			vadd(res_neon, res_neon, acc_neon);
 			// vprime_avx[k] &= mod_p
@@ -443,7 +442,11 @@ void indcpa_kem_dec(const unsigned char *sk,
 	for(j=0;j<SABER_K;j++){
 
 		// toom_cook_4way_avx(pksv_avx[j], sksv_avx[j], SABER_P, acc);
+<<<<<<< HEAD
 		poly_mul_neon(pksv[j], sksv[j], SABER_P, acc);
+=======
+		toom_cook_4way_neon(pksv[j], sksv[j], SABER_P, acc);
+>>>>>>> f0aa541bcc2f6ccb50701c19607a4923d2f788d7
 
 		for(k=0;k<SABER_N/16;k++){
 			vload(v_neon, &v_avx[k*16]);
