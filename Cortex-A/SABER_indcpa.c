@@ -33,7 +33,7 @@ limitations under the License.
 #include "cbd.h"
 #include "SABER_params.h"
 #include "fips202.h"
-#include "polymul/toom_cook_4/asimd_toom_cook_4way_neon.c"
+#include "rq_mul/neon_poly_rq_mul.h"
 
 
 #define h1 4 //2^(EQ-EP-1)
@@ -196,7 +196,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 	// Matrix-vector multiplication; Matrix in transposed order
 	for(i=0;i<SABER_K;i++){
 		for(j=0;j<SABER_K;j++){
-			toom_cook_4way_neon(a[j].vec[i].coeffs, skpv1[j], SABER_Q, acc);
+			poly_mul_neon(a[j].vec[i].coeffs, skpv1[j], SABER_Q, acc);
 
 			for(k=0;k<SABER_N/16;k++){
 				vload(res_neon, &res_avx[i][k*16]);
@@ -290,7 +290,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 		for(j=0;j<SABER_K;j++){
 
 			// toom_cook_4way_avx(a_avx[i][j], sk_avx[j], SABER_Q, acc);
-			toom_cook_4way_neon(a[i].vec[j].coeffs, skpv1[j], SABER_Q, acc);
+			poly_mul_neon(a[i].vec[j].coeffs, skpv1[j], SABER_Q, acc);
 
 			for(k=0;k<SABER_N/16;k++){
 				vload(res_neon, &res_avx[i][k*16]);
@@ -336,7 +336,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 	
 	for(j=0;j<SABER_K;j++){
 		// toom_cook_4way_avx(pkcl_avx[j], sk_avx[j], SABER_P, acc);
-		toom_cook_4way_neon(pkcl[j], skpv1[j], SABER_P, acc);
+		poly_mul_neon(pkcl[j], skpv1[j], SABER_P, acc);
 
 		for(k=0;k<SABER_N/16;k++){
 			vload(acc_neon, &acc[k*16]);
@@ -443,7 +443,7 @@ void indcpa_kem_dec(const unsigned char *sk,
 	for(j=0;j<SABER_K;j++){
 
 		// toom_cook_4way_avx(pksv_avx[j], sksv_avx[j], SABER_P, acc);
-		toom_cook_4way_neon(pksv[j], sksv[j], SABER_P, acc);
+		poly_mul_neon(pksv[j], sksv[j], SABER_P, acc);
 
 		for(k=0;k<SABER_N/16;k++){
 			vload(v_neon, &v_avx[k*16]);
