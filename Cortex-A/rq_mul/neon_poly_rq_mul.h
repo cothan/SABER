@@ -21,9 +21,8 @@ limitations under the License.
 #define NEON_POLY_RQ_MUL_H
 
 #include <stdint.h>
+#include "../SABER_params.h"
 
-void poly_mul_neon(uint16_t *restrict polyC, 
-                   uint16_t const polyA[512], 
-                   uint16_t const polyB[512]);
+void poly_mul_neon(uint16_t polyC[SABER_N], uint16_t const polyA[SABER_N], uint16_t const polyB[SABER_N]);
 
 #endif

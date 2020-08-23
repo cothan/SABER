@@ -19,21 +19,21 @@ limitations under the License.
 =============================================================================*/
 #include <arm_neon.h>
 
-#include "../params.h"
+#include "../SABER_params.h"
 #include "neon_batch_multiplication.h"
 #include "neon_matrix_transpose.h"
 
-#define SB0 (NTRU_N_PAD / 2) // 256
-#define SB1 (SB0 / 4)        // 64
-#define SB2 (SB1 / 2)        // 32
-#define SB3 (SB2 / 2)        // 16
+#define SB0 (SABER_N) // 256
+#define SB1 (SB0 / 4) // 64
+#define SB2 (SB1 / 2) // 32
+#define SB3 (SB2 / 2) // 16
 
 #define SB0_RES (2 * SB0) // 512
 #define SB1_RES (2 * SB1) // 128
 #define SB2_RES (2 * SB2) // 64
 #define SB3_RES (2 * SB3) // 32
 
-#define MASK (NTRU_Q - 1)
+#define MASK (SABER_Q - 1)
 
 #define inv3 43691
 #define inv15 61167
@@ -109,27 +109,6 @@ limitations under the License.
     c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
     c.val[1] = vsubq_u16(a.val[1], b.val[1]);
 
-// Evaluate and copy
-void karat_neon_evaluate_SB0(uint16_t *restrict w[3], uint16_t poly[NTRU_N_PAD])
-{
-    uint16_t *c0 = poly,
-             *c1 = &poly[SB0],
-             *w0_mem = w[0],
-             *w1_mem = w[1],
-             *w2_mem = w[2];
-    uint16x8x4_t r0, r1, r2;
-    for (uint16_t addr = 0; addr < SB0; addr += 32)
-    {
-        vload(r0, &c0[addr]);
-        vload(r1, &c1[addr]);
-        vstore(&w0_mem[addr], r0);
-        vstore(&w2_mem[addr], r1);
-
-        vadd(r2, r0, r1);
-        vstore(&w1_mem[addr], r2);
-    }
-}
-
 // Evaluate and Copy, this go to TMP
 void karat_neon_evaluate_combine(uint16_t *restrict w, uint16_t *restrict poly)
 {
@@ -174,36 +153,6 @@ void karat_neon_evaluate_combine(uint16_t *restrict w, uint16_t *restrict poly)
 
         vadd_x2(tmp3, tmp1, tmp2);
         vstore_x2(&w4_mem[addr], tmp3);
-    }
-}
-
-// Interpolate
-void karat_neon_interpolate_SB0(uint16_t *restrict poly, uint16_t *restrict w[3])
-{
-    uint16x8x4_t r0, r1, r2, tmp0, tmp1, tmp2, r0r2;
-    uint16_t *w0_mem = w[0],
-             *w1_mem = w[1],
-             *w2_mem = w[2];
-    for (uint16_t i = 0; i < SB0_RES; i += 32)
-    {
-        vload(r0, &w0_mem[i]);
-        vload(r1, &w1_mem[i]);
-        vload(r2, &w2_mem[i]);
-
-        vload(tmp0, &poly[0 * SB0 + i]);
-        vload(tmp1, &poly[1 * SB0 + i]);
-        vload(tmp2, &poly[2 * SB0 + i]);
-
-        vadd(tmp1, tmp1, r1);
-        vadd(r0r2, r0, r2);
-        vsub(tmp1, tmp1, r0r2);
-
-        vadd(tmp0, r0, tmp0);
-        vadd(tmp2, r2, tmp2);
-
-        vstore(&poly[0 * SB0 + i], tmp0);
-        vstore(&poly[1 * SB0 + i], tmp1);
-        vstore(&poly[2 * SB0 + i], tmp2);
     }
 }
 
@@ -298,15 +247,15 @@ void karat_neon_interpolate_combine(uint16_t *restrict poly, uint16_t *restrict 
     }
 }
 
-// Ultilize all 32 SIMD registers, no Copy
-void tc4_evaluate_neon_SB1(uint16_t *restrict w[7], uint16_t *restrict poly)
+// Ultilize all 32 SIMD registers
+void tc4_evaluate_neon_SB1(uint16_t *restrict w[7], uint16_t const poly[SABER_N])
 {
     uint16_t *c0 = poly,
              *c1 = &poly[1 * SB1],
              *c2 = &poly[2 * SB1],
              *c3 = &poly[3 * SB1],
-            //  *w0_mem = w[0],
-            //  *w6_mem = w[6],
+             *w0_mem = w[0],
+             *w6_mem = w[6],
              *w1_mem = w[1],
              *w2_mem = w[2],
              *w3_mem = w[3],
@@ -319,8 +268,8 @@ void tc4_evaluate_neon_SB1(uint16_t *restrict w[7], uint16_t *restrict poly)
         vload(r1, &c1[addr]);
         vload(r2, &c2[addr]);
         vload(r3, &c3[addr]);
-        // vstore(&w0_mem[addr], r0); // Direct point when initialized
-        // vstore(&w6_mem[addr], r3); // Direct point when initialized
+        vstore(&w0_mem[addr], r0);
+        vstore(&w6_mem[addr], r3);
 
         vadd(tmp0, r0, r2);
         vadd(tmp1, r1, r3);
@@ -455,21 +404,21 @@ void neon_toom_cook_422_combine(uint16_t *restrict polyC, uint16_t *restrict pol
     uint16x8x4_t zero;
 
     // TC4
-    aw[0] = &polyA[0 * SB1];
-    aw[1] = &polyA[1 * SB1];
-    aw[2] = &polyA[2 * SB1];
-    aw[3] = &tmp_cc[0 * SB1];
-    aw[4] = &tmp_cc[1 * SB1];
-    aw[5] = &tmp_cc[2 * SB1];
-    aw[6] = &polyA[3 * SB1];
+    aw[0] = &tmp_cc[0 * SB1];
+    aw[1] = &tmp_cc[1 * SB1];
+    aw[2] = &tmp_cc[2 * SB1];
+    aw[3] = &tmp_cc[3 * SB1];
+    aw[4] = &tmp_cc[4 * SB1];
+    aw[5] = &tmp_cc[5 * SB1];
+    aw[6] = &tmp_cc[6 * SB1];
 
-    bw[0] = &polyB[0 * SB1];
-    bw[1] = &polyB[1 * SB1];
-    bw[2] = &polyB[2 * SB1];
-    bw[3] = &tmp_cc[3 * SB1];
-    bw[4] = &tmp_cc[4 * SB1];
-    bw[5] = &tmp_cc[5 * SB1];
-    bw[6] = &polyB[3 * SB1];
+    bw[0] = &tmp_cc[7 * SB1];
+    bw[1] = &tmp_cc[8 * SB1];
+    bw[2] = &tmp_cc[9 * SB1];
+    bw[3] = &tmp_cc[10 * SB1];
+    bw[4] = &tmp_cc[11 * SB1];
+    bw[5] = &tmp_cc[12 * SB1];
+    bw[6] = &tmp_cc[13 * SB1];
 
     cw[0] = &tmp_aabb[0 * SB1_RES];
     cw[1] = &tmp_aabb[1 * SB1_RES];
@@ -537,66 +486,31 @@ void poly_neon_reduction(uint16_t *poly, uint16_t *tmp)
     uint16x8_t mask;
     uint16x8x4_t res, tmp1, tmp2;
     mask = vdupq_n_u16(MASK);
-    for (uint16_t addr = 0; addr < NTRU_N_PAD; addr += 32)
+    for (uint16_t addr = 0; addr < SABER_N; addr += 32)
     {
         vload(tmp2, &tmp[addr]);
-        vload(tmp1, &tmp[addr + NTRU_N]);
+        vload(tmp1, &tmp[addr + SABER_N]);
         vadd(res, tmp1, tmp2);
         vand(res, res, mask);
         vstore(&poly[addr], res);
     }
 }
 
-void poly_mul_neon(uint16_t *restrict polyC, uint16_t *restrict polyA, uint16_t *restrict polyB)
+void poly_mul_neon(uint16_t polyC[SABER_N], uint16_t const polyA[SABER_N], uint16_t const polyB[SABER_N])
 {
-    uint16_t *kaw[3], *kbw[3], *kcw[3];
-    uint16_t tmp_ab[SB0 * 6];
-    uint16_t tmp_c[SB0_RES * 3];
-
-    // Better for caching
-    kaw[0] = &tmp_ab[0 * SB0];
-    kbw[0] = &tmp_ab[1 * SB0];
-
-    kaw[1] = &tmp_ab[2 * SB0];
-    kbw[1] = &tmp_ab[3 * SB0];
-
-    kaw[2] = &tmp_ab[4 * SB0];
-    kbw[2] = &tmp_ab[5 * SB0];
-
-    kcw[0] = &tmp_c[0 * SB0_RES];
-    kcw[1] = &tmp_c[1 * SB0_RES];
-    kcw[2] = &tmp_c[2 * SB0_RES];
+    uint16_t tmp_c[SB0_RES];
 
     uint16x8x4_t zero;
     vxor(zero, zero, zero);
-    for (uint16_t addr = 0; addr < SB0_RES * 3; addr += 32)
+    for (uint16_t addr = 0; addr < SB0_RES; addr += 32)
     {
         vstore(&tmp_c[addr], zero);
     }
 
-    // Karatsuba Evaluate A
-    karat_neon_evaluate_SB0(kaw, polyA);
-    // Karatsuba Evaluate B
-    karat_neon_evaluate_SB0(kbw, polyB);
-
     // Toom Cook 4-way combine
-    neon_toom_cook_422_combine(kcw[0], kaw[0], kbw[0]);
-
-    // Toom Cook 4-way combine
-    neon_toom_cook_422_combine(kcw[1], kaw[1], kbw[1]);
-
-    // Toom Cook 4-way combine
-    neon_toom_cook_422_combine(kcw[2], kaw[2], kbw[2]);
-
-    // Karatsuba Interpolate
-    vxor(zero, zero, zero);
-    for (uint16_t addr = 0; addr < SB0_RES * 2; addr += 32)
-    {
-        vstore(&tmp_ab[addr], zero);
-    }
-    karat_neon_interpolate_SB0(tmp_ab, kcw);
+    neon_toom_cook_422_combine(tmp_c, polyB, polyA);
 
     // Ring reduction
-    // Reduce from 1024 -> 512
-    poly_neon_reduction(polyC, tmp_ab);
+    // Reduce from 512 -> 256
+    poly_neon_reduction(polyC, tmp_c);
 }

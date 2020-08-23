@@ -15,6 +15,9 @@ SOURCES2 =  pack_unpack.c \
 			rng.c \
 			poly.c \
 			verify.c \
+			rq_mul/neon_batch_multiplication.c \
+      		rq_mul/neon_matrix_transpose.c \
+      		rq_mul/neon_poly_rq_mul.c \
 			SABER_indcpa.c \
 			kem.c \
 			cbd.c \

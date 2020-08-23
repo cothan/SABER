@@ -11,7 +11,6 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
  * Author: Duc Tri Nguyen
 =============================================================================*/
 
-
 #include <arm_neon.h>
 
 #include "pack_unpack.h"
@@ -20,27 +19,39 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #include "cbd.h"
 #include "SABER_params.h"
 #include "fips202.h"
-#include "polymul/toom_cook_4/asimd_toom_cook_4way_neon.c"
+#include "rq_mul/neon_poly_rq_mul.h"
 
 
 #define h1 4 //2^(EQ-EP-1)
 
 #define h2 ( (1<<(SABER_EP-2)) - (1<<(SABER_EP-SABER_ET-1)) + (1<<(SABER_EQ-SABER_EP-1)) )
 
+// load c <= a
+#define vload(c, a) c = vld1q_u16_x4(a);
+
+// store c <= a
+#define vstore(c, a) vst1q_u16_x4(c, a);
+
+// c = a + b
+#define vadd(c, a, b)                         \
+    c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
+    c.val[1] = vaddq_u16(a.val[1], b.val[1]); \
+    c.val[2] = vaddq_u16(a.val[2], b.val[2]); \
+    c.val[3] = vaddq_u16(a.val[3], b.val[3]);
+
 // c = a + b
 #define vadd1(c, a, b) \
 	c.val[0] = vaddq_u16(a.val[0], b); \
-	c.val[1] = vaddq_u16(a.val[1], b);
+	c.val[1] = vaddq_u16(a.val[1], b); \
+	c.val[2] = vaddq_u16(a.val[2], b); \
+	c.val[3] = vaddq_u16(a.val[3], b);
 
 // c = a & b
 #define vand(c, a, b) \
 	c.val[0] = vandq_u16(a.val[0], b); \
-	c.val[1] = vandq_u16(a.val[1], b);
-
-// c = 0 
-#define vzero(c, zero) \
-	vxor(zero, zero, zero); \
-	vstore(c, zero);
+	c.val[1] = vandq_u16(a.val[1], b); \
+	c.val[2] = vandq_u16(a.val[2], b); \ 
+	c.val[3] = vandq_u16(a.val[3], b);
 
 
 void POL2MSG(uint16_t *message_dec_unpacked, unsigned char *message_dec){
@@ -144,8 +155,6 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   polyvec a[SABER_K];
 
   uint16_t skpv1[SABER_K][SABER_N];
-
-  
  
   unsigned char seed[SABER_SEEDBYTES];
   unsigned char noiseseed[SABER_COINBYTES];
@@ -156,8 +165,8 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 
   uint16x8_t mod   =vdupq_n_u16(SABER_Q-1);
   uint16x8_t H1_avx=vdupq_n_u16(h1);
-  uint16x8x2_t acc_neon;
-  uint16x8x2_t res_neon;
+  uint16x8x4_t acc_neon;
+  uint16x8x4_t res_neon;
 
 //--------------NEON declaration ends------------------
   uint16_t res_avx[SABER_K][SABER_N] = {0};
@@ -183,33 +192,33 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 	// Matrix-vector multiplication; Matrix in transposed order
 	for(i=0;i<SABER_K;i++){
 		for(j=0;j<SABER_K;j++){
-			toom_cook_4way_neon(a[j].vec[i].coeffs, skpv1[j], SABER_Q, acc);
+			poly_mul_neon(acc, a[j].vec[i].coeffs, skpv1[j]);
 
-			for(k=0;k<SABER_N/16;k++){
-				vload(res_neon, &res_avx[i][k*16]);
-				vload(acc_neon, &acc[k*16]);
+			for(k=0;k<SABER_N;k+=32){
+				vload(res_neon, &res_avx[i][k]);
+				vload(acc_neon, &acc[k]);
 				// res_avx[i][k] += acc[k]
 				vadd(res_neon, res_neon, acc_neon);
 				// res_avx[i][k] &= mod 
 				vand(res_neon, res_neon, mod);
 				// acc[k] = 0
 				// vzero(&acc[k*16], acc_neon); // No Need
-				vstore(&res_avx[i][k*16], res_neon);
+				vstore(&res_avx[i][k], res_neon);
 			}
 		}
 	}
 	
 	// Now truncation
 	for(i=0;i<SABER_K;i++){ //shift right EQ-EP bits
-		for(j=0;j<SABER_N/16;j++){
-			vload(res_neon, &res_avx[i][16*j]);
+		for(j=0;j<SABER_N;j+=32){
+			vload(res_neon, &res_avx[i][j]);
 			// res_avx[i][j] += H1_avx
 			vadd1(res_neon, res_neon, H1_avx);
 			// res_avx[i][j] >>= (SABER_EQ-SABER_EP)
 			vsr(res_neon, res_neon, (SABER_EQ-SABER_EP));
 			// res_avx[i][j] &= mod
 			vand(res_neon, res_neon, mod);
-			vstore(&res_avx[i][16*j], res_neon);
+			vstore(&res_avx[i][j], res_neon);
 		}
 	}
 
@@ -250,8 +259,8 @@ void indcpa_kem_enc(unsigned char *message_received,
 	  uint16x8_t mod_p = vdupq_n_u16 (SABER_P-1);
 	  uint16x8_t H1_avx= vdupq_n_u16(h1);
 	  
-	  uint16x8x2_t acc_neon;
-	  uint16x8x2_t res_neon;
+	  uint16x8x4_t acc_neon;
+	  uint16x8x4_t res_neon;
  
 	//--------------NEON declaration ends------------------
 	uint16_t acc[SABER_N];
@@ -275,20 +284,18 @@ void indcpa_kem_enc(unsigned char *message_received,
 	// Matrix-vector multiplication; 
 	for(i=0;i<SABER_K;i++){
 		for(j=0;j<SABER_K;j++){
+			poly_mul_neon(acc, a[i].vec[j].coeffs, skpv1[j]);
 
-			// toom_cook_4way_avx(a_avx[i][j], sk_avx[j], SABER_Q, acc);
-			toom_cook_4way_neon(a[i].vec[j].coeffs, skpv1[j], SABER_Q, acc);
-
-			for(k=0;k<SABER_N/16;k++){
-				vload(res_neon, &res_avx[i][k*16]);
-				vload(acc_neon, &acc[k*16]);
+			for(k=0;k<SABER_N;k+=32){
+				vload(res_neon, &res_avx[i][k]);
+				vload(acc_neon, &acc[k]);
 				// res_avx[i][k] += acc[k]
 				vadd(res_neon, res_neon, acc_neon);
 				// res_avx[i][k] &= mod 
 				vand(res_neon, res_neon, mod);
 				// acc[k] = 0 
 				// vzero(&acc[k*16], acc_neon); // No need
-				vstore(&res_avx[i][k*16], res_neon);
+				vstore(&res_avx[i][k], res_neon);
 				
 			}
 			
@@ -298,8 +305,8 @@ void indcpa_kem_enc(unsigned char *message_received,
 	// Now truncation
 
 	for(i=0;i<SABER_K;i++){ //shift right EQ-EP bits
-		for(j=0;j<SABER_N/16;j++){
-			vload(res_neon, &res_avx[i][j*16]);
+		for(j=0;j<SABER_N;j+=32){
+			vload(res_neon, &res_avx[i][j]);
 			// res_avx[i][j] += H1_avx
 			vadd1(res_neon, res_neon, H1_avx);
 			// res_avx[i][j] >>= (SABER_EQ-SABER_EP)
@@ -308,7 +315,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 			vand(res_neon, res_neon, mod);
 			
 			//-----this result should be put in b_prime for later use in server.
-			vstore(&temp[i][j*16], res_neon);
+			vstore(&temp[i][j], res_neon);
 		}
 	}
 	
@@ -322,19 +329,17 @@ void indcpa_kem_enc(unsigned char *message_received,
 	
 	
 	for(j=0;j<SABER_K;j++){
-		// toom_cook_4way_avx(pkcl_avx[j], sk_avx[j], SABER_P, acc);
-		toom_cook_4way_neon(pkcl[j], skpv1[j], SABER_P, acc);
+		poly_mul_neon(acc, pkcl[j], skpv1[j]);
 
-		for(k=0;k<SABER_N/16;k++){
-			vload(acc_neon, &acc[k*16]);
-			vload(res_neon, &vprime_avx[k*16]);
+		for(k=0;k<SABER_N;k+=32){
+			vload(acc_neon, &acc[k]);
+			vload(res_neon, &vprime_avx[k]);
 			// vprime_avx[k] += acc[k]
 			vadd(res_neon, res_neon, acc_neon);
 			// vprime_avx[k] &= mod_p
 			vand(res_neon, res_neon, mod_p);
 			// acc[k] = 0
-			// vzero(&acc[k*16], acc_neon); // No need
-			vstore(&vprime_avx[k*16], res_neon);
+			vstore(&vprime_avx[k], res_neon);
 		}
 	}
 	
@@ -348,13 +353,13 @@ void indcpa_kem_enc(unsigned char *message_received,
 	}
 	
 	// message encoding
-	for(k=0; k<SABER_N/16; k++)
+	for(k=0; k<SABER_N; k+=32)
 	{
-		vload(acc_neon, &message[k*16]);
+		vload(acc_neon, &message[k]);
 		vsl(acc_neon, acc_neon, SABER_EP-1);
 		
 		// Computation of v'+h1 
-		vload(res_neon, &vprime_avx[k*16]);
+		vload(res_neon, &vprime_avx[k]);
 		vadd1(res_neon, res_neon, H1_avx); //adding h1
 
 		// SHIFTRIGHT(v'+h1-m mod p, EP-ET)
@@ -363,7 +368,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 		vsr(res_neon, res_neon, (SABER_EP-SABER_ET));
 		
 		// Unpack avx
-		vstore(&temp[0][k*16], res_neon);
+		vstore(&temp[0][k], res_neon);
 	}
 
 	#if Saber_type == 1
@@ -400,9 +405,9 @@ void indcpa_kem_dec(const unsigned char *sk,
 
 	//--------------NEON declaration------------------
 	  uint16x8_t mod_p=vdupq_n_u16(SABER_P-1); 
-	  uint16x8x2_t acc_neon;
-	  uint16x8x2_t v_neon;
-	  uint16x8x2_t vh2;
+	  uint16x8x4_t acc_neon;
+	  uint16x8x4_t v_neon;
+	  uint16x8x4_t vh2;
 	  vh2.val[0] = vdupq_n_u16(h2);
 	  vh2.val[1] = vdupq_n_u16(h2);
 	//--------------NEON declaration ends------------------
@@ -430,34 +435,34 @@ void indcpa_kem_dec(const unsigned char *sk,
 	for(j=0;j<SABER_K;j++){
 
 		// toom_cook_4way_avx(pksv_avx[j], sksv_avx[j], SABER_P, acc);
-		toom_cook_4way_neon(pksv[j], sksv[j], SABER_P, acc);
+		poly_mul_neon(acc, pksv[j], sksv[j]);
 
-		for(k=0;k<SABER_N/16;k++){
-			vload(v_neon, &v_avx[k*16]);
-			vload(acc_neon, &acc[k*16]);
+		for(k=0;k<SABER_N;k+=32){
+			vload(v_neon, &v_avx[k]);
+			vload(acc_neon, &acc[k]);
 			// v_avx[k] += acc[k]
 			vadd(v_neon, v_neon, acc_neon);
 			// v_avx[k] &= mod_p 
 			vand(v_neon, v_neon, mod_p);
 			// acc[k] = 0
 			// vzero(&acc[k*16], acc_neon); // No need
-			vstore(&v_avx[k*16], v_neon);
+			vstore(&v_avx[k], v_neon);
 		}
 	}
 
-	for(i=0; i<SABER_N/16; i++){
+	for(i=0; i<SABER_N; i+=32){
 		//addition of h2
-		vload(v_neon, &v_avx[i*16]);
+		vload(v_neon, &v_avx[i]);
 		vadd(v_neon, v_neon, vh2);
 
-		vload(acc_neon, &op[i*16]);
+		vload(acc_neon, &op[i]);
 		vsl(acc_neon, acc_neon, (SABER_EP-SABER_ET));
 
 		vsub(v_neon, v_neon, acc_neon);
 		vand(v_neon, v_neon, mod_p);
 		vsr(v_neon, v_neon, (SABER_EP-1));
 
-		vstore(&message_dec_unpacked[i*16], v_neon);	
+		vstore(&message_dec_unpacked[i], v_neon);	
 	}
 
 	POL2MSG(message_dec_unpacked, message_dec);
