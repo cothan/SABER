@@ -1,4 +1,4 @@
-CC 		  = cc
+CC 		  = clang
 CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -g3 -lpapi
 CFLAGS6  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w -lpapi -g3 -flax-vector-conversions
 CLANG    = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w -Qunused-arguments -lpapi -g3

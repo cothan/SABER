@@ -32,12 +32,33 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 // store c <= a
 #define vstore(c, a) vst1q_u16_x4(c, a);
 
+// c = a << value
+#define vsl(c, a, value)                     \
+    c.val[0] = vshlq_n_u16(a.val[0], value); \
+    c.val[1] = vshlq_n_u16(a.val[1], value); \
+    c.val[2] = vshlq_n_u16(a.val[2], value); \
+    c.val[3] = vshlq_n_u16(a.val[3], value);
+
+// c = a >> value
+#define vsr(c, a, value)                     \
+    c.val[0] = vshrq_n_u16(a.val[0], value); \
+    c.val[1] = vshrq_n_u16(a.val[1], value); \
+    c.val[2] = vshrq_n_u16(a.val[2], value); \
+    c.val[3] = vshrq_n_u16(a.val[3], value);
+
 // c = a + b
 #define vadd(c, a, b)                         \
     c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
     c.val[1] = vaddq_u16(a.val[1], b.val[1]); \
     c.val[2] = vaddq_u16(a.val[2], b.val[2]); \
     c.val[3] = vaddq_u16(a.val[3], b.val[3]);
+
+// c = a - b
+#define vsub(c, a, b)                         \
+    c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
+    c.val[1] = vsubq_u16(a.val[1], b.val[1]); \
+    c.val[2] = vsubq_u16(a.val[2], b.val[2]); \
+    c.val[3] = vsubq_u16(a.val[3], b.val[3]);
 
 // c = a + b
 #define vadd1(c, a, b) \
