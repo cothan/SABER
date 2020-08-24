@@ -25,4 +25,9 @@ limitations under the License.
 
 void poly_mul_neon(uint16_t polyC[SABER_N], uint16_t const polyA[SABER_N], uint16_t const polyB[SABER_N]);
 
+void polyvec_mul_accumulate_neon(uint16_t accumulate[SABER_N], uint16_t modQ,
+                                 uint16_t polyvecA[SABER_K][SABER_N],
+                                 uint16_t polyvecB[SABER_K][SABER_N]);
+
+
 #endif

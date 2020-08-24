@@ -375,22 +375,23 @@ void indcpa_kem_enc(unsigned char *message_received,
 
   // vector-vector scalar multiplication with mod p
 
-  for (j = 0; j < SABER_K; j++)
-  {
-    poly_mul_neon(acc, pkcl[j], skpv1[j]);
+  // for (j = 0; j < SABER_K; j++)
+  // {
+  //   poly_mul_neon(acc, pkcl[j], skpv1[j]);
 
-    for (k = 0; k < SABER_N; k += 32)
-    {
-      vload(acc_neon, &acc[k]);
-      vload(res_neon, &vprime_avx[k]);
-      // vprime_avx[k] += acc[k]
-      vadd(res_neon, res_neon, acc_neon);
-      // vprime_avx[k] &= mod_p
-      vand(res_neon, res_neon, mod_p);
-      // acc[k] = 0
-      vstore(&vprime_avx[k], res_neon);
-    }
-  }
+  //   for (k = 0; k < SABER_N; k += 32)
+  //   {
+  //     vload(acc_neon, &acc[k]);
+  //     vload(res_neon, &vprime_avx[k]);
+  //     // vprime_avx[k] += acc[k]
+  //     vadd(res_neon, res_neon, acc_neon);
+  //     // vprime_avx[k] &= mod_p
+  //     vand(res_neon, res_neon, mod_p);
+  //     // acc[k] = 0
+  //     vstore(&vprime_avx[k], res_neon);
+  //   }
+  // }
+  polyvec_mul_accumulate_neon(vprime_avx, SABER_P, pkcl, skpv1);
 
   // unpack message_received;
   for (j = 0; j < SABER_KEYBYTES; j++)
@@ -503,11 +504,11 @@ void indcpa_kem_dec(const unsigned char *sk,
     }
   }
 
-  printf("dec: v_avx:\n");
-  printArray(v_avx, "v_avx", SABER_N);
+  // printf("dec: v_avx:\n");
+  // printArray(v_avx, "v_avx", SABER_N);
   
-  printf("dec: op:\n");
-  printArray(op, "op", SABER_N);
+  // printf("dec: op:\n");
+  // printArray(op, "op", SABER_N);
   
 
   for (i = 0; i < SABER_N; i += 32)
@@ -526,8 +527,8 @@ void indcpa_kem_dec(const unsigned char *sk,
     vstore(&message_dec_unpacked[i], v_neon);
   }
 
-  printf("dec: message_dec_unpacked:\n");
-  printArray(message_dec_unpacked, "message_dec_unpacked", SABER_N);
+  // printf("dec: message_dec_unpacked:\n");
+  // printArray(message_dec_unpacked, "message_dec_unpacked", SABER_N);
   	
 
 

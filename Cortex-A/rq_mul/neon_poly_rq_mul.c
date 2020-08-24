@@ -534,3 +534,44 @@ void poly_mul_neon(uint16_t polyC[SABER_N], uint16_t const polyA[SABER_N], uint1
     // Reduce from 512 -> 256
     poly_neon_reduction(polyC, tmp_c);
 }
+
+void polyvec_mul_accumulate_neon(uint16_t accumulate[SABER_N], uint16_t modQ,
+                                 uint16_t polyvecA[SABER_K][SABER_N],
+                                 uint16_t polyvecB[SABER_K][SABER_N])
+{
+    uint16_t polyC[SABER_N];
+    uint16x8x4_t zero, tmp, acc;
+    uint16x8_t mod;
+    vxor(zero, zero, zero);
+    for (uint16_t addr = 0; addr < SABER_N; addr +=32)
+    {
+        vstore(&accumulate[addr], zero);
+    }
+
+    for (uint16_t k  = 0; k < SABER_K - 1; k++)
+    {
+        poly_mul_neon(polyC, polyvecA[k], polyvecB[k]);
+
+        for (uint16_t addr = 0; addr < SABER_N; addr += 32)
+        {
+            vload(acc, &accumulate[addr]);
+            vload(tmp, &polyC[addr]);
+
+            vadd(acc, acc, tmp);
+
+            vstore(&accumulate[addr], acc);
+        }
+    }
+
+    poly_mul_neon(polyC, polyvecA[SABER_K - 1], polyvecB[SABER_K - 1]);
+    mod = vdupq_n_u16(modQ - 1);
+    for (uint16_t addr = 0; addr < SABER_N; addr += 32)
+    {
+        vload(acc, &accumulate[addr]);
+        vload(tmp, &polyC[addr]);
+
+        vadd(acc, acc, tmp);
+        vand(acc, acc, mod);
+        vstore(&accumulate[addr], acc);
+    }
+}
