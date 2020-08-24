@@ -410,7 +410,7 @@ void tc4_interpolate_neon_SB1(uint16_t *restrict poly, uint16_t *restrict w[7])
     }
 }
 
-void neon_toom_cook_422_combine(uint16_t *restrict polyC, uint16_t *restrict polyA, uint16_t *restrict polyB)
+void neon_toom_cook_422_combine(uint16_t polyC[SB0_RES], uint16_t const polyA[SABER_N], uint16_t const polyB[SABER_N])
 {
     // TC4
     uint16_t *aw[7], *bw[7], *cw[7];
@@ -503,14 +503,14 @@ void neon_toom_cook_422_combine(uint16_t *restrict polyC, uint16_t *restrict pol
 static inline
 void poly_neon_reduction(uint16_t *poly, uint16_t *tmp)
 {
-    // uint16x8_t mask;
+    uint16x8_t mask;
     uint16x8x4_t res, tmp1, tmp2;
-    // mask = vdupq_n_u16(MASK);
+    mask = vdupq_n_u16(MASK);
     for (uint16_t addr = 0; addr < SABER_N; addr += 32)
     {
-        vload(tmp2, &tmp[addr]);
-        vload(tmp1, &tmp[addr + SABER_N]);
-        vadd(res, tmp1, tmp2);
+        vload(tmp1, &tmp[addr]);
+        vload(tmp2, &tmp[addr + SABER_N]);
+        vsub(res, tmp1, tmp2);
         // vand(res, res, mask);
         vstore(&poly[addr], res);
     }
@@ -528,7 +528,7 @@ void poly_mul_neon(uint16_t polyC[SABER_N], uint16_t const polyA[SABER_N], uint1
     }
 
     // Toom Cook 4-way combine
-    neon_toom_cook_422_combine(tmp_c, polyB, polyA);
+    neon_toom_cook_422_combine(tmp_c, polyA, polyB);
 
     // Ring reduction
     // Reduce from 512 -> 256
