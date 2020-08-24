@@ -51,15 +51,37 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #error "Unsupported compiler"
 #endif
 
-// c = a + b
-#define vadd(c, a, b)                       \
-  c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
-  c.val[1] = vaddq_u16(a.val[1], b.val[1]); \
-  c.val[2] = vaddq_u16(a.val[2], b.val[2]); \
-  c.val[3] = vaddq_u16(a.val[3], b.val[3]);
+// c = a << value
+#define vsl(c, a, value)                     \
+    c.val[0] = vshlq_n_u16(a.val[0], value); \
+    c.val[1] = vshlq_n_u16(a.val[1], value); \
+    c.val[2] = vshlq_n_u16(a.val[2], value); \
+    c.val[3] = vshlq_n_u16(a.val[3], value);
+
+// c = a >> value
+#define vsr(c, a, value)                     \
+    c.val[0] = vshrq_n_u16(a.val[0], value); \
+    c.val[1] = vshrq_n_u16(a.val[1], value); \
+    c.val[2] = vshrq_n_u16(a.val[2], value); \
+    c.val[3] = vshrq_n_u16(a.val[3], value);
 
 // c = a + b
-#define vadd1(c, a, b)               \
+#define vadd(c, a, b)                         \
+    c.val[0] = vaddq_u16(a.val[0], b.val[0]); \
+    c.val[1] = vaddq_u16(a.val[1], b.val[1]); \
+    c.val[2] = vaddq_u16(a.val[2], b.val[2]); \
+    c.val[3] = vaddq_u16(a.val[3], b.val[3]);
+
+// c = a - b
+#define vsub(c, a, b)                         \
+    c.val[0] = vsubq_u16(a.val[0], b.val[0]); \
+    c.val[1] = vsubq_u16(a.val[1], b.val[1]); \
+    c.val[2] = vsubq_u16(a.val[2], b.val[2]); \
+    c.val[3] = vsubq_u16(a.val[3], b.val[3]);
+
+
+// c = a + b
+#define vadd_const(c, a, b)               \
   c.val[0] = vaddq_u16(a.val[0], b); \
   c.val[1] = vaddq_u16(a.val[1], b); \
   c.val[2] = vaddq_u16(a.val[2], b); \
@@ -195,11 +217,11 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 
   GenSecret(skpv1, noiseseed);
 
-  //   printf("skvp1:\n");
-  //   for (i = 0; i < SABER_K; i++)
-  //   {
-  // 	  printArray(skpv1[i], "skvp1", SABER_N);
-  //   }
+    // printf("skvp1:\n");
+    // for (i = 0; i < SABER_K; i++)
+    // {
+  	//   printArray(skpv1[i], "skvp1", SABER_N);
+    // }
 
   //------------------------do the matrix vector multiplication and rounding------------
 
@@ -225,6 +247,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
     }
   }
 
+
   // Now truncation
   for (i = 0; i < SABER_K; i++)
   { //shift right EQ-EP bits
@@ -232,7 +255,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
     {
       vload(res_neon, &res_avx[i][j]);
       // res_avx[i][j] += H1_avx
-      vadd1(res_neon, res_neon, H1_avx);
+      vadd_const(res_neon, res_neon, H1_avx);
       // res_avx[i][j] >>= (SABER_EQ-SABER_EP)
       vsr(res_neon, res_neon, (SABER_EQ - SABER_EP));
       // res_avx[i][j] &= mod
@@ -241,6 +264,11 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
     }
   }
 
+  // printf("res_avx:\n");
+  // for (i = 0; i < SABER_K; i++)
+  // {
+  //   printArray(res_avx[i], "res_avx", SABER_N);
+  // }
   //------------------Pack sk into byte string-------
 
   POLVEC2BS(sk, skpv1, SABER_Q);
@@ -327,7 +355,7 @@ void indcpa_kem_enc(unsigned char *message_received,
     {
       vload(res_neon, &res_avx[i][j]);
       // res_avx[i][j] += H1_avx
-      vadd1(res_neon, res_neon, H1_avx);
+      vadd_const(res_neon, res_neon, H1_avx);
       // res_avx[i][j] >>= (SABER_EQ-SABER_EP)
       vsr(res_neon, res_neon, (SABER_EQ - SABER_EP));
       // res_avx[i][j] &= mod
@@ -337,6 +365,7 @@ void indcpa_kem_enc(unsigned char *message_received,
       vstore(&temp[i][j], res_neon);
     }
   }
+
 
   POLVEC2BS(ciphertext, temp, SABER_P); // Pack b_prime into ciphertext byte string
 
@@ -380,7 +409,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 
     // Computation of v'+h1
     vload(res_neon, &vprime_avx[k]);
-    vadd1(res_neon, res_neon, H1_avx); //adding h1
+    vadd_const(res_neon, res_neon, H1_avx); //adding h1
 
     // SHIFTRIGHT(v'+h1-m mod p, EP-ET)
     vsub(res_neon, res_neon, acc_neon);
@@ -390,6 +419,11 @@ void indcpa_kem_enc(unsigned char *message_received,
     // Unpack avx
     vstore(&temp[0][k], res_neon);
   }
+  // printf("enc: temp:\n");
+  // for (i = 0; i < 1; i++)
+  // {
+  //   printArray(temp[i], "temp", SABER_N);
+  // }
 
 #if Saber_type == 1
   SABER_pack_3bit(msk_c, temp[0]);
@@ -424,9 +458,8 @@ void indcpa_kem_dec(const unsigned char *sk,
   uint16x8_t mod_p = vdupq_n_u16(SABER_P - 1);
   uint16x8x4_t acc_neon;
   uint16x8x4_t v_neon;
-  uint16x8x4_t vh2;
-  vh2.val[0] = vdupq_n_u16(h2);
-  vh2.val[1] = vdupq_n_u16(h2);
+  uint16x8_t vh2;
+  vh2 = vdupq_n_u16(h2);
   //--------------NEON declaration ends------------------
   uint16_t v_avx[SABER_N] = {0};
   uint16_t acc[SABER_N];
@@ -470,11 +503,18 @@ void indcpa_kem_dec(const unsigned char *sk,
     }
   }
 
+  printf("dec: v_avx:\n");
+  printArray(v_avx, "v_avx", SABER_N);
+  
+  printf("dec: op:\n");
+  printArray(op, "op", SABER_N);
+  
+
   for (i = 0; i < SABER_N; i += 32)
   {
     //addition of h2
     vload(v_neon, &v_avx[i]);
-    vadd(v_neon, v_neon, vh2);
+    vadd_const(v_neon, v_neon, vh2);
 
     vload(acc_neon, &op[i]);
     vsl(acc_neon, acc_neon, (SABER_EP - SABER_ET));
@@ -485,6 +525,11 @@ void indcpa_kem_dec(const unsigned char *sk,
 
     vstore(&message_dec_unpacked[i], v_neon);
   }
+
+  printf("dec: message_dec_unpacked:\n");
+  printArray(message_dec_unpacked, "message_dec_unpacked", SABER_N);
+  	
+
 
   POL2MSG(message_dec_unpacked, message_dec);
 }
