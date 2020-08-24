@@ -5,7 +5,7 @@
 #include <string.h>
 #include <arm_neon.h>
 
-#include "../polymul/toom_cook_4/asimd_toom_cook_4way_neon.h"
+#include "../rq_mul/neon_poly_rq_mul.h"
 
 void readFile(uint16_t *out, char *filename, int length)
 {
@@ -79,7 +79,7 @@ int test1() {
   printArray(res_gold, 256, "res_gold:");
   printf("========\n");
 
-  toom_cook_4way_neon(a, b, 8192, res_test);
+  poly_mul_neon(res_test, a, b);
 
   printArray(res_test, 256, "res_test:");
   printf("========\n");
