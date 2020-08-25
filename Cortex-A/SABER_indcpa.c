@@ -220,28 +220,28 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   //------------------------do the matrix vector multiplication and rounding------------
 
   // Matrix-vector multiplication; Matrix in transposed order
-  for (i = 0; i < SABER_K; i++)
-  {
-    for (j = 0; j < SABER_K; j++)
-    {
-      poly_mul_neon(acc, a[j].vec[i].coeffs, skpv1[j]);
+  // for (i = 0; i < SABER_K; i++)
+  // {
+  //   for (j = 0; j < SABER_K; j++)
+  //   {
+  //     poly_mul_neon(acc, a[j].vec[i].coeffs, skpv1[j]);
 
-      for (k = 0; k < SABER_N; k += 32)
-      {
-        vload(res_neon, &res_avx[i][k]);
-        vload(acc_neon, &acc[k]);
-        // res_avx[i][k] += acc[k]
-        vadd(res_neon, res_neon, acc_neon);
-        // res_avx[i][k] &= mod
-        vand(res_neon, res_neon, mod);
-        // acc[k] = 0
-        // vzero(&acc[k*16], acc_neon); // No Need
-        vstore(&res_avx[i][k], res_neon);
-      }
-    }
-  }
+  //     for (k = 0; k < SABER_N; k += 32)
+  //     {
+  //       vload(res_neon, &res_avx[i][k]);
+  //       vload(acc_neon, &acc[k]);
+  //       // res_avx[i][k] += acc[k]
+  //       vadd(res_neon, res_neon, acc_neon);
+  //       // res_avx[i][k] &= mod
+  //       vand(res_neon, res_neon, mod);
+  //       // acc[k] = 0
+  //       // vzero(&acc[k*16], acc_neon); // No Need
+  //       vstore(&res_avx[i][k], res_neon);
+  //     }
+  //   }
+  // }
 
-  // neon_matrix_vector_mul(res_avx, SABER_Q, a, skpv1);
+  neon_matrix_vector_mul_transpose(res_avx, SABER_Q, a, skpv1);
 
   // Now truncation
   for (i = 0; i < SABER_K; i++)
@@ -293,12 +293,10 @@ void indcpa_kem_enc(unsigned char *message_received,
   uint16x8_t mod_p = vdupq_n_u16(SABER_P - 1);
   uint16x8_t H1_avx = vdupq_n_u16(h1);
 
-  uint16x8x4_t acc_neon;
-  uint16x8x4_t res_neon;
+  uint16x8x4_t tmp1_neon, tmp2_neon;
 
   //--------------NEON declaration ends------------------
-  uint16_t acc[SABER_N];
-  uint16_t res_avx[SABER_K][SABER_N] = {0};
+  uint16_t accumulator[SABER_K][SABER_N];
   uint16_t vprime[SABER_N];
 
   for (i = 0; i < SABER_SEEDBYTES; i++)
@@ -316,7 +314,7 @@ void indcpa_kem_enc(unsigned char *message_received,
   //-----------------matrix-vector multiplication and rounding
 
   // Matrix-vector multiplication;
-  neon_matrix_vector_mul(res_avx, SABER_Q, a, skpv1);
+  neon_matrix_vector_mul(accumulator, SABER_Q, a, skpv1);
 
   // Now truncation
 
@@ -324,16 +322,16 @@ void indcpa_kem_enc(unsigned char *message_received,
   { //shift right EQ-EP bits
     for (j = 0; j < SABER_N; j += 32)
     {
-      vload(res_neon, &res_avx[i][j]);
-      // res_avx[i][j] += H1_avx
-      vadd_const(res_neon, res_neon, H1_avx);
-      // res_avx[i][j] >>= (SABER_EQ-SABER_EP)
-      vsr(res_neon, res_neon, (SABER_EQ - SABER_EP));
-      // res_avx[i][j] &= mod
-      vand(res_neon, res_neon, mod);
+      vload(tmp2_neon, &accumulator[i][j]);
+      // accumulator[i][j] += H1_avx
+      vadd_const(tmp2_neon, tmp2_neon, H1_avx);
+      // accumulator[i][j] >>= (SABER_EQ-SABER_EP)
+      vsr(tmp2_neon, tmp2_neon, (SABER_EQ - SABER_EP));
+      // accumulator[i][j] &= mod
+      vand(tmp2_neon, tmp2_neon, mod);
 
       //-----this result should be put in b_prime for later use in server.
-      vstore(&temp[i][j], res_neon);
+      vstore(&temp[i][j], tmp2_neon);
     }
   }
 
@@ -345,7 +343,6 @@ void indcpa_kem_enc(unsigned char *message_received,
   //------now calculate the v'
 
   // vector-vector scalar multiplication with mod p
-
   neon_vector_vector_mul(vprime, SABER_P, pkcl, skpv1);
 
   // TODO: add vzip to unpack, pack faster
@@ -361,20 +358,20 @@ void indcpa_kem_enc(unsigned char *message_received,
   // message encoding
   for (k = 0; k < SABER_N; k += 32)
   {
-    vload(acc_neon, &message[k]);
-    vsl(acc_neon, acc_neon, SABER_EP - 1);
+    vload(tmp1_neon, &message[k]);
+    vsl(tmp1_neon, tmp1_neon, SABER_EP - 1);
 
     // Computation of v'+h1
-    vload(res_neon, &vprime[k]);
-    vadd_const(res_neon, res_neon, H1_avx); //adding h1
+    vload(tmp2_neon, &vprime[k]);
+    vadd_const(tmp2_neon, tmp2_neon, H1_avx); //adding h1
 
     // SHIFTRIGHT(v'+h1-m mod p, EP-ET)
-    vsub(res_neon, res_neon, acc_neon);
-    vand(res_neon, res_neon, mod_p);
-    vsr(res_neon, res_neon, (SABER_EP - SABER_ET));
+    vsub(tmp2_neon, tmp2_neon, tmp1_neon);
+    vand(tmp2_neon, tmp2_neon, mod_p);
+    vsr(tmp2_neon, tmp2_neon, (SABER_EP - SABER_ET));
 
     // Unpack avx
-    vstore(&temp[0][k], res_neon);
+    vstore(&temp[0][k], tmp2_neon);
   }
 
 #if Saber_type == 1
