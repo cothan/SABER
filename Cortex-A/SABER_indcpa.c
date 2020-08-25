@@ -177,14 +177,14 @@ void GenSecret(uint16_t r[SABER_K][SABER_N], const unsigned char *seed)
   }
 }
 
-void printArray(uint16_t *M, char *string, size_t length)
-{
-  for (size_t i = 0; i < length; i++)
-  {
-    printf("%d, ", M[i]);
-  }
-  printf("\n");
-}
+// void printArray(uint16_t *M, char *string, size_t length)
+// {
+//   for (size_t i = 0; i < length; i++)
+//   {
+//     printf("%d, ", M[i]);
+//   }
+//   printf("\n");
+// }
 
 void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 {
@@ -241,7 +241,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
     }
   }
 
-
+  // neon_matrix_vector_mul(res_avx, SABER_Q, a, skpv1);
 
   // Now truncation
   for (i = 0; i < SABER_K; i++)
@@ -316,40 +316,7 @@ void indcpa_kem_enc(unsigned char *message_received,
   //-----------------matrix-vector multiplication and rounding
 
   // Matrix-vector multiplication;
-  for (i = 0; i < SABER_K; i++)
-  {
-    for (j = 0; j < SABER_K; j++)
-    {
-      poly_mul_neon(acc, a[i].vec[j].coeffs, skpv1[j]);
-
-      for (k = 0; k < SABER_N; k += 32)
-      {
-        vload(res_neon, &res_avx[i][k]);
-        vload(acc_neon, &acc[k]);
-        // res_avx[i][k] += acc[k]
-        vadd(res_neon, res_neon, acc_neon);
-        // res_avx[i][k] &= (SABER_Q - 1)
-        vand(res_neon, res_neon, mod);
-        // acc[k] = 0
-        // vzero(&acc[k*16], acc_neon); // No need
-        vstore(&res_avx[i][k], res_neon);
-      }
-    }
-  }
-  
-  // printf("enc_gold: matrix, vector mul:\n");
-  // for (i = 0; i < SABER_K; i++)
-  // {
-  //   printArray(res_avx[i], "gold: matrix, vector mul", SABER_N);
-  // }
-
-  // matrix_vector_mul(res_avx, SABER_Q, a, skpv1);
-
-  // printf("enc: matrix, vector mul:\n");
-  // for (i = 0; i < SABER_K; i++)
-  // {
-  //   printArray(res_avx[i], "matrix, vector mul", SABER_N);
-  // }
+  neon_matrix_vector_mul(res_avx, SABER_Q, a, skpv1);
 
   // Now truncation
 
@@ -381,6 +348,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 
   neon_vector_vector_mul(vprime, SABER_P, pkcl, skpv1);
 
+  // TODO: add vzip to unpack, pack faster
   // unpack message_received;
   for (j = 0; j < SABER_KEYBYTES; j++)
   {
@@ -427,7 +395,7 @@ void indcpa_kem_dec(const unsigned char *sk,
                     const unsigned char *ciphertext,
                     unsigned char message_dec[])
 {
-  uint32_t i, j, k;
+  uint32_t i;
 
   uint16_t sksv[SABER_K][SABER_N]; //secret key of the server
 
@@ -436,14 +404,12 @@ void indcpa_kem_dec(const unsigned char *sk,
   uint16_t message_dec_unpacked[SABER_KEYBYTES * 8]; // one element containes on decrypted bit;
 
   uint8_t scale_ar[SABER_SCALEBYTES_KEM];
-  uint16_t op[SABER_N];
 
   //--------------NEON declaration------------------
-  uint16x8_t mod_p = vdupq_n_u16(SABER_P - 1);
-  uint16x8_t vh2 = vdupq_n_u16(h2);
-  uint16x8x4_t acc_neon;
+  uint16x8x4_t op_neon;
   uint16x8x4_t v_neon;
   //--------------NEON declaration ends------------------
+  uint16_t op[SABER_N];
   uint16_t v[SABER_N];
 
   //-------unpack the public_key
@@ -467,16 +433,18 @@ void indcpa_kem_dec(const unsigned char *sk,
   // InnerProduct(b', s, mod p)
   neon_vector_vector_mul(v, SABER_P, pksv, sksv);
 
+  uint16x8_t mod_p = vdupq_n_u16(SABER_P - 1);
+  uint16x8_t vh2 = vdupq_n_u16(h2);
   for (i = 0; i < SABER_N; i += 32)
   {
     //addition of h2
     vload(v_neon, &v[i]);
     vadd_const(v_neon, v_neon, vh2);
 
-    vload(acc_neon, &op[i]);
-    vsl(acc_neon, acc_neon, (SABER_EP - SABER_ET));
+    vload(op_neon, &op[i]);
+    vsl(op_neon, op_neon, (SABER_EP - SABER_ET));
 
-    vsub(v_neon, v_neon, acc_neon);
+    vsub(v_neon, v_neon, op_neon);
     vand(v_neon, v_neon, mod_p);
     vsr(v_neon, v_neon, (SABER_EP - 1));
 
