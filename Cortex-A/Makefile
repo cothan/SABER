@@ -1,4 +1,4 @@
-CC 		  = cc
+CC 		  = gcc
 CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -g3 -lpapi
 CFLAGS6  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w -lpapi -g3 -flax-vector-conversions
 CLANG    = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w -Qunused-arguments -lpapi -g3
@@ -15,6 +15,9 @@ SOURCES2 =  pack_unpack.c \
 			rng.c \
 			poly.c \
 			verify.c \
+			rq_mul/neon_batch_multiplication.c \
+      		rq_mul/neon_matrix_transpose.c \
+      		rq_mul/neon_poly_rq_mul.c \
 			SABER_indcpa.c \
 			kem.c \
 			cbd.c \
@@ -54,6 +57,7 @@ fips202.o: fips202.c
 test:
 	./test/test_speed
 	./test/test_speed2
+	./test/PQCgenKAT_kem
 
 clean:
 	-$(RM) -r test/test_speed
