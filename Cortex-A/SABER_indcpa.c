@@ -242,6 +242,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   }
 
 
+
   // Now truncation
   for (i = 0; i < SABER_K; i++)
   { //shift right EQ-EP bits
@@ -298,7 +299,7 @@ void indcpa_kem_enc(unsigned char *message_received,
   //--------------NEON declaration ends------------------
   uint16_t acc[SABER_N];
   uint16_t res_avx[SABER_K][SABER_N] = {0};
-  uint16_t vprime_avx[SABER_N] = {0};
+  uint16_t vprime[SABER_N];
 
   for (i = 0; i < SABER_SEEDBYTES; i++)
   { // Load the seedbytes in the client seed from PK.
@@ -378,7 +379,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 
   // vector-vector scalar multiplication with mod p
 
-  neon_vector_vector_mul(vprime_avx, SABER_P, pkcl, skpv1);
+  neon_vector_vector_mul(vprime, SABER_P, pkcl, skpv1);
 
   // unpack message_received;
   for (j = 0; j < SABER_KEYBYTES; j++)
@@ -396,7 +397,7 @@ void indcpa_kem_enc(unsigned char *message_received,
     vsl(acc_neon, acc_neon, SABER_EP - 1);
 
     // Computation of v'+h1
-    vload(res_neon, &vprime_avx[k]);
+    vload(res_neon, &vprime[k]);
     vadd_const(res_neon, res_neon, H1_avx); //adding h1
 
     // SHIFTRIGHT(v'+h1-m mod p, EP-ET)
@@ -439,13 +440,11 @@ void indcpa_kem_dec(const unsigned char *sk,
 
   //--------------NEON declaration------------------
   uint16x8_t mod_p = vdupq_n_u16(SABER_P - 1);
+  uint16x8_t vh2 = vdupq_n_u16(h2);
   uint16x8x4_t acc_neon;
   uint16x8x4_t v_neon;
-  uint16x8_t vh2;
-  vh2 = vdupq_n_u16(h2);
   //--------------NEON declaration ends------------------
-  uint16_t v_avx[SABER_N] = {0};
-  uint16_t acc[SABER_N];
+  uint16_t v[SABER_N];
 
   //-------unpack the public_key
 
@@ -466,12 +465,12 @@ void indcpa_kem_dec(const unsigned char *sk,
 #endif
 
   // InnerProduct(b', s, mod p)
-  neon_vector_vector_mul(v_avx, SABER_P, pksv, sksv);
+  neon_vector_vector_mul(v, SABER_P, pksv, sksv);
 
   for (i = 0; i < SABER_N; i += 32)
   {
     //addition of h2
-    vload(v_neon, &v_avx[i]);
+    vload(v_neon, &v[i]);
     vadd_const(v_neon, v_neon, vh2);
 
     vload(acc_neon, &op[i]);
