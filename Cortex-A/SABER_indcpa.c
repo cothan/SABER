@@ -217,12 +217,6 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 
   GenSecret(skpv1, noiseseed);
 
-    // printf("skvp1:\n");
-    // for (i = 0; i < SABER_K; i++)
-    // {
-  	//   printArray(skpv1[i], "skvp1", SABER_N);
-    // }
-
   //------------------------do the matrix vector multiplication and rounding------------
 
   // Matrix-vector multiplication; Matrix in transposed order
@@ -264,11 +258,6 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
     }
   }
 
-  // printf("res_avx:\n");
-  // for (i = 0; i < SABER_K; i++)
-  // {
-  //   printArray(res_avx[i], "res_avx", SABER_N);
-  // }
   //------------------Pack sk into byte string-------
 
   POLVEC2BS(sk, skpv1, SABER_Q);
@@ -338,7 +327,7 @@ void indcpa_kem_enc(unsigned char *message_received,
         vload(acc_neon, &acc[k]);
         // res_avx[i][k] += acc[k]
         vadd(res_neon, res_neon, acc_neon);
-        // res_avx[i][k] &= mod
+        // res_avx[i][k] &= (SABER_Q - 1)
         vand(res_neon, res_neon, mod);
         // acc[k] = 0
         // vzero(&acc[k*16], acc_neon); // No need
@@ -346,6 +335,20 @@ void indcpa_kem_enc(unsigned char *message_received,
       }
     }
   }
+  
+  // printf("enc_gold: matrix, vector mul:\n");
+  // for (i = 0; i < SABER_K; i++)
+  // {
+  //   printArray(res_avx[i], "gold: matrix, vector mul", SABER_N);
+  // }
+
+  // matrix_vector_mul(res_avx, SABER_Q, a, skpv1);
+
+  // printf("enc: matrix, vector mul:\n");
+  // for (i = 0; i < SABER_K; i++)
+  // {
+  //   printArray(res_avx[i], "matrix, vector mul", SABER_N);
+  // }
 
   // Now truncation
 
@@ -375,23 +378,7 @@ void indcpa_kem_enc(unsigned char *message_received,
 
   // vector-vector scalar multiplication with mod p
 
-  // for (j = 0; j < SABER_K; j++)
-  // {
-  //   poly_mul_neon(acc, pkcl[j], skpv1[j]);
-
-  //   for (k = 0; k < SABER_N; k += 32)
-  //   {
-  //     vload(acc_neon, &acc[k]);
-  //     vload(res_neon, &vprime_avx[k]);
-  //     // vprime_avx[k] += acc[k]
-  //     vadd(res_neon, res_neon, acc_neon);
-  //     // vprime_avx[k] &= mod_p
-  //     vand(res_neon, res_neon, mod_p);
-  //     // acc[k] = 0
-  //     vstore(&vprime_avx[k], res_neon);
-  //   }
-  // }
-  polyvec_mul_accumulate_neon(vprime_avx, SABER_P, pkcl, skpv1);
+  neon_vector_vector_mul(vprime_avx, SABER_P, pkcl, skpv1);
 
   // unpack message_received;
   for (j = 0; j < SABER_KEYBYTES; j++)
@@ -420,11 +407,6 @@ void indcpa_kem_enc(unsigned char *message_received,
     // Unpack avx
     vstore(&temp[0][k], res_neon);
   }
-  // printf("enc: temp:\n");
-  // for (i = 0; i < 1; i++)
-  // {
-  //   printArray(temp[i], "temp", SABER_N);
-  // }
 
 #if Saber_type == 1
   SABER_pack_3bit(msk_c, temp[0]);
@@ -484,32 +466,7 @@ void indcpa_kem_dec(const unsigned char *sk,
 #endif
 
   // InnerProduct(b', s, mod p)
-  for (j = 0; j < SABER_K; j++)
-  {
-
-    // toom_cook_4way_avx(pksv_avx[j], sksv_avx[j], SABER_P, acc);
-    poly_mul_neon(acc, pksv[j], sksv[j]);
-
-    for (k = 0; k < SABER_N; k += 32)
-    {
-      vload(v_neon, &v_avx[k]);
-      vload(acc_neon, &acc[k]);
-      // v_avx[k] += acc[k]
-      vadd(v_neon, v_neon, acc_neon);
-      // v_avx[k] &= mod_p
-      vand(v_neon, v_neon, mod_p);
-      // acc[k] = 0
-      // vzero(&acc[k*16], acc_neon); // No need
-      vstore(&v_avx[k], v_neon);
-    }
-  }
-
-  // printf("dec: v_avx:\n");
-  // printArray(v_avx, "v_avx", SABER_N);
-  
-  // printf("dec: op:\n");
-  // printArray(op, "op", SABER_N);
-  
+  neon_vector_vector_mul(v_avx, SABER_P, pksv, sksv);
 
   for (i = 0; i < SABER_N; i += 32)
   {
@@ -526,11 +483,6 @@ void indcpa_kem_dec(const unsigned char *sk,
 
     vstore(&message_dec_unpacked[i], v_neon);
   }
-
-  // printf("dec: message_dec_unpacked:\n");
-  // printArray(message_dec_unpacked, "message_dec_unpacked", SABER_N);
-  	
-
 
   POL2MSG(message_dec_unpacked, message_dec);
 }
