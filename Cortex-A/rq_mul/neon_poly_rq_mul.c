@@ -409,96 +409,6 @@ void tc4_interpolate_neon_SB1(uint16_t *restrict poly, uint16_t *restrict w[7])
     }
 }
 
-void neon_toom_cook_422_combine(uint16_t polyC[SB0_RES], uint16_t const polyA[SABER_N], uint16_t const polyB[SABER_N])
-{
-    // TC4
-    uint16_t *aw[7], *bw[7], *cw[7];
-
-    // TC4-2-2 Combine
-    // Total memory: 16*128 + 64*32 = 4096 16-bit coefficient
-    uint16_t tmp_aabb[SB3 * 128], tmp_cc[SB3_RES * 64];
-    uint16_t *tmp_aa = &tmp_aabb[SB3 * 0],
-             *tmp_bb = &tmp_aabb[SB3 * 64];
-    // Done
-    uint16x8x4_t zero;
-
-    // TC4
-    aw[0] = &tmp_cc[0 * SB1];
-    aw[1] = &tmp_cc[1 * SB1];
-    aw[2] = &tmp_cc[2 * SB1];
-    aw[3] = &tmp_cc[3 * SB1];
-    aw[4] = &tmp_cc[4 * SB1];
-    aw[5] = &tmp_cc[5 * SB1];
-    aw[6] = &tmp_cc[6 * SB1];
-
-    bw[0] = &tmp_cc[7 * SB1];
-    bw[1] = &tmp_cc[8 * SB1];
-    bw[2] = &tmp_cc[9 * SB1];
-    bw[3] = &tmp_cc[10 * SB1];
-    bw[4] = &tmp_cc[11 * SB1];
-    bw[5] = &tmp_cc[12 * SB1];
-    bw[6] = &tmp_cc[13 * SB1];
-
-    cw[0] = &tmp_aabb[0 * SB1_RES];
-    cw[1] = &tmp_aabb[1 * SB1_RES];
-    cw[2] = &tmp_aabb[2 * SB1_RES];
-    cw[3] = &tmp_aabb[3 * SB1_RES];
-    cw[4] = &tmp_aabb[4 * SB1_RES];
-    cw[5] = &tmp_aabb[5 * SB1_RES];
-    cw[6] = &tmp_aabb[6 * SB1_RES];
-    // DONE TC4
-
-    // Evaluate A, No Copy
-    // Size: 256 to 64x7
-    tc4_evaluate_neon_SB1(aw, polyA);
-
-    // Evaluate B, No Copy
-    // Size: 256 to 64x7
-    tc4_evaluate_neon_SB1(bw, polyB);
-
-    karat_neon_evaluate_combine(&tmp_aa[0 * 9 * SB3], aw[0]);
-    karat_neon_evaluate_combine(&tmp_aa[1 * 9 * SB3], aw[1]);
-    karat_neon_evaluate_combine(&tmp_aa[2 * 9 * SB3], aw[2]);
-    karat_neon_evaluate_combine(&tmp_aa[3 * 9 * SB3], aw[3]);
-    karat_neon_evaluate_combine(&tmp_aa[4 * 9 * SB3], aw[4]);
-    karat_neon_evaluate_combine(&tmp_aa[5 * 9 * SB3], aw[5]);
-    karat_neon_evaluate_combine(&tmp_aa[6 * 9 * SB3], aw[6]);
-
-    karat_neon_evaluate_combine(&tmp_bb[0 * 9 * SB3], bw[0]);
-    karat_neon_evaluate_combine(&tmp_bb[1 * 9 * SB3], bw[1]);
-    karat_neon_evaluate_combine(&tmp_bb[2 * 9 * SB3], bw[2]);
-    karat_neon_evaluate_combine(&tmp_bb[3 * 9 * SB3], bw[3]);
-    karat_neon_evaluate_combine(&tmp_bb[4 * 9 * SB3], bw[4]);
-    karat_neon_evaluate_combine(&tmp_bb[5 * 9 * SB3], bw[5]);
-    karat_neon_evaluate_combine(&tmp_bb[6 * 9 * SB3], bw[6]);
-
-    // Transpose 8x8x16
-    transpose_8x16(tmp_aa);
-    transpose_8x16(tmp_bb);
-    // Batch multiplication
-    schoolbook_neon(tmp_cc, tmp_aa, tmp_bb);
-    // Transpose 8x8x32
-    transpose_8x32(tmp_cc);
-
-    vxor(zero, zero, zero);
-    for (uint16_t addr = 0; addr < SB1_RES * 7; addr += 32)
-    {
-        vstore(&tmp_aabb[addr], zero);
-    }
-
-    karat_neon_interpolate_combine(cw[0], &tmp_cc[0 * 9 * SB3_RES]);
-    karat_neon_interpolate_combine(cw[1], &tmp_cc[1 * 9 * SB3_RES]);
-    karat_neon_interpolate_combine(cw[2], &tmp_cc[2 * 9 * SB3_RES]);
-    karat_neon_interpolate_combine(cw[3], &tmp_cc[3 * 9 * SB3_RES]);
-    karat_neon_interpolate_combine(cw[4], &tmp_cc[4 * 9 * SB3_RES]);
-    karat_neon_interpolate_combine(cw[5], &tmp_cc[5 * 9 * SB3_RES]);
-    karat_neon_interpolate_combine(cw[6], &tmp_cc[6 * 9 * SB3_RES]);
-
-    // Interpolate C = A*B = CC
-    // Size: 128*7 to 128*4 = 512
-    tc4_interpolate_neon_SB1(polyC, cw);
-}
-
 static inline
 void neon_poly_neon_reduction(uint16_t *restrict poly, uint16_t *restrict tmp, const uint16_t MASK)
 {
@@ -513,25 +423,6 @@ void neon_poly_neon_reduction(uint16_t *restrict poly, uint16_t *restrict tmp, c
         vand(res, res, mask);
         vstore(&poly[addr], res);
     }
-}
-
-void poly_mul_neon(uint16_t polyC[SABER_N], uint16_t const polyA[SABER_N], uint16_t const polyB[SABER_N])
-{
-    uint16_t tmp_c[SB0_RES];
-
-    uint16x8x4_t zero;
-    vxor(zero, zero, zero);
-    for (uint16_t addr = 0; addr < SB0_RES; addr += 32)
-    {
-        vstore(&tmp_c[addr], zero);
-    }
-
-    // Toom Cook 4-way combine
-    neon_toom_cook_422_combine(tmp_c, polyA, polyB);
-
-    // Ring reduction
-    // Reduce from 512 -> 256
-    neon_poly_neon_reduction(polyC, tmp_c, SABER_Q);
 }
 
 void neon_toom_cook_422_evaluate(uint16_t tmp_out[SB3 * 64], uint16_t const poly[SABER_N])
@@ -559,6 +450,7 @@ void neon_toom_cook_422_evaluate(uint16_t tmp_out[SB3 * 64], uint16_t const poly
     transpose_8x16(tmp_out);
 }
 
+static inline
 void neon_toom_cook_422_mul(uint16_t tmp_cc[SB3_RES *64], uint16_t tmp_aa[SB3*64], uint16_t tmp_bb[SB3*64])
 {
     schoolbook_neon(tmp_cc, tmp_aa, tmp_bb);
@@ -663,12 +555,6 @@ void neon_matrix_vector_mul(uint16_t vectorB[SABER_K][SABER_N], const uint16_t m
              tmp_res[SABER_K][SB3_RES * 64];
     
     uint16x8x4_t neon_acc, neon_res;
-
-    // for (uint16_t i = 0; i < SABER_K; i++)
-    // {
-    // // printArray(res_avx[i], "gold: matrix, vector mul", SABER_N);
-    // printArray(matrixA[0].vec[i].coeffs, "test matrix vector mul", SABER_N);
-    // }
 
     uint16x8x4_t zero;
     vxor(zero, zero, zero);

@@ -24,8 +24,6 @@ limitations under the License.
 #include "../SABER_params.h"
 #include "../poly.h"
 
-void poly_mul_neon(uint16_t polyC[SABER_N], uint16_t const polyA[SABER_N], uint16_t const polyB[SABER_N]);
-
 void neon_vector_vector_mul(uint16_t accumulate[SABER_N], const uint16_t modP,
                             const uint16_t polyvecA[SABER_K][SABER_N],
                             const uint16_t polyvecB[SABER_K][SABER_N]);

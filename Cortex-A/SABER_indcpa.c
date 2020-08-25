@@ -79,9 +79,8 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
     c.val[2] = vsubq_u16(a.val[2], b.val[2]); \
     c.val[3] = vsubq_u16(a.val[3], b.val[3]);
 
-
 // c = a + b
-#define vadd_const(c, a, b)               \
+#define vadd_const(c, a, b)          \
   c.val[0] = vaddq_u16(a.val[0], b); \
   c.val[1] = vaddq_u16(a.val[1], b); \
   c.val[2] = vaddq_u16(a.val[2], b); \
@@ -177,15 +176,6 @@ void GenSecret(uint16_t r[SABER_K][SABER_N], const unsigned char *seed)
   }
 }
 
-// void printArray(uint16_t *M, char *string, size_t length)
-// {
-//   for (size_t i = 0; i < length; i++)
-//   {
-//     printf("%d, ", M[i]);
-//   }
-//   printf("\n");
-// }
-
 void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 {
 
@@ -199,14 +189,13 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
 
   //--------------NEON declaration------------------
 
-  uint16x8_t mod = vdupq_n_u16(SABER_Q - 1);
-  uint16x8_t H1_avx = vdupq_n_u16(h1);
+  uint16x8_t modQ = vdupq_n_u16(SABER_Q - 1);
+  uint16x8_t H1_neon = vdupq_n_u16(h1);
   uint16x8x4_t acc_neon;
   uint16x8x4_t res_neon;
 
   //--------------NEON declaration ends------------------
-  uint16_t res_avx[SABER_K][SABER_N] = {0};
-  uint16_t acc[SABER_N];
+  uint16_t res[SABER_K][SABER_N];
 
   randombytes(seed, SABER_SEEDBYTES);
 
@@ -220,42 +209,21 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   //------------------------do the matrix vector multiplication and rounding------------
 
   // Matrix-vector multiplication; Matrix in transposed order
-  // for (i = 0; i < SABER_K; i++)
-  // {
-  //   for (j = 0; j < SABER_K; j++)
-  //   {
-  //     poly_mul_neon(acc, a[j].vec[i].coeffs, skpv1[j]);
-
-  //     for (k = 0; k < SABER_N; k += 32)
-  //     {
-  //       vload(res_neon, &res_avx[i][k]);
-  //       vload(acc_neon, &acc[k]);
-  //       // res_avx[i][k] += acc[k]
-  //       vadd(res_neon, res_neon, acc_neon);
-  //       // res_avx[i][k] &= mod
-  //       vand(res_neon, res_neon, mod);
-  //       // acc[k] = 0
-  //       // vzero(&acc[k*16], acc_neon); // No Need
-  //       vstore(&res_avx[i][k], res_neon);
-  //     }
-  //   }
-  // }
-
-  neon_matrix_vector_mul_transpose(res_avx, SABER_Q, a, skpv1);
+  neon_matrix_vector_mul_transpose(res, SABER_Q, a, skpv1);
 
   // Now truncation
   for (i = 0; i < SABER_K; i++)
   { //shift right EQ-EP bits
     for (j = 0; j < SABER_N; j += 32)
     {
-      vload(res_neon, &res_avx[i][j]);
-      // res_avx[i][j] += H1_avx
-      vadd_const(res_neon, res_neon, H1_avx);
-      // res_avx[i][j] >>= (SABER_EQ-SABER_EP)
+      vload(res_neon, &res[i][j]);
+      // res[i][j] += H1_neon
+      vadd_const(res_neon, res_neon, H1_neon);
+      // res[i][j] >>= (SABER_EQ-SABER_EP)
       vsr(res_neon, res_neon, (SABER_EQ - SABER_EP));
-      // res_avx[i][j] &= mod
-      vand(res_neon, res_neon, mod);
-      vstore(&res_avx[i][j], res_neon);
+      // res[i][j] &= modQ
+      vand(res_neon, res_neon, modQ);
+      vstore(&res[i][j], res_neon);
     }
   }
 
@@ -264,7 +232,7 @@ void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk)
   POLVEC2BS(sk, skpv1, SABER_Q);
 
   //------------------Pack pk into byte string-------
-  POLVEC2BS(pk, res_avx, SABER_P); // load the public-key into pk byte string
+  POLVEC2BS(pk, res, SABER_P); // load the public-key into pk byte string
 
   for (i = 0; i < SABER_SEEDBYTES; i++)
   { // now load the seedbytes in PK. Easy since seed bytes are kept in byte format.
@@ -291,7 +259,7 @@ void indcpa_kem_enc(unsigned char *message_received,
   //--------------NEON declaration------------------
   uint16x8_t mod = vdupq_n_u16(SABER_Q - 1);
   uint16x8_t mod_p = vdupq_n_u16(SABER_P - 1);
-  uint16x8_t H1_avx = vdupq_n_u16(h1);
+  uint16x8_t H1_neon = vdupq_n_u16(h1);
 
   uint16x8x4_t tmp1_neon, tmp2_neon;
 
@@ -317,14 +285,13 @@ void indcpa_kem_enc(unsigned char *message_received,
   neon_matrix_vector_mul(accumulator, SABER_Q, a, skpv1);
 
   // Now truncation
-
   for (i = 0; i < SABER_K; i++)
   { //shift right EQ-EP bits
     for (j = 0; j < SABER_N; j += 32)
     {
       vload(tmp2_neon, &accumulator[i][j]);
-      // accumulator[i][j] += H1_avx
-      vadd_const(tmp2_neon, tmp2_neon, H1_avx);
+      // accumulator[i][j] += H1_neon
+      vadd_const(tmp2_neon, tmp2_neon, H1_neon);
       // accumulator[i][j] >>= (SABER_EQ-SABER_EP)
       vsr(tmp2_neon, tmp2_neon, (SABER_EQ - SABER_EP));
       // accumulator[i][j] &= mod
@@ -345,7 +312,6 @@ void indcpa_kem_enc(unsigned char *message_received,
   // vector-vector scalar multiplication with mod p
   neon_vector_vector_mul(vprime, SABER_P, pkcl, skpv1);
 
-  // TODO: add vzip to unpack, pack faster
   // unpack message_received;
   for (j = 0; j < SABER_KEYBYTES; j++)
   {
@@ -363,14 +329,14 @@ void indcpa_kem_enc(unsigned char *message_received,
 
     // Computation of v'+h1
     vload(tmp2_neon, &vprime[k]);
-    vadd_const(tmp2_neon, tmp2_neon, H1_avx); //adding h1
+    vadd_const(tmp2_neon, tmp2_neon, H1_neon); //adding h1
 
     // SHIFTRIGHT(v'+h1-m mod p, EP-ET)
     vsub(tmp2_neon, tmp2_neon, tmp1_neon);
     vand(tmp2_neon, tmp2_neon, mod_p);
     vsr(tmp2_neon, tmp2_neon, (SABER_EP - SABER_ET));
 
-    // Unpack avx
+    // Unpack
     vstore(&temp[0][k], tmp2_neon);
   }
 
