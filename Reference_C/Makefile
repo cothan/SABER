@@ -1,7 +1,8 @@
 CC 		  = /usr/bin/gcc
 CFLAGS  = -Wall -Wextra -O3 -fomit-frame-pointer -lcrypto -march=native 
-CFLAGS2  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native -std=c99 
-CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native  -g3
+CFLAGS2  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native  -g3 -lpapi 
+CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native  -g3 -lpapi
+CFLAGS4  = -Wall -Wextra -O3 -fomit-frame-pointer -march=native  -g3 -lpapi -fno-tree-vectorize
 CLANG   = clang -march=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments
 RM 		  = /bin/rm
 
@@ -26,6 +27,9 @@ test/kem: $(SOURCES) $(HEADERS) test/kem.c
 
 test/test_speed: $(SOURCES) $(HEADERS) test/test_speed.c 
 	$(CC) $(CFLAGS3) -o $@ $(SOURCES) test/test_speed.c -lpapi  -lcrypto
+
+test/test_speed2: $(SOURCES) $(HEADERS) test/test_speed2.c 
+	$(CC) $(CFLAGS4) -o $@ $(SOURCES) test/test_speed2.c -lpapi  -lcrypto
 
 rng.o: rng.c
 	$(CC) $(CFLAGS2) -c rng.c -lcrypto -o $@ 
