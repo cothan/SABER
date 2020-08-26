@@ -12,6 +12,8 @@
 
 #include <papi.h>
 
+#define TESTS 100000
+
 extern int crypto_kem_keypair(unsigned char *pk, unsigned char *sk);
 extern int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
 extern int crypto_kem_dec(unsigned char *ss, const unsigned char *ct, const unsigned char *sk);
@@ -28,12 +30,10 @@ int test_kem_cca()
 
     unsigned char entropy_input[48];
 
-    uint64_t i, repeat;
-    repeat = 10000;
-    //repeat = 1;
-
-	// Force CPU to max frequency
-    for (i = 0; i < repeat; i++);
+    uint64_t i;
+    
+	// // Force CPU to max frequency
+    // for (i = 0; i < TESTS; i++);
 
     time_t t;
     // Intializes random number generator
@@ -47,7 +47,7 @@ int test_kem_cca()
     randombytes_init(entropy_input, NULL, 256);
     /* =================================== */
     retval = PAPI_hl_region_begin("keypair");
-    for (i = 0; i < repeat; i++)
+    for (i = 0; i < TESTS; i++)
     {
         crypto_kem_keypair(pk, sk);
     }
@@ -58,7 +58,7 @@ int test_kem_cca()
     }
     /* =================================== */
     retval = PAPI_hl_region_begin("encaps");
-    for (i = 0; i < repeat; i++)
+    for (i = 0; i < TESTS; i++)
     {
         crypto_kem_enc(c, k_a, pk);
     }
@@ -69,7 +69,7 @@ int test_kem_cca()
     }
     /* =================================== */
     retval = PAPI_hl_region_begin("decaps");
-    for (i = 0; i < repeat; i++)
+    for (i = 0; i < TESTS; i++)
     {
         crypto_kem_dec(k_b, c, sk);
     }
