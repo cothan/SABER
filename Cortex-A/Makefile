@@ -1,6 +1,5 @@
-CC 		  = gcc
-CFLAGS5  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -g3 -lpapi
-CFLAGS6  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w -lpapi -g3 -flax-vector-conversions
+CC 		  = cc
+CFLAGS  = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -g3 -lpapi
 CLANG    = -Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w -Qunused-arguments -lpapi -g3
 RM 		  = /bin/rm
 
@@ -37,13 +36,13 @@ HEADERS = 	SABER_params.h  \
 
 
 test/test_speed: $(SOURCES2) $(HEADERS) test/test_speed.c 
-	$(CC) $(CFLAGS6) -o $@ $(SOURCES2) test/test_speed.c 
+	$(CC) $(CFLAGS) -o $@ $(SOURCES2) test/test_speed.c 
 
 test/test_speed2: $(SOURCES2) $(HEADERS) test/test_speed2.c 
-	$(CC) $(CFLAGS6) -o $@ $(SOURCES2) test/test_speed2.c 
+	$(CC) $(CFLAGS) -o $@ $(SOURCES2) test/test_speed2.c 
 
 test/PQCgenKAT_kem: $(SOURCES2) $(HEADERS) test/PQCgenKAT_kem.c 
-	$(CC) $(CFLAGS6) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c 
+	$(CC) $(CFLAGS) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c 
 
 
 rng.o: rng.c
