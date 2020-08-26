@@ -28,12 +28,12 @@ static unsigned long long median(unsigned long long *l, size_t llen) {
     return (l[llen / 2 - 1] + l[llen / 2]) / 2;
 }
 
-static unsigned long long average(unsigned long long *t, size_t tlen) {
+static double average(unsigned long long *t, size_t tlen) {
   unsigned long long acc = 0;
   size_t i;
   for (i = 0; i < tlen; i++)
     acc += t[i];
-  return acc / (tlen);
+  return ((double)acc) / (tlen);
 }
 
 static void print_results(const char *s, unsigned long long *t, size_t tlen) {
@@ -52,7 +52,7 @@ static void print_results(const char *s, unsigned long long *t, size_t tlen) {
   }
   printf("\n");
   printf("median: %'llu\n", median(t, tlen));
-  printf("average: %'llu\n", average(t, tlen - 1));
+  printf("average: %'lf\n", average(t, tlen - 1));
   printf("\n");
 }
 
