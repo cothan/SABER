@@ -7,6 +7,12 @@ SABER NEON (aarch64) implementation by Duc Tri Nguyen (CERG Geogre Mason Univers
 
 === Cortex-A53 Benchmark
 
+* CPU max freq: 1200 Mhz (no overclock)
+* ARMv8 ASIMD instruction 
+* RAM: 1 GB
+* Speculative: Yes
+* Out-of-order: No
+* Branch prediction: Unknown
 
 * Compiler flags:
 ** Reference code: `gcc -Wall -Wextra -O3 -fno-tree-vectorize -fomit-frame-pointer -mcpu=cortex-a53 -mtune=native  -g3`
@@ -20,8 +26,7 @@ SABER NEON (aarch64) implementation by Duc Tri Nguyen (CERG Geogre Mason Univers
 * Report result:
 ** Unit is clock cycles at 1200 MHz.
 
-
-.Light Saber
+.A53-old-Light Saber
 |===
 | Implementation | Keygen | Encap | Decap 
 | Reference | 455,672 |	626,820 |	786,213
@@ -32,7 +37,7 @@ SABER NEON (aarch64) implementation by Duc Tri Nguyen (CERG Geogre Mason Univers
 
 |===
 
-.Saber
+.A53-old-Saber
 |===
 | Implementation | Keygen | Encap | Decap 
 | Reference | 946,380 |	1,209,930 |	1,453,019
@@ -44,7 +49,7 @@ SABER NEON (aarch64) implementation by Duc Tri Nguyen (CERG Geogre Mason Univers
 |===
 
 
-.Fire Saber
+.A53-old-Fire Saber
 |===
 | Implementation | Keygen | Encap | Decap 
 | Reference | 1,619,635 |	1,971,942 |	2,303,857
@@ -54,4 +59,191 @@ SABER NEON (aarch64) implementation by Duc Tri Nguyen (CERG Geogre Mason Univers
 | Ref/NEON Clang | 3.6| 	3.9	| 4.2
 |===
 
+
+
+**Update August 27 2020**
+
+By applying techniques described in paper [1], the neon implementation improves significantly. The reference code mostly get improved by compiler version.
+
+Compiler flags:
+
+- Reference^1^: `-Wall -Wextra -O3 -fomit-frame-pointer -march=native -g3 -fno-tree-vectorize`
+- Reference^2^: `-Wall -Wextra -O3 -fomit-frame-pointer -march=native -g3`
+
+* Compiler settings: 
+** `gcc version 10.2.0 (Gentoo 10.2.0 p1)`
+** `clang version 10.0.1 aarch64-unknown-linux-gnu`
+** Compiler flags: `-Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -g3 -lpapi`
+
+* Report result:
+** Unit is clock cycles at 1200 MHz.
+
+
+.Light Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ |  441,148 | 603,767 | 755,280
+| Reference^2^ |  230,080 | 288,346 | 335,560
+| NEON GCC   | 158,233 | 183,854 | 197,265
+| NEON Clang | 149,218 | 170,212 | 181,233
+|===
+
+.Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ |  908,543 | 1,158,383 | 1,390,112
+| Reference^2^ |  440,565 | 534,134 | 610,619
+| NEON GCC   | 266,603 | 306,626 | 327,156
+| NEON Clang | 246,387 | 282,507 | 301,024
+|===
+
+.Fire Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 1,552,956 | 1,888,738 |	2,202,832
+| Reference^2^ | 721,688 | 852,713 | 962,702
+| NEON GCC | 400,885 |	457,888 |	490,390
+| NEON Clang | 373,043|	419,959 |	449,171
+|===
+
+
+==== Timing in microseconds (us)
+
+.A53-Light Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 367.6 | 503.1 | 629.4 
+| Reference^2^ | 191.7 | 240.2 | 279.6 
+| NEON GCC     | 131.8 | 153.2 | 164.3 
+| NEON Clang   | 124.3 | 141.8 | 151.0 
+|===
+
+.A53-Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 757.1 | 965.3 | 1158.4 
+| Reference^2^ | 367.1 | 445.1 | 508.8 
+| NEON GCC     | 222.1 | 255.5 | 272.6 
+| NEON Clang   | 205.3 | 235.4 | 250.8 
+|===
+
+.A53-Fire Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 1294.1 | 1573.9 | 1835.6 
+| Reference^2^ | 601.4 | 710.5 | 802.2 
+| NEON GCC     | 334.0 | 381.5 | 408.6 
+| NEON Clang   | 310.8 | 349.9 | 374.3 
+|===
+
+
+
+=== Cortex-A72 Benchmark
+
+Benchmark on Raspberry Pi 4:
+
+* CPU max freq: 1500 Mhz (no overclock)
+* ARMv8 ASIMD instruction 
+* RAM: 8 GB
+* Speculator: Yes
+* Out-of-order: Yes
+* Branch prediction: Yes
+
+Use the same settings as Cortex-A53 update August 27 2020. 
+
+Compiler flags:
+
+- Reference^1^: `-Wall -Wextra -O3 -fomit-frame-pointer -march=native -g3 -fno-tree-vectorize`
+- Reference^2^: `-Wall -Wextra -O3 -fomit-frame-pointer -march=native -g3`
+
+* Compiler settings: 
+** `gcc version 10.2.0 (GCC)`
+** `clang version 10.0.1 aarch64-unknown-linux-gnu`
+** Compiler flags: `-Wall -Wextra -O3 -fomit-frame-pointer -mtune=native -mcpu=native -lcrypto -fwrapv -w  -g3 -lpapi`
+
+* Report result:
+** Unit is clock cycles at 1900 MHz (overclocked)
+
+==== Timing in microseconds (us)
+
+.A72-stock-Light Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 248.5 | 339.3 | 423.9
+| Reference^2^ | 102.7 | 121.6 | 133.8 
+| NEON GCC     | 80.2 | 88.3 | 90.7
+| NEON Clang   | 80.5 | 89.9 | 92.1
+|===
+
+.A72-stock-Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 512.3 | 654.8 | 785.2
+| Reference^2^ | 184.4 | 220.2 | 240.8
+| NEON GCC     | 127.1 | 144.0 | 149.0
+| NEON Clang   | 129.8 | 146.0 | 151.8
+|===
+
+.A72-stock-Fire Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 878.3 | 1069.7 | 1247.8
+| Reference^2^ | 299.2 | 348.5 | 377.0
+| NEON GCC     | 189.2 | 212.3 | 222.1
+| NEON Clang   | 190.7 | 216.6 | 226.7
+|===
+
+
+*What happen if one overclock Pi 4 to 1900 Mhz?* -- Here it is, 25% increase in CPU frequency lead to ~25% gain in performance. 
+
+
+.A72-overclocked-Light Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 195.8 | 267.1 | 334.4
+| Reference^2^ | 80.3 | 95.5 | 106.2 
+| NEON GCC     | 63.2 | 68.7 | 70.5 
+| NEON Clang   | 64.7 | 72.6 | 74.2 
+|===
+
+.A72-overclocked-Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 404.9 | 517.4 | 621.4 
+| Reference^2^ | 146.2 | 172.3 | 192.2 
+| NEON GCC     | 100.0 | 113.0 | 116.8 
+| NEON Clang   | 102.0 | 115.8 | 120.1 
+|===
+
+.A72-overclocked-Fire Saber
+|===
+| Implementation | Keygen | Encap | Decap 
+| Reference^1^ | 692.1 | 842.8 | 984.0 
+| Reference^2^ | 232.9 | 271.3 | 301.7 
+| NEON GCC     | 150.5 | 169.3 | 176.8
+| NEON Clang   | 149.9 | 170.2 | 178.2 
+|===
+
+
+=== Compiler analysis 
+
+I'm actually surprise that clang perform worse than GCC in out-of-order CPU, e.g Cortex-A72. It's useful to know clang can schedule instruction better than GCC in non out-of-order CPU, e.g Cortex-A53.
+
+=== Questions? 
+
+Feel free to create a pull request. 
+
+Is SABER faster than NTRU? Want a comparison?
+
+You can find my other repo NEON implementation of NTRU here: https://github.com/cothan/ntru 
+
+
+=== References
+
+.[1]
+----
+Time-memory trade-off in Toom-Cook multiplication: an application to module-lattice based cryptography
+
+Jose Maria Bermudo Mera and Angshuman Karmakar and Ingrid Verbauwhede
+----
 
