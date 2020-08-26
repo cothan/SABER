@@ -64,3 +64,4 @@ clean:
 	-$(RM) -r test/PQCgenKAT_kem
 	-$(RM) -r test/*.req
 	-$(RM) -r test/*.rsp
+	-$(RM) -r papi_hl_output*/

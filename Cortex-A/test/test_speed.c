@@ -12,7 +12,7 @@
 
 #include <papi.h>
 
-#define TESTS 100000
+#define TESTS 10000
 
 extern int crypto_kem_keypair(unsigned char *pk, unsigned char *sk);
 extern int crypto_kem_enc(unsigned char *ct, unsigned char *ss, const unsigned char *pk);
