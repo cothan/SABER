@@ -16,12 +16,12 @@
 #define Saber 2
 #define FireSaber 3
 
-#define CRYPTO_ALGNAME "LightSaber"
+#define CRYPTO_ALGNAME "Saber"
 
 // Change the algorithm name 
 // #define SABER_TYPE LightSaber
 #define SABER_TYPE Saber
-//#define SABER_TYPE FireSaber
+// #define SABER_TYPE FireSaber
 
 //  Set these three values apropriately for your algorithm
 #if SABER_TYPE == LightSaber

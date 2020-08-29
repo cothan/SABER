@@ -15,7 +15,7 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #include "crypto_kem.h"
 #include "kem.h"
 #include "verify.h"
-#include "randombytes.h"
+#include "randombytes.h" // Enable only for SUPERCOP
 #include "fips202.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
