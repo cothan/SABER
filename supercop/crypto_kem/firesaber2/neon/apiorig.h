@@ -16,7 +16,7 @@
 #define Saber 2
 #define FireSaber 3
 
-#define CRYPTO_ALGNAME "LightSaber"
+#define CRYPTO_ALGNAME "FireSaber"
 
 // Change the algorithm name 
 // #define SABER_TYPE LightSaber
