@@ -19,7 +19,7 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #include "cbd.h"
 #include "SABER_params.h"
 #include "fips202.h"
-#include "rq_mul/neon_poly_rq_mul.h"
+#include "rq_mul/neon_poly_rq_mul.c"
 
 #define h1 4 //2^(EQ-EP-1)
 

@@ -21,8 +21,8 @@ limitations under the License.
 
 #include "../SABER_params.h"
 #include "../poly.h"
-#include "neon_batch_multiplication.h"
-#include "neon_matrix_transpose.h"
+#include "neon_batch_multiplication.c"
+#include "neon_matrix_transpose.c"
 
 #define SB0 (SABER_N) // 256
 #define SB1 (SB0 / 4) // 64
