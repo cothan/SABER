@@ -1,33 +1,10 @@
-/*=============================================================================
-This file has been adapted from the implementation 
-(available at, Public Domain https://github.com/KULeuven-COSIC/SABER) 
-of "Saber: Module-LWR based key exchange, CPA-secure encryption and CCA-secure KEM"
-by : Jan-Pieter D'Anvers, Angshuman Karmakar, Sujoy Sinha Roy, and Frederik Vercauteren
-Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso. 
-
- * Copyright (c) 2020 by Cryptographic Engineering Research Group (CERG)
- * ECE Department, George Mason University
- * Fairfax, VA, U.S.A.
- * Author: Duc Tri Nguyen
-=============================================================================*/
-
 #ifndef INDCPA_H
 #define INDCPA_H
 
-#include "poly.h"
+#include "SABER_params.h"
 
-void indcpa_keypair(unsigned char *pk, unsigned char *sk);
-
-void GenMatrix(polyvec *a, const unsigned char *seed);
-
-void indcpa_client(unsigned char *pk, unsigned char *b_prime, unsigned char *c, unsigned char *key);
-
-void indcpa_server(unsigned char *pk, unsigned char *b_prime, unsigned char *c, unsigned char *key);
-
-void indcpa_kem_keypair(unsigned char *pk, unsigned char *sk);
-void indcpa_kem_enc(unsigned char *message, unsigned char *noiseseed, const unsigned char *pk,
-                    unsigned char *ciphertext);
-void indcpa_kem_dec(const unsigned char *sk, const unsigned char *ciphertext,
-                    unsigned char *message_dec);
+void indcpa_kem_keypair(uint8_t pk[SABER_INDCPA_PUBLICKEYBYTES], uint8_t sk[SABER_INDCPA_SECRETKEYBYTES]);
+void indcpa_kem_enc(const uint8_t m[SABER_KEYBYTES], const uint8_t seed_sp[SABER_NOISE_SEEDBYTES], const uint8_t pk[SABER_INDCPA_PUBLICKEYBYTES], uint8_t ciphertext[SABER_BYTES_CCA_DEC]);
+void indcpa_kem_dec(const uint8_t sk[SABER_INDCPA_SECRETKEYBYTES], const uint8_t ciphertext[SABER_BYTES_CCA_DEC], uint8_t m[SABER_KEYBYTES]);
 
 #endif
