@@ -1,18 +1,6 @@
-/*=============================================================================
-This file has been adapted from the implementation 
-(available at, Public Domain https://github.com/KULeuven-COSIC/SABER) 
-of "Saber: Module-LWR based key exchange, CPA-secure encryption and CCA-secure KEM"
-by : Jan-Pieter D'Anvers, Angshuman Karmakar, Sujoy Sinha Roy, and Frederik Vercauteren
-Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso. 
-=============================================================================*/
-
-
 #ifndef INDCPA_H
 #define INDCPA_H
-<<<<<<< HEAD:Cortex-A/kem.h
-=======
 #include <stdint.h>
->>>>>>> upstream/master:AVX_Implementation_KEM/kem.h
 
 void indcpa_keypair(uint8_t *pk, uint8_t *sk);
 
@@ -29,6 +17,13 @@ int crypto_kem_enc(unsigned char *c, unsigned char *k, const unsigned char *pk);
 int crypto_kem_dec(unsigned char *k, const unsigned char *c, const unsigned char *sk);
 
 
+<<<<<<< HEAD:Reference_C/kem.h
+=======
+//uint64_t clock1,clock2;
+
+//uint64_t clock_kp_kex, clock_enc_kex, clock_dec_kex;
+
+>>>>>>> upstream/master:Variants/uSaber-90s/avx2/kem.h
 
 #endif
 
