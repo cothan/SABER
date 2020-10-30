@@ -7,40 +7,63 @@ Vadim Lyubashevsky, John M. Schanck, Peter Schwabe & Damien stehle
 ----------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include "api.h"
 #include "poly.h"
+#include "poly_mul.h"
+#include "pack_unpack.h"
 #include "cbd.h"
 #include "fips202.h"
-#include "crypto_stream.h"
 
-void poly_getnoise(uint16_t *r,const unsigned char *seed, unsigned char nonce)
+void MatrixVectorMul(const uint16_t A[SABER_L][SABER_L][SABER_N], const uint16_t s[SABER_L][SABER_N], uint16_t res[SABER_L][SABER_N], int16_t transpose)
 {
-  unsigned char buf[SABER_N];
-
-  cshake128_simple(buf,SABER_N,nonce,seed,SABER_NOISESEEDBYTES);
-
-  cbd( r, buf);
+	int i, j;
+	for (i = 0; i < SABER_L; i++)
+	{
+		for (j = 0; j < SABER_L; j++)
+		{
+			if (transpose == 1)
+			{
+				poly_mul_acc(A[j][i], s[j], res[i]);
+			}
+			else
+			{
+				poly_mul_acc(A[i][j], s[j], res[i]);
+			}	
+		}
+	}
 }
 
-
-void poly_getnoise4x(uint16_t *r0, uint16_t *r1, uint16_t *r2, const unsigned char *seed, unsigned char nonce0, unsigned char nonce1, unsigned char nonce2, unsigned char nonce3)
+void InnerProd(const uint16_t b[SABER_L][SABER_N], const uint16_t s[SABER_L][SABER_N], uint16_t res[SABER_N])
 {
-  uint16_t nblocks=2;
-  unsigned char buf0[SHAKE128_RATE*nblocks];
-  unsigned char buf1[SHAKE128_RATE*nblocks];
-  unsigned char buf2[SHAKE128_RATE*nblocks];
-  // unsigned char buf3[SHAKE128_RATE*nblocks];
-
-  // cshake128_simple4x(buf0,buf1,buf2,buf3,SHAKE128_RATE*nblocks,nonce0,nonce1,nonce2,nonce3,seed,SABER_NOISESEEDBYTES);
-  cshake128_simple(buf0,SABER_N,nonce0,seed,SABER_NOISESEEDBYTES);
-  cshake128_simple(buf1,SABER_N,nonce1,seed,SABER_NOISESEEDBYTES);
-  cshake128_simple(buf2,SABER_N,nonce2,seed,SABER_NOISESEEDBYTES);
-
-
-  	
-  cbd( r0, buf0);
-  cbd( r1, buf1);
-  cbd( r2, buf2);
+	int j;
+	for (j = 0; j < SABER_L; j++)
+	{
+		poly_mul_acc(b[j], s[j], res);
+	}
 }
 
+void GenMatrix(uint16_t A[SABER_L][SABER_L][SABER_N], const uint8_t seed[SABER_SEEDBYTES])
+{
+	uint8_t buf[SABER_L * SABER_POLYVECBYTES];
+	int i;
 
+	shake128(buf, sizeof(buf), seed, SABER_SEEDBYTES);
 
+	for (i = 0; i < SABER_L; i++)
+	{
+		BS2POLVECq(buf + i * SABER_POLYVECBYTES, A[i]);
+	}
+}
+
+void GenSecret(uint16_t s[SABER_L][SABER_N], const uint8_t seed[SABER_NOISE_SEEDBYTES])
+{
+	uint8_t buf[SABER_L * SABER_POLYCOINBYTES];
+	size_t i;
+
+	shake128(buf, sizeof(buf), seed, SABER_NOISE_SEEDBYTES);
+
+	for (i = 0; i < SABER_L; i++)
+	{
+		cbd(s[i], buf + i * SABER_POLYCOINBYTES);
+	}
+}
