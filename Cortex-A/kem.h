@@ -9,10 +9,7 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 
 #ifndef INDCPA_H
 #define INDCPA_H
-<<<<<<< HEAD:Cortex-A/kem.h
-=======
 #include <stdint.h>
->>>>>>> upstream/master:AVX_Implementation_KEM/kem.h
 
 void indcpa_keypair(uint8_t *pk, uint8_t *sk);
 
