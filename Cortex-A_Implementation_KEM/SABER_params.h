@@ -5,8 +5,6 @@ of "Saber: Module-LWR based key exchange, CPA-secure encryption and CCA-secure K
 by : Jan-Pieter D'Anvers, Angshuman Karmakar, Sujoy Sinha Roy, and Frederik Vercauteren
 Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso. 
 =============================================================================*/
-
-
 #ifndef PARAMS_H
 #define PARAMS_H
 
