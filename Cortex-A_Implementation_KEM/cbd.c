@@ -6,10 +6,7 @@ by : Joppe Bos, Leo Ducas, Eike Kiltz, Tancrede Lepoint,
 Vadim Lyubashevsky, John M. Schanck, Peter Schwabe & Damien stehle
 ----------------------------------------------------------------------*/
 
-#include "SABER_params.h"
-#include "api.h"
 #include "cbd.h"
-#include <stdint.h>
 
 static uint64_t load_littleendian(const uint8_t *x, int bytes)
 {

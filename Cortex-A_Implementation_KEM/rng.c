@@ -211,12 +211,3 @@ AES256_CTR_DRBG_Update(unsigned char *provided_data,
     memcpy(Key, temp, 32);
     memcpy(V, temp+32, 16);
 }
-
-
-
-
-
-
-
-
-

@@ -7,8 +7,8 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 =============================================================================*/
 
 
-#ifndef INDCPA_H
-#define INDCPA_H
+#ifndef KEM_H
+#define KEM_H
 #include <stdint.h>
 
 void indcpa_keypair(uint8_t *pk, uint8_t *sk);

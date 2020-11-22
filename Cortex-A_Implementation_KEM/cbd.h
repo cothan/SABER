@@ -8,7 +8,9 @@ Vadim Lyubashevsky, John M. Schanck, Peter Schwabe & Damien stehle
 #ifndef CBD_H
 #define CBD_H
 
+#include "api.h"
 #include <stdint.h>
+#include "SABER_params.h"
 
 void cbd(uint16_t s[SABER_N], const uint8_t buf[SABER_POLYCOINBYTES]);
 
