@@ -21,8 +21,8 @@ limitations under the License.
 #define NEON_POLY_RQ_MUL_H
 
 #include <stdint.h>
-#include "../SABER_params.h"
-#include "../poly.h"
+#include "SABER_params.h"
+#include "poly.h"
 
 void neon_vector_vector_mul(uint16_t accumulate[SABER_N], const uint16_t modP,
                             const uint16_t polyvecA[SABER_K][SABER_N],

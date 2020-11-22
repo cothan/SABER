@@ -19,8 +19,8 @@ limitations under the License.
 =============================================================================*/
 #include <arm_neon.h>
 
-#include "../SABER_params.h"
-#include "../poly.h"
+#include "SABER_params.h"
+#include "poly.h"
 #include "neon_batch_multiplication.h"
 #include "neon_matrix_transpose.h"
 
@@ -451,7 +451,7 @@ void neon_toom_cook_422_evaluate(uint16_t tmp_out[SB3 * 64], uint16_t const poly
 
 static inline void neon_toom_cook_422_mul(uint16_t tmp_cc[SB3_RES * 64], uint16_t tmp_aa[SB3 * 64], uint16_t tmp_bb[SB3 * 64])
 {
-    schoolbook_neon(tmp_cc, tmp_aa, tmp_bb);
+    schoolbook16x16(tmp_cc, tmp_aa, tmp_bb);
 }
 
 void neon_toom_cook_422_interpolate(uint16_t poly[2 * SABER_N], uint16_t tmp_cc[SB3_RES * 64])
@@ -547,9 +547,9 @@ void neon_matrix_vector_mul(uint16_t vectorB[SABER_K][SABER_N], const uint16_t m
                             const uint16_t vectorS[SABER_K][SABER_N])
 {
     uint16_t tmp_vector_eval[SB3 * 64],
-        tmp_matrix_eval[SB3 * 64],
-        tmp_accumulate[SB3_RES * 64],
-        tmp_res[SABER_K][SB3_RES * 64];
+             tmp_matrix_eval[SB3 * 64],
+             tmp_accumulate[SB3_RES * 64],
+             tmp_res[SABER_K][SB3_RES * 64];
 
     uint16x8x4_t neon_acc, neon_res;
 

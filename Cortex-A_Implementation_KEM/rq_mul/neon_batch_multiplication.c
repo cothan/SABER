@@ -80,7 +80,7 @@ Output After Transpose
   0   1   2   3   4   5   6   7  |   8   9  10  11  12  13  14  15  |  16   17   18   19   20   21   22   23  |  24   25   26   27   28   29   30    x
 ------
 */
-void schoolbook_neon(uint16_t *restrict c_in_mem,
+void schoolbook16x16(uint16_t *restrict c_in_mem,
                      uint16_t *restrict a_in_mem,
                      uint16_t *restrict b_in_mem)
 {
