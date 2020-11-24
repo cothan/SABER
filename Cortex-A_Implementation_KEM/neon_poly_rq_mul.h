@@ -22,18 +22,17 @@ limitations under the License.
 
 #include <stdint.h>
 #include "SABER_params.h"
-#include "poly.h"
 
-void neon_vector_vector_mul(uint16_t accumulate[SABER_N], const uint16_t modP,
-                            const uint16_t polyvecA[SABER_L][SABER_N],
-                            const uint16_t polyvecB[SABER_L][SABER_N]);
+void neonInnerProd(uint16_t accumulate[SABER_N],
+             const uint16_t polyvecA[SABER_L][SABER_N],
+             const uint16_t polyvecB[SABER_L][SABER_N]);
 
-void neon_matrix_vector_mul(uint16_t vectorB[SABER_L][SABER_N], const uint16_t modQ,
+void neonMatrixVectorMul(uint16_t vectorB[SABER_L][SABER_N],
+                   const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
+                   const uint16_t vectorS[SABER_L][SABER_N]);
+
+void neonMatrixVectorMulTranspose(uint16_t vectorB[SABER_L][SABER_N],
                             const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
                             const uint16_t vectorS[SABER_L][SABER_N]);
-
-void neon_matrix_vector_mul_transpose(uint16_t vectorB[SABER_L][SABER_N], const uint16_t modQ,
-                                      const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
-                                      const uint16_t vectorS[SABER_L][SABER_N]);
 
 #endif

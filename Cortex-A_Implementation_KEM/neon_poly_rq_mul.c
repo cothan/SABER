@@ -20,9 +20,9 @@ limitations under the License.
 #include <arm_neon.h>
 
 #include "SABER_params.h"
-#include "poly.h"
 #include "neon_batch_multiplication.h"
 #include "neon_matrix_transpose.h"
+#include "neon_poly_rq_mul.h"
 
 #define SB0 (SABER_N) // 256
 #define SB1 (SB0 / 4) // 64
@@ -490,13 +490,13 @@ void neon_toom_cook_422_interpolate(uint16_t poly[2 * SABER_N], uint16_t tmp_cc[
     tc4_interpolate_neon_SB1(poly, cw);
 }
 
-void neon_vector_vector_mul(uint16_t accumulate[SABER_N], const uint16_t modP,
-                            const uint16_t polyvecA[SABER_L][SABER_N],
-                            const uint16_t polyvecB[SABER_L][SABER_N])
+void neonInnerProd(uint16_t accumulate[SABER_N],
+             const uint16_t polyvecA[SABER_L][SABER_N],
+             const uint16_t polyvecB[SABER_L][SABER_N])
 {
     uint16_t tmp_cc[SB3_RES * 64],
-        tmp_acc[SB3_RES * 64],
-        polyC[2 * SABER_N];
+             tmp_acc[SB3_RES * 64],
+             polyC[2 * SABER_N];
     uint16x8x4_t zero, tmp, acc;
     uint16x8_t mod;
     vxor(zero, zero, zero);
@@ -532,6 +532,7 @@ void neon_vector_vector_mul(uint16_t accumulate[SABER_N], const uint16_t modP,
     neon_poly_neon_reduction(accumulate, polyC, SABER_P);
 }
 
+#if DEBUG == 1
 static
 void printArray(uint16_t *M, char *string, uint16_t length)
 {
@@ -542,10 +543,11 @@ void printArray(uint16_t *M, char *string, uint16_t length)
     }
     printf("\n");
 }
+#endif
 
-void neon_matrix_vector_mul(uint16_t vectorB[SABER_L][SABER_N], const uint16_t modQ,
-                            const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
-                            const uint16_t vectorS[SABER_L][SABER_N])
+void neonMatrixVectorMul(uint16_t vectorB[SABER_L][SABER_N],
+                   const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
+                   const uint16_t vectorS[SABER_L][SABER_N])
 {
     uint16_t tmp_vector_eval[SB3 * 64],
              tmp_matrix_eval[SB3 * 64],
@@ -597,14 +599,14 @@ void neon_matrix_vector_mul(uint16_t vectorB[SABER_L][SABER_N], const uint16_t m
     }
 }
 
-void neon_matrix_vector_mul_transpose(uint16_t vectorB[SABER_L][SABER_N], const uint16_t modQ,
-                                      const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
-                                      const uint16_t vectorS[SABER_L][SABER_N])
+void neonMatrixVectorMulTranspose(uint16_t vectorB[SABER_L][SABER_N],
+                            const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
+                            const uint16_t vectorS[SABER_L][SABER_N])
 {
     uint16_t tmp_vector_eval[SB3 * 64],
-        tmp_matrix_eval[SB3 * 64],
-        tmp_accumulate[SB3_RES * 64],
-        tmp_res[SABER_L][SB3_RES * 64];
+             tmp_matrix_eval[SB3 * 64],
+             tmp_accumulate[SB3_RES * 64],
+             tmp_res[SABER_L][SB3_RES * 64];
 
     uint16x8x4_t neon_acc, neon_res;
 
