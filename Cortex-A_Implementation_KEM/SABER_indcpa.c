@@ -17,7 +17,7 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #include "SABER_indcpa.h"
 #include "poly.h"
 #include "pack_unpack.h"
-#include "poly_mul.c"
+#include "neon_poly_rq_mul.h"
 #include "rng.h"
 #include "fips202.h"
 #include "SABER_params.h"
@@ -41,7 +41,7 @@ void indcpa_kem_keypair(uint8_t pk[SABER_INDCPA_PUBLICKEYBYTES], uint8_t sk[SABE
 
 	GenMatrix(A, seed_A);
 	GenSecret(s, seed_s);
-	MatrixVectorMul(A, s, b, 1);
+	neonMatrixVectorMulTranspose(b, A, s);
 
 	for (i = 0; i < SABER_L; i++)
 	{
@@ -69,7 +69,7 @@ void indcpa_kem_enc(const uint8_t m[SABER_KEYBYTES], const uint8_t seed_sp[SABER
 
 	GenMatrix(A, seed_A);
 	GenSecret(sp, seed_sp);
-	MatrixVectorMul(A, sp, bp, 0);
+	neonMatrixVectorMul(bp, A, sp);
 
 	for (i = 0; i < SABER_L; i++)
 	{
@@ -81,7 +81,7 @@ void indcpa_kem_enc(const uint8_t m[SABER_KEYBYTES], const uint8_t seed_sp[SABER
 
 	POLVECp2BS(ciphertext, bp);
 	BS2POLVECp(pk, b);
-	InnerProd(b, sp, vp);
+	neonInnerProd(vp, b, sp);
 
 	BS2POLmsg(m, mp);
 
@@ -104,7 +104,7 @@ void indcpa_kem_dec(const uint8_t sk[SABER_INDCPA_SECRETKEYBYTES], const uint8_t
 
 	BS2POLVECq(sk, s);
 	BS2POLVECp(ciphertext, b);
-	InnerProd(b, s, v);
+	neonInnerProd(v, b, s);
 	BS2POLT(ciphertext + SABER_POLYVECCOMPRESSEDBYTES, cm);
 
 	for (i = 0; i < SABER_N; i++)
