@@ -41,7 +41,7 @@ static uint32_t load24_littleendian(const uint8_t x[3])
   return r;
 }
 
-static void neon_cbd3(uint16_t s[SABER_N], const uint8_t buf[SABER_POLYCOINBYTES])
+static void cbd3(uint16_t s[SABER_N], const uint8_t buf[SABER_POLYCOINBYTES])
 {
   unsigned int i,j;
   uint32_t t,d;
@@ -56,7 +56,7 @@ static void neon_cbd3(uint16_t s[SABER_N], const uint8_t buf[SABER_POLYCOINBYTES
     for(j=0;j<4;j++) {
       a = (d >> (6*j+0)) & 0x7;
       b = (d >> (6*j+3)) & 0x7;
-      r->coeffs[4*i+j] = a - b;
+      s[4*i+j] = a - b;
     }
   }
 }
