@@ -29,6 +29,9 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #define SABER_EP 10
 #define SABER_N 256
 
+#define SABER_Q 8192 //2^13
+#define SABER_P 1024
+
 #define SABER_SEEDBYTES 32
 #define SABER_NOISE_SEEDBYTES 32
 #define SABER_KEYBYTES 32
