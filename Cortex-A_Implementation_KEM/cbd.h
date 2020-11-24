@@ -8,7 +8,6 @@ Vadim Lyubashevsky, John M. Schanck, Peter Schwabe & Damien stehle
 #ifndef CBD_H
 #define CBD_H
 
-#include "api.h"
 #include <stdint.h>
 #include "SABER_params.h"
 
