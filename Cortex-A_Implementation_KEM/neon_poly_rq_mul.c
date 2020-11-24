@@ -491,8 +491,8 @@ void neon_toom_cook_422_interpolate(uint16_t poly[2 * SABER_N], uint16_t tmp_cc[
 }
 
 void neon_vector_vector_mul(uint16_t accumulate[SABER_N], const uint16_t modP,
-                            const uint16_t polyvecA[SABER_K][SABER_N],
-                            const uint16_t polyvecB[SABER_K][SABER_N])
+                            const uint16_t polyvecA[SABER_L][SABER_N],
+                            const uint16_t polyvecB[SABER_L][SABER_N])
 {
     uint16_t tmp_cc[SB3_RES * 64],
         tmp_acc[SB3_RES * 64],
@@ -507,7 +507,7 @@ void neon_vector_vector_mul(uint16_t accumulate[SABER_N], const uint16_t modP,
 
     uint16_t tmp_aa[SB3 * 64], tmp_bb[SB3 * 64];
 
-    for (uint16_t k = 0; k < SABER_K; k++)
+    for (uint16_t k = 0; k < SABER_L; k++)
     {
         neon_toom_cook_422_evaluate(tmp_aa, polyvecA[k]);
         neon_toom_cook_422_evaluate(tmp_bb, polyvecB[k]);
@@ -532,6 +532,7 @@ void neon_vector_vector_mul(uint16_t accumulate[SABER_N], const uint16_t modP,
     neon_poly_neon_reduction(accumulate, polyC, SABER_P);
 }
 
+static
 void printArray(uint16_t *M, char *string, uint16_t length)
 {
     printf("%s\n", string);
@@ -542,20 +543,20 @@ void printArray(uint16_t *M, char *string, uint16_t length)
     printf("\n");
 }
 
-void neon_matrix_vector_mul(uint16_t vectorB[SABER_K][SABER_N], const uint16_t modQ,
-                            const polyvec matrixA[SABER_K],
-                            const uint16_t vectorS[SABER_K][SABER_N])
+void neon_matrix_vector_mul(uint16_t vectorB[SABER_L][SABER_N], const uint16_t modQ,
+                            const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
+                            const uint16_t vectorS[SABER_L][SABER_N])
 {
     uint16_t tmp_vector_eval[SB3 * 64],
              tmp_matrix_eval[SB3 * 64],
              tmp_accumulate[SB3_RES * 64],
-             tmp_res[SABER_K][SB3_RES * 64];
+             tmp_res[SABER_L][SB3_RES * 64];
 
     uint16x8x4_t neon_acc, neon_res;
 
     uint16x8x4_t zero;
     vxor(zero, zero, zero);
-    for (uint16_t i = 0; i < SABER_K; i++)
+    for (uint16_t i = 0; i < SABER_L; i++)
     {
         for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
         {
@@ -563,12 +564,12 @@ void neon_matrix_vector_mul(uint16_t vectorB[SABER_K][SABER_N], const uint16_t m
         }
     }
 
-    for (uint16_t j = 0; j < SABER_K; j++)
+    for (uint16_t j = 0; j < SABER_L; j++)
     {
         neon_toom_cook_422_evaluate(tmp_vector_eval, vectorS[j]);
-        for (uint16_t i = 0; i < SABER_K; i++)
+        for (uint16_t i = 0; i < SABER_L; i++)
         {
-            neon_toom_cook_422_evaluate(tmp_matrix_eval, matrixA[i].vec[j].coeffs);
+            neon_toom_cook_422_evaluate(tmp_matrix_eval, matrixA[i][j]);
             neon_toom_cook_422_mul(tmp_accumulate, tmp_vector_eval, tmp_matrix_eval);
 
             for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
@@ -584,32 +585,32 @@ void neon_matrix_vector_mul(uint16_t vectorB[SABER_K][SABER_N], const uint16_t m
     }
 
     vxor(zero, zero, zero);
-    for (uint16_t addr = 0; addr < SB3_RES * 16 * SABER_K; addr += 32)
+    for (uint16_t addr = 0; addr < SB3_RES * 16 * SABER_L; addr += 32)
     {
         vstore(&tmp_accumulate[addr], zero);
     }
 
-    for (uint16_t i = 0; i < SABER_K; i++)
+    for (uint16_t i = 0; i < SABER_L; i++)
     {
         neon_toom_cook_422_interpolate(&tmp_accumulate[i << 9], tmp_res[i]);
         neon_poly_neon_reduction(vectorB[i], &tmp_accumulate[i << 9], SABER_Q);
     }
 }
 
-void neon_matrix_vector_mul_transpose(uint16_t vectorB[SABER_K][SABER_N], const uint16_t modQ,
-                                      const polyvec matrixA[SABER_K],
-                                      const uint16_t vectorS[SABER_K][SABER_N])
+void neon_matrix_vector_mul_transpose(uint16_t vectorB[SABER_L][SABER_N], const uint16_t modQ,
+                                      const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
+                                      const uint16_t vectorS[SABER_L][SABER_N])
 {
     uint16_t tmp_vector_eval[SB3 * 64],
         tmp_matrix_eval[SB3 * 64],
         tmp_accumulate[SB3_RES * 64],
-        tmp_res[SABER_K][SB3_RES * 64];
+        tmp_res[SABER_L][SB3_RES * 64];
 
     uint16x8x4_t neon_acc, neon_res;
 
     uint16x8x4_t zero;
     vxor(zero, zero, zero);
-    for (uint16_t i = 0; i < SABER_K; i++)
+    for (uint16_t i = 0; i < SABER_L; i++)
     {
         for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
         {
@@ -617,12 +618,12 @@ void neon_matrix_vector_mul_transpose(uint16_t vectorB[SABER_K][SABER_N], const 
         }
     }
 
-    for (uint16_t j = 0; j < SABER_K; j++)
+    for (uint16_t j = 0; j < SABER_L; j++)
     {
         neon_toom_cook_422_evaluate(tmp_vector_eval, vectorS[j]);
-        for (uint16_t i = 0; i < SABER_K; i++)
+        for (uint16_t i = 0; i < SABER_L; i++)
         {
-            neon_toom_cook_422_evaluate(tmp_matrix_eval, matrixA[j].vec[i].coeffs);
+            neon_toom_cook_422_evaluate(tmp_matrix_eval, matrixA[j][i]);
             neon_toom_cook_422_mul(tmp_accumulate, tmp_vector_eval, tmp_matrix_eval);
 
             for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
@@ -638,12 +639,12 @@ void neon_matrix_vector_mul_transpose(uint16_t vectorB[SABER_K][SABER_N], const 
     }
 
     vxor(zero, zero, zero);
-    for (uint16_t addr = 0; addr < SB3_RES * 16 * SABER_K; addr += 32)
+    for (uint16_t addr = 0; addr < SB3_RES * 16 * SABER_L; addr += 32)
     {
         vstore(&tmp_accumulate[addr], zero);
     }
 
-    for (uint16_t i = 0; i < SABER_K; i++)
+    for (uint16_t i = 0; i < SABER_L; i++)
     {
         neon_toom_cook_422_interpolate(&tmp_accumulate[i << 9], tmp_res[i]);
         neon_poly_neon_reduction(vectorB[i], &tmp_accumulate[i << 9], SABER_Q);
