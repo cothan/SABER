@@ -41,7 +41,7 @@ void indcpa_kem_keypair(uint8_t pk[SABER_INDCPA_PUBLICKEYBYTES], uint8_t sk[SABE
 
 	GenMatrix(A, seed_A);
 	GenSecret(s, seed_s);
-	neonMatrixVectorMulTranspose(b, A, s);
+	neonMatrixVectorMul(b, A, s, 1);
 
 	for (i = 0; i < SABER_L; i++)
 	{
@@ -69,7 +69,7 @@ void indcpa_kem_enc(const uint8_t m[SABER_KEYBYTES], const uint8_t seed_sp[SABER
 
 	GenMatrix(A, seed_A);
 	GenSecret(sp, seed_sp);
-	neonMatrixVectorMul(bp, A, sp);
+	neonMatrixVectorMul(bp, A, sp, 0);
 
 	for (i = 0; i < SABER_L; i++)
 	{

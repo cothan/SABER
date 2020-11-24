@@ -29,10 +29,6 @@ void neonInnerProd(uint16_t accumulate[SABER_N],
 
 void neonMatrixVectorMul(uint16_t vectorB[SABER_L][SABER_N],
                    const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
-                   const uint16_t vectorS[SABER_L][SABER_N]);
-
-void neonMatrixVectorMulTranspose(uint16_t vectorB[SABER_L][SABER_N],
-                            const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
-                            const uint16_t vectorS[SABER_L][SABER_N]);
+                   const uint16_t vectorS[SABER_L][SABER_N], const unsigned int transpose);
 
 #endif

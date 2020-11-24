@@ -547,7 +547,7 @@ void printArray(uint16_t *M, char *string, uint16_t length)
 
 void neonMatrixVectorMul(uint16_t vectorB[SABER_L][SABER_N],
                    const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
-                   const uint16_t vectorS[SABER_L][SABER_N])
+                   const uint16_t vectorS[SABER_L][SABER_N], const unsigned int transpose)
 {
     uint16_t tmp_vector_eval[SB3 * 64],
              tmp_matrix_eval[SB3 * 64],
@@ -566,76 +566,47 @@ void neonMatrixVectorMul(uint16_t vectorB[SABER_L][SABER_N],
         }
     }
 
-    for (uint16_t j = 0; j < SABER_L; j++)
+    if (transpose)
     {
-        neon_toom_cook_422_evaluate(tmp_vector_eval, vectorS[j]);
-        for (uint16_t i = 0; i < SABER_L; i++)
+        for (uint16_t j = 0; j < SABER_L; j++)
         {
-            neon_toom_cook_422_evaluate(tmp_matrix_eval, matrixA[i][j]);
-            neon_toom_cook_422_mul(tmp_accumulate, tmp_vector_eval, tmp_matrix_eval);
-
-            for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
+            neon_toom_cook_422_evaluate(tmp_vector_eval, vectorS[j]);
+            for (uint16_t i = 0; i < SABER_L; i++)
             {
-                vload(neon_acc, &tmp_accumulate[addr]);
-                vload(neon_res, &tmp_res[i][addr]);
+                neon_toom_cook_422_evaluate(tmp_matrix_eval, matrixA[j][i]);
+                neon_toom_cook_422_mul(tmp_accumulate, tmp_vector_eval, tmp_matrix_eval);
 
-                vadd(neon_res, neon_acc, neon_res);
+                for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
+                {
+                    vload(neon_acc, &tmp_accumulate[addr]);
+                    vload(neon_res, &tmp_res[i][addr]);
 
-                vstore(&tmp_res[i][addr], neon_res);
+                    vadd(neon_res, neon_acc, neon_res);
+
+                    vstore(&tmp_res[i][addr], neon_res);
+                }
             }
         }
     }
-
-    vxor(zero, zero, zero);
-    for (uint16_t addr = 0; addr < SB3_RES * 16 * SABER_L; addr += 32)
+    else
     {
-        vstore(&tmp_accumulate[addr], zero);
-    }
-
-    for (uint16_t i = 0; i < SABER_L; i++)
-    {
-        neon_toom_cook_422_interpolate(&tmp_accumulate[i << 9], tmp_res[i]);
-        neon_poly_neon_reduction(vectorB[i], &tmp_accumulate[i << 9], SABER_Q);
-    }
-}
-
-void neonMatrixVectorMulTranspose(uint16_t vectorB[SABER_L][SABER_N],
-                            const uint16_t matrixA[SABER_L][SABER_L][SABER_N],
-                            const uint16_t vectorS[SABER_L][SABER_N])
-{
-    uint16_t tmp_vector_eval[SB3 * 64],
-             tmp_matrix_eval[SB3 * 64],
-             tmp_accumulate[SB3_RES * 64],
-             tmp_res[SABER_L][SB3_RES * 64];
-
-    uint16x8x4_t neon_acc, neon_res;
-
-    uint16x8x4_t zero;
-    vxor(zero, zero, zero);
-    for (uint16_t i = 0; i < SABER_L; i++)
-    {
-        for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
+        for (uint16_t j = 0; j < SABER_L; j++)
         {
-            vstore(&tmp_res[i][addr], zero);
-        }
-    }
-
-    for (uint16_t j = 0; j < SABER_L; j++)
-    {
-        neon_toom_cook_422_evaluate(tmp_vector_eval, vectorS[j]);
-        for (uint16_t i = 0; i < SABER_L; i++)
-        {
-            neon_toom_cook_422_evaluate(tmp_matrix_eval, matrixA[j][i]);
-            neon_toom_cook_422_mul(tmp_accumulate, tmp_vector_eval, tmp_matrix_eval);
-
-            for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
+            neon_toom_cook_422_evaluate(tmp_vector_eval, vectorS[j]);
+            for (uint16_t i = 0; i < SABER_L; i++)
             {
-                vload(neon_acc, &tmp_accumulate[addr]);
-                vload(neon_res, &tmp_res[i][addr]);
+                neon_toom_cook_422_evaluate(tmp_matrix_eval, matrixA[i][j]);
+                neon_toom_cook_422_mul(tmp_accumulate, tmp_vector_eval, tmp_matrix_eval);
 
-                vadd(neon_res, neon_acc, neon_res);
+                for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
+                {
+                    vload(neon_acc, &tmp_accumulate[addr]);
+                    vload(neon_res, &tmp_res[i][addr]);
 
-                vstore(&tmp_res[i][addr], neon_res);
+                    vadd(neon_res, neon_acc, neon_res);
+
+                    vstore(&tmp_res[i][addr], neon_res);
+                }
             }
         }
     }
