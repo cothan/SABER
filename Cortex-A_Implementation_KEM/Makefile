@@ -10,8 +10,8 @@ all: test/PQCgenKAT_kem \
      test/test_kex \
      test/kem \
 
-SOURCES = pack_unpack.c poly.c fips202.c verify.c cbd.c SABER_indcpa.c kem.c
-HEADERS = SABER_params.h pack_unpack.h poly.h rng.h fips202.h verify.h cbd.h SABER_indcpa.h 
+SOURCES = neon_batch_multiplication.c neon_matrix_transpose.c neon_poly_rq_mul.c pack_unpack.c poly.c fips202.c verify.c cbd.c SABER_indcpa.c kem.c
+HEADERS = SABER_params.h neon_batch_multiplication.h neon_matrix_transpose.h neon_poly_rq_mul.h pack_unpack.h poly.h rng.h fips202.h verify.h cbd.h SABER_indcpa.h 
 
 test/test_kex: $(SOURCES) $(HEADERS) rng.o test/test_kex.c
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) rng.o test/test_kex.c -lcrypto
