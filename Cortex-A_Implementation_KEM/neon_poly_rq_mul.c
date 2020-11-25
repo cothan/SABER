@@ -37,6 +37,9 @@ limitations under the License.
 #define inv3 43691
 #define inv15 61167
 
+#define h1 (1 << (SABER_EQ - SABER_EP - 1))
+#define h2 ((1 << (SABER_EP - 2)) - (1 << (SABER_EP - SABER_ET - 1)) + (1 << (SABER_EQ - SABER_EP - 1)))
+
 #if defined(__clang__)
 
 // load c <= a
@@ -638,17 +641,88 @@ void neon_toom_cook_44_interpolate(uint16_t poly[2 * SABER_N], uint16_t tmp_cc[S
     tc4_interpolate_neon_SB1(poly, cw);
 }
 
-static inline void neon_poly_neon_reduction(uint16_t *restrict poly, uint16_t *restrict tmp, const uint16_t MASK)
+static inline 
+void neon_poly_neon_reduction_enc(uint16_t poly[SABER_N], 
+                                  uint16_t tmp[SABER_N * 2], 
+                                  uint16_t polyM[SABER_N], 
+                                  const uint16_t MASK)
 {
     uint16x8_t mask;
-    uint16x8x4_t res, tmp1, tmp2;
+    uint16x8x4_t res, tmp1, tmp2, const_h1, mp;
     mask = vdupq_n_u16(MASK - 1);
+    const_h1.val[0] = vdupq_n_u16(h1);
+    const_h1.val[1] = vdupq_n_u16(h1);
+    const_h1.val[2] = vdupq_n_u16(h1);
+    const_h1.val[3] = vdupq_n_u16(h1);
+
+    for (uint16_t addr = 0; addr < SABER_N; addr += 32)
+    {
+        vload(tmp1, &tmp[addr]);
+        vload(tmp2, &tmp[addr + SABER_N]);
+        vload(mp, &polyM[addr]);
+
+        vsub(res, tmp1, tmp2);
+        vand(res, res, mask);
+        vadd(res, res, const_h1);
+        vsl(mp, mp, SABER_EP - 1);
+        vsub(res, res, mp);
+        vsr(res, res, SABER_EP - SABER_ET);
+        
+        vstore(&poly[addr], res);
+    }
+}
+
+static inline 
+void neon_poly_neon_reduction_dec(uint16_t poly[SABER_N], 
+                                  uint16_t tmp[SABER_N * 2],  
+                                  uint16_t polyM[SABER_N], 
+                                  const uint16_t MASK)
+{
+    uint16x8_t mask;
+    uint16x8x4_t res, tmp1, tmp2, const_h2, cm;
+    mask = vdupq_n_u16(MASK - 1);
+    const_h2.val[0] = vdupq_n_u16(h2);
+    const_h2.val[1] = vdupq_n_u16(h2);
+    const_h2.val[2] = vdupq_n_u16(h2);
+    const_h2.val[3] = vdupq_n_u16(h2);
+
+    for (uint16_t addr = 0; addr < SABER_N; addr += 32)
+    {
+        vload(tmp1, &tmp[addr]);
+        vload(tmp2, &tmp[addr + SABER_N]);
+        vload(cm, &polyM[addr]);
+
+        vsub(res, tmp1, tmp2);
+        vand(res, res, mask);
+        vadd(res, res, const_h2);
+        vsl(cm, cm, SABER_EP - SABER_ET);
+        vsub(res, res, cm);
+        vsr(res, res, SABER_EP - 1);
+
+        vstore(&poly[addr], res);
+    }
+}
+
+static inline void neon_poly_neon_reduction_add(uint16_t poly[SABER_N], 
+                                                uint16_t tmp[SABER_N * 2], 
+                                                const uint16_t MASK)
+{
+    uint16x8_t mask;
+    uint16x8x4_t res, tmp1, tmp2, const_h1;
+    mask = vdupq_n_u16(MASK - 1);
+    const_h1.val[0] = vdupq_n_u16(h1);
+    const_h1.val[1] = vdupq_n_u16(h1);
+    const_h1.val[2] = vdupq_n_u16(h1);
+    const_h1.val[3] = vdupq_n_u16(h1);
     for (uint16_t addr = 0; addr < SABER_N; addr += 32)
     {
         vload(tmp1, &tmp[addr]);
         vload(tmp2, &tmp[addr + SABER_N]);
         vsub(res, tmp1, tmp2);
         vand(res, res, mask);
+        // b[i][j] + h1 
+        vadd(res, res, const_h1);
+        vsr(res, res, SABER_EQ - SABER_EP);
         vstore(&poly[addr], res);
     }
 }
@@ -728,7 +802,9 @@ void neon_toom_cook_422_interpolate(uint16_t poly[2 * SABER_N], uint16_t tmp_cc[
 
 void neonInnerProd(uint16_t accumulate[SABER_N],
                   uint16_t polyvecA[SABER_L][SABER_N],
-                  uint16_t polyvecB[SABER_L][SABER_N])
+                  uint16_t polyvecB[SABER_L][SABER_N],
+                  uint16_t polyM[SABER_N],
+                  const unsigned int enc)
 {
     // TODO: RESIZE
     uint16_t tmp_cc[SB3_RES * 49],
@@ -769,7 +845,10 @@ void neonInnerProd(uint16_t accumulate[SABER_N],
     }
     neon_toom_cook_44_interpolate(polyC, tmp_acc);
 
-    neon_poly_neon_reduction(accumulate, polyC, SABER_P);
+    if (enc)
+        neon_poly_neon_reduction_enc(accumulate, polyC, polyM, SABER_P);
+    else
+        neon_poly_neon_reduction_dec(accumulate, polyC, polyM, SABER_P);
 }
 
 #if DEBUG == 1
@@ -867,6 +946,7 @@ void neonMatrixVectorMul(uint16_t vectorB[SABER_L][SABER_N],
     for (uint16_t i = 0; i < SABER_L; i++)
     {
         neon_toom_cook_422_interpolate(&tmp_accumulate[i << 9], tmp_res[i]);
-        neon_poly_neon_reduction(vectorB[i], &tmp_accumulate[i << 9], SABER_Q);
+        // b[i][j] = (b[i][j] + h1) >> (SABER_EQ - SABER_EP);
+        neon_poly_neon_reduction_add(vectorB[i], &tmp_accumulate[i << 9], SABER_Q);
     }
 }

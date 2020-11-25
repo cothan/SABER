@@ -41,15 +41,9 @@ void indcpa_kem_keypair(uint8_t pk[SABER_INDCPA_PUBLICKEYBYTES], uint8_t sk[SABE
 
 	GenMatrix(A, seed_A);
 	GenSecret(s, seed_s);
-	neonMatrixVectorMul(b, A, s, 1);
 
-	for (i = 0; i < SABER_L; i++)
-	{
-		for (j = 0; j < SABER_N; j++)
-		{
-			b[i][j] = (b[i][j] + h1) >> (SABER_EQ - SABER_EP);
-		}
-	}
+	// b = tranpose(A*s)
+	neonMatrixVectorMul(b, A, s, 1);
 
 	POLVECq2BS(sk, s);
 	POLVECp2BS(pk, b);
@@ -69,27 +63,16 @@ void indcpa_kem_enc(const uint8_t m[SABER_KEYBYTES], const uint8_t seed_sp[SABER
 
 	GenMatrix(A, seed_A);
 	GenSecret(sp, seed_sp);
-	neonMatrixVectorMul(bp, A, sp, 0);
 
-	for (i = 0; i < SABER_L; i++)
-	{
-		for (j = 0; j < SABER_N; j++)
-		{
-			bp[i][j] = (bp[i][j] + h1) >> (SABER_EQ - SABER_EP);
-		}
-	}
-
-	POLVECp2BS(ciphertext, bp);
 	BS2POLVECp(pk, b);
-	neonInnerProd(vp, b, sp);
-
 	BS2POLmsg(m, mp);
 
-	for (j = 0; j < SABER_N; j++)
-	{
-		vp[j] = (vp[j] - (mp[j] << (SABER_EP - 1)) + h1) >> (SABER_EP - SABER_ET);
-	}
+	// bp = A*sp
+	neonMatrixVectorMul(bp, A, sp, 0);
+	// vp = b*sp - mp
+	neonInnerProd(vp, b, sp, mp, 1);
 
+	POLVECp2BS(ciphertext, bp);
 	POLT2BS(ciphertext + SABER_POLYVECCOMPRESSEDBYTES, vp);
 }
 
@@ -104,13 +87,10 @@ void indcpa_kem_dec(const uint8_t sk[SABER_INDCPA_SECRETKEYBYTES], const uint8_t
 
 	BS2POLVECq(sk, s);
 	BS2POLVECp(ciphertext, b);
-	neonInnerProd(v, b, s);
 	BS2POLT(ciphertext + SABER_POLYVECCOMPRESSEDBYTES, cm);
 
-	for (i = 0; i < SABER_N; i++)
-	{
-		v[i] = (v[i] + h2 - (cm[i] << (SABER_EP - SABER_ET))) >> (SABER_EP - 1);
-	}
+	// v = b*s + h2 - cm
+	neonInnerProd(v, b, s, cm, 0);
 
 	POLmsg2BS(m, v);
 }

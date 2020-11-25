@@ -25,7 +25,9 @@ limitations under the License.
 
 void neonInnerProd(uint16_t accumulate[SABER_N],
                    uint16_t polyvecA[SABER_L][SABER_N],
-                   uint16_t polyvecB[SABER_L][SABER_N]);
+                   uint16_t polyvecB[SABER_L][SABER_N],
+                   uint16_t polyC[SABER_N],
+                   const unsigned int enc);
 
 void neonMatrixVectorMul(uint16_t vectorB[SABER_L][SABER_N],
                          uint16_t matrixA[SABER_L][SABER_L][SABER_N],
