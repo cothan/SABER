@@ -10,8 +10,13 @@ all: test/PQCgenKAT_kem \
      test/test_kex \
      test/kem \
 
+speed: test/speed512 \
+	test/speed768 \
+	test/speed1024
+
+
 SOURCES = pack_unpack.c poly.c fips202.c verify.c cbd.c SABER_indcpa.c kem.c
-HEADERS = SABER_params.h pack_unpack.h poly.h rng.h fips202.h verify.h cbd.h SABER_indcpa.h 
+HEADERS = SABER_params.h pack_unpack.h poly.h rng.h fips202.h verify.h cbd.h SABER_indcpa.h
 
 test/test_kex: $(SOURCES) $(HEADERS) rng.o test/test_kex.c
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) rng.o test/test_kex.c -lcrypto
@@ -22,18 +27,41 @@ test/PQCgenKAT_kem: $(SOURCES) $(HEADERS) rng.o test/PQCgenKAT_kem.c
 test/kem: $(SOURCES) $(HEADERS) rng.o test/kem.c
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) rng.o test/kem.c -lcrypto
 
+test/speedusec512: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
+	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c -lpapi -lcrypto
+
+test/speedusec768: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
+	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c -lpapi -lcrypto
+
+test/speedusec1024: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
+	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c -lpapi -lcrypto
+
+test/speed512: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c -lpapi -lcrypto
+
+test/speed768: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c -lpapi -lcrypto
+
+test/speed1024: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c -lpapi -lcrypto
+
 rng.o: rng.c
 	$(CC) $(NISTFLAGS) -c rng.c -lcrypto -o $@ 
 
 # fips202.o: fips202.c
 # 	$(CLANG) -c $^ -o $@
 
-.PHONY: clean test
+.PHONY: clean test bench
 
 test: 
 	./test/test_kex
 	./test/PQCgenKAT_kem
 	./test/kem
+
+bench:
+	./test/speed512
+	./test/speed768
+	./test/speed1024
 
 clean:
 	-$(RM) -f *.o
@@ -42,3 +70,9 @@ clean:
 	-$(RM) -rf test/PQCgenKAT_kem
 	-$(RM) -f *.req
 	-$(RM) -f *.rsp
+	-$(RM) -f test/speed512
+	-$(RM) -f test/speed768
+	-$(RM) -f test/speed1024
+	-$(RM) -f test/speedusec512
+	-$(RM) -f test/speedusec768
+	-$(RM) -f test/speedusec1024
