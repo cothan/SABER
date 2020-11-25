@@ -1,6 +1,6 @@
 CC 		  = /usr/bin/gcc
 CFLAGS  = -Wall -Wextra -Wmissing-prototypes -Wredundant-decls\
-	-O3 -fomit-frame-pointer -march=native 
+	-O3 -fomit-frame-pointer -march=native  -fno-tree-vectorize
 NISTFLAGS  = -Wno-unused-result -O3 -fomit-frame-pointer -march=native -std=c99 
 CLANG   = clang -march=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments
 RM 		  = /bin/rm
