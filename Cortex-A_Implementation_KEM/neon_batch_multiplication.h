@@ -22,7 +22,12 @@ limitations under the License.
 
 #include <stdint.h>
 
+#define SB_ITER 8 // Round up of 7*3*3/8
+#define SB_ITER_INNER_PROD 6
+
+
 void schoolbook16x16(uint16_t *restrict c_in_mem,
                      uint16_t *restrict a_in_mem,
-                     uint16_t *restrict b_in_mem);
+                     uint16_t *restrict b_in_mem,
+                     const unsigned int iter);
 #endif
