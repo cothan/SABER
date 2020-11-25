@@ -22,7 +22,10 @@ limitations under the License.
 
 #include <stdint.h>
 
-void transpose_8x32(uint16_t *matrix);
-void transpose_8x16(uint16_t *matrix);
+#define TRANSPOSE_ITER 8 // Round up of 7*3*3/8
+#define TRANSPOSE_ITER_INNER_PROD 6 // Round down of 7*7/8
+
+void transpose_8x32(uint16_t *matrix, const unsigned int iter);
+void transpose_8x16(uint16_t *matrix, const unsigned int iter);
 
 #endif

@@ -18,8 +18,8 @@ limitations under the License.
 
 =============================================================================*/
 #include <arm_neon.h>
+#include "neon_matrix_transpose.h"
 
-#define TRANSPOSE_ITER 8 // Round up of 7*7*3/8
 
 /*
  * Improved in-place tranpose, minimal spill to memory.
@@ -44,13 +44,13 @@ After Transpose
   7   7   7   7   7   7   7   7  | 15  15  15  15  15  15  15  15
 -----------
  */
-void transpose_8x16(uint16_t *matrix) {
+void transpose_8x16(uint16_t *matrix, const unsigned int iter) {
   uint16_t *M = matrix;
   uint16x8_t y0, y1, y2, y3, y4, y5, y6, y7, 
              y8, y9, y10, y11, y12, y13, y14,
              y15, y16, y17, y18, y19, y20, y21, 
              y22, y23, y24, y25, y26, y27;
-  for (uint16_t i = 0; i < TRANSPOSE_ITER; i++) {
+  for (uint16_t i = 0; i < iter; i++) {
     // 16x16: LD A1
     y0 = vld1q_u16(M + 16*0);
     y1 = vld1q_u16(M + 16*1);
@@ -188,13 +188,13 @@ Output After Transpose
   0   1   2   3   4   5   6   7  |   8   9  10  11  12  13  14  15  |  16   17   18   19   20   21   22   23  |  24   25   26   27   28   29   30    x
 ---------------------
  */
-void transpose_8x32(uint16_t *matrix) {
+void transpose_8x32(uint16_t *matrix, const unsigned int iter) {
   uint16_t *M = matrix;
   uint16x8_t y0, y1, y2, y3, y4, y5, y6, y7, 
              y8, y9, y10, y11, y12, y13, y14,
              y15, y16, y17, y18, y19, y20, y21, 
              y22, y23, y24, y25, y26, y27;
-  for (uint16_t i = 0; i < TRANSPOSE_ITER; i++) {
+  for (uint16_t i = 0; i < iter; i++) {
     // 16x16: LD A1
     y0 = vld1q_u16(M + 32*0);
     y1 = vld1q_u16(M + 32*1);
