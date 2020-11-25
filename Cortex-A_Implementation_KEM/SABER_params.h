@@ -9,9 +9,11 @@ Jose Maria Bermudo Mera, Michiel Van Beirendonck, Andrea Basso.
 #define PARAMS_H
 
 /* Change this for different security strengths */
+#ifndef SABER_L
 // #define SABER_L 2 /* LightSaber */
 #define SABER_L 3 /* Saber */
 // #define SABER_L 4 /* FireSaber */
+#endif 
 
 /* Don't change anything below this line */
 #if SABER_L == 2
