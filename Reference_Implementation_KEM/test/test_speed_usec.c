@@ -1,12 +1,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
+#include <string.h>
 
 #include "../SABER_params.h"
 #include "../api.h"
-#include "../kem.h"
 #include "../rng.h"
 
 #include <papi.h>
@@ -61,13 +60,7 @@ void handle_error(int retval) {
   exit(1);
 }
 
-extern int crypto_kem_keypair(unsigned char *pk, unsigned char *sk);
-extern int crypto_kem_enc(unsigned char *ct, unsigned char *ss,
-                          const unsigned char *pk);
-extern int crypto_kem_dec(unsigned char *ss, const unsigned char *ct,
-                          const unsigned char *sk);
-
-#define NTESTS 20000
+#define NTESTS 100000
 
 int test_kem_cca() {
 
@@ -75,8 +68,6 @@ int test_kem_cca() {
   uint8_t sk[SABER_SECRETKEYBYTES];
   uint8_t c[SABER_BYTES_CCA_DEC];
   uint8_t k_a[SABER_KEYBYTES], k_b[SABER_KEYBYTES];
-
-  int retval;
 
   unsigned char entropy_input[48];
 
@@ -87,17 +78,10 @@ int test_kem_cca() {
 
   for (i = 0; i < NTESTS; i++);
 
-  int EventSet = PAPI_NULL;
 
   if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT)
     exit(1);
 
-  // Intializes random number generator
-  srand((unsigned)time(&t));
-
-  for (i = 0; i < 48; i++) {
-    entropy_input[i] = i;
-  }
   randombytes_init(entropy_input, NULL, 256);
   /* =================================== */
   for (i = 0; i < repeat; i++) {
