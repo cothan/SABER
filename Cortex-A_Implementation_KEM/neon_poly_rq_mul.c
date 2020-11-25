@@ -731,8 +731,8 @@ void neonInnerProd(uint16_t accumulate[SABER_N],
                   uint16_t polyvecB[SABER_L][SABER_N])
 {
     // TODO: RESIZE
-    uint16_t tmp_cc[SB3_RES * 64],
-             tmp_acc[SB3_RES * 64],
+    uint16_t tmp_cc[SB3_RES * 49],
+             tmp_acc[SB3_RES * 49],
              polyC[2 * SABER_N];
     uint16x8x4_t zero, tmp, acc;
     // vxor(zero, zero, zero);
@@ -740,24 +740,19 @@ void neonInnerProd(uint16_t accumulate[SABER_N],
     zero.val[0] = vdupq_n_u16(0);
     zero.val[0] = vdupq_n_u16(0);
     zero.val[0] = vdupq_n_u16(0);
-    for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
+    for (uint16_t addr = 0; addr < SB3_RES * 49; addr += 32)
     {
         vstore(&tmp_acc[addr], zero);
     }
 
-    // uint16_t tmp_aa[SB3 * 64], tmp_bb[SB3 * 64];
     uint16_t tmp_aa[SB3 * 49], tmp_bb[SB3 * 49];
 
     for (uint16_t k = 0; k < SABER_L; k++)
     {
-        // neon_toom_cook_422_evaluate(tmp_aa, polyvecA[k]);
-        // neon_toom_cook_422_evaluate(tmp_bb, polyvecB[k]);
-        // neon_toom_cook_422_mul(tmp_cc, tmp_aa, tmp_bb);
         neon_toom_cook_44_evaluate(tmp_aa, polyvecA[k]);
         neon_toom_cook_44_evaluate(tmp_bb, polyvecB[k]);
         neon_toom_cook_44_mul(tmp_cc, tmp_aa, tmp_bb);
 
-        // for (uint16_t addr = 0; addr < SB3_RES * 64; addr += 32)
         for (uint16_t addr = 0; addr < SB3_RES * 49; addr += 32)
         {
             vload(tmp, &tmp_cc[addr]);
@@ -772,7 +767,6 @@ void neonInnerProd(uint16_t accumulate[SABER_N],
     {
         vstore(&polyC[addr], zero);
     }
-    // neon_toom_cook_422_interpolate(polyC, tmp_acc);
     neon_toom_cook_44_interpolate(polyC, tmp_acc);
 
     neon_poly_neon_reduction(accumulate, polyC, SABER_P);
