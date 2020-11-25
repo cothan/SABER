@@ -75,7 +75,6 @@ void neon_cbd4(uint16_t s[SABER_N], const uint8_t buf[SABER_POLYCOINBYTES])
     const_0xf = vdupq_n_u8(0xf);
 
     // Total SIMD register: 30
-    int j = 0;
     for (int i = 0; i < SABER_POLYCOINBYTES; i += 4 * 16)
     {
         // 0, 4, ...
