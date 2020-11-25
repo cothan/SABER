@@ -9,7 +9,6 @@
 *.gdb*
 */papi_hl_output*/*
 */test/PQCgenKAT_kem
-*/test/test_speed
-*/test/test_speed2
+*/test/speed*
 .vscode
 libopencm3
