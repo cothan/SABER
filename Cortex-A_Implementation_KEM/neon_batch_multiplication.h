@@ -30,4 +30,8 @@ void schoolbook16x16(uint16_t *restrict c_in_mem,
                      uint16_t *restrict a_in_mem,
                      uint16_t *restrict b_in_mem,
                      const unsigned int iter);
+
+void c_schoolbook16x16(uint16_t c[32],
+                 const uint16_t b[16],
+                 const uint16_t a[16]);
 #endif
