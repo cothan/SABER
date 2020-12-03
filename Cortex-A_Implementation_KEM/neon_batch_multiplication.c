@@ -491,8 +491,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[1]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[1], tmp.val[0]);
 
     // 2 
@@ -500,8 +500,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[2]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[2], tmp.val[0]);
 
     // 3
@@ -509,8 +509,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[3]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[3], tmp.val[0]);
 
     // 4
@@ -518,8 +518,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[4]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[4], tmp.val[0]);
 
     // 5
@@ -527,8 +527,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[5]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[5], tmp.val[0]);
 
     // 6
@@ -536,8 +536,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[6]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[6], tmp.val[0]);
 
     // 7
@@ -545,8 +545,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[7]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[7], tmp.val[0]);
 
     // 8
@@ -554,8 +554,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[8]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[8], tmp.val[0]);
 
     // 9
@@ -563,8 +563,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[9]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[9], tmp.val[0]);
 
     // 10
@@ -572,8 +572,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[10]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[10], tmp.val[0]);
 
     // 11
@@ -581,8 +581,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[11]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[11], tmp.val[0]);
 
     // 12
@@ -590,8 +590,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[12]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[12], tmp.val[0]);
 
     // 13
@@ -599,8 +599,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[13]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[13], tmp.val[0]);
 
     // 14
@@ -608,8 +608,8 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[14]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
     sb_vstore(&c[14], tmp.val[0]);
 
     // 15
@@ -617,9 +617,10 @@ void c_schoolbook16x16(uint16_t c[32],
     tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
     aa = vdupq_n_u16(a[15]);
-    sb_vmla(tmp.val[0], bb[0], aa);
-    sb_vmla(tmp.val[1], bb[1], aa);
-    sb_vstore(&c[15], tmp.val[0]);
+    sb_vmla(tmp.val[0], bb.val[0], aa);
+    sb_vmla(tmp.val[1], bb.val[1], aa);
 
+    vst1q_u16_x2(&c[15], tmp);
+    
     c[31] = 0;
 }
