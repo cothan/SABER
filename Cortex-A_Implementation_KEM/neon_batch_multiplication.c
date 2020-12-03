@@ -473,430 +473,153 @@ void c_schoolbook16x16(uint16_t c[32],
                        const uint16_t b[16],
                        const uint16_t a[16])
 {
-    uint16_t aa[16], bb[16];
-
-    aa[0] = a[0];
-    bb[0] = b[0];
-
-    aa[1] = a[1];
-    bb[1] = b[1];
-
-    aa[2] = a[2];
-    bb[2] = b[2];
-
-    aa[3] = a[3];
-    bb[3] = b[3];
-
-    aa[4] = a[4];
-    bb[4] = b[4];
-
-    aa[5] = a[5];
-    bb[5] = b[5];
-
-    aa[6] = a[6];
-    bb[6] = b[6];
-
-    aa[7] = a[7];
-    bb[7] = b[7];
-
-    aa[8] = a[8];
-    bb[8] = b[8];
-
-    aa[9] = a[9];
-    bb[9] = b[9];
-
-    aa[10] = a[10];
-    bb[10] = b[10];
-
-    // a:11 + b:11 + c:11 = 33
-    c[0] = aa[0] * bb[0];
-    c[1] = aa[0] * bb[1];
-    c[2] = aa[0] * bb[2];
-    c[3] = aa[0] * bb[3];
-    c[4] = aa[0] * bb[4];
-    c[5] = aa[0] * bb[5];
-    c[6] = aa[0] * bb[6];
-    c[7] = aa[0] * bb[7];
-    c[8] = aa[0] * bb[8];
-    c[9] = aa[0] * bb[9];
-    c[10] = aa[0] * bb[10];
-
-    // 32
-    c[1] += aa[1] * bb[0];
-    c[2] += aa[1] * bb[1];
-    c[3] += aa[1] * bb[2];
-    c[4] += aa[1] * bb[3];
-    c[5] += aa[1] * bb[4];
-    c[6] += aa[1] * bb[5];
-    c[7] += aa[1] * bb[6];
-    c[8] += aa[1] * bb[7];
-    c[9] += aa[1] * bb[8];
-    c[10] += aa[1] * bb[9];
-
-    // 31
-    c[2] += aa[2] * bb[0];
-    c[3] += aa[2] * bb[1];
-    c[4] += aa[2] * bb[2];
-    c[5] += aa[2] * bb[3];
-    c[6] += aa[2] * bb[4];
-    c[7] += aa[2] * bb[5];
-    c[8] += aa[2] * bb[6];
-    c[9] += aa[2] * bb[7];
-    c[10] += aa[2] * bb[8];
-
-    // 30
-    c[3] += aa[3] * bb[0];
-    c[4] += aa[3] * bb[1];
-    c[5] += aa[3] * bb[2];
-    c[6] += aa[3] * bb[3];
-    c[7] += aa[3] * bb[4];
-    c[8] += aa[3] * bb[5];
-    c[9] += aa[3] * bb[6];
-    c[10] += aa[3] * bb[7];
-
-    // 29
-    c[4] += aa[4] * bb[0];
-    c[5] += aa[4] * bb[1];
-    c[6] += aa[4] * bb[2];
-    c[7] += aa[4] * bb[3];
-    c[8] += aa[4] * bb[4];
-    c[9] += aa[4] * bb[5];
-    c[10] += aa[4] * bb[6];
-
-    // 28: Introduce 3 more
-    aa[11] = a[11];
-    bb[11] = b[11];
-
-    // a:12 + b:12 + c:7 = 31
-    c[5] += aa[5] * bb[0];
-    c[6] += aa[5] * bb[1];
-    c[7] += aa[5] * bb[2];
-    c[8] += aa[5] * bb[3];
-    c[9] += aa[5] * bb[4];
-    c[10] += aa[5] * bb[5];
-
-    c[11] = aa[0] * bb[11];
-
-    // 30
-    c[6] += aa[6] * bb[0];
-    c[7] += aa[6] * bb[1];
-    c[8] += aa[6] * bb[2];
-    c[9] += aa[6] * bb[3];
-    c[10] += aa[6] * bb[4];
-
-    c[11] += aa[1] * bb[10];
-
-    // 29: Introduce 3 more
-    aa[12] = a[12];
-    bb[12] = b[12];
-
-    // a:13 + b:13 + c:6 = 32
-    c[7] += aa[7] * bb[0];
-    c[8] += aa[7] * bb[1];
-    c[9] += aa[7] * bb[2];
-    c[10] += aa[7] * bb[3];
-
-    c[11] += aa[2] * bb[9];
-    c[12] = aa[0] * bb[12];
-
-    // 31
-    c[8] += aa[8] * bb[0];
-    c[9] += aa[8] * bb[1];
-    c[10] += aa[8] * bb[2];
-
-    c[11] += aa[3] * bb[8];
-    c[12] += aa[1] * bb[11];
-
-    // 30
-    c[9] += aa[9] * bb[0];
-    c[10] += aa[9] * bb[1];
-
-    c[11] += aa[4] * bb[7];
-    c[12] += aa[2] * bb[10];
-
-    // 29: Introduce 3 more
-    aa[13] = a[13];
-    bb[13] = b[13];
-
-    // a:14 + b:14 + c:4 = 32
-    c[10] += aa[10] * bb[0];
-
-    c[11] += aa[5] * bb[6];
-    c[12] += aa[3] * bb[9];
-    c[13] = aa[0] * bb[13];
-
-    // 31
-    c[11] += aa[6] * bb[5];
-    c[12] += aa[4] * bb[8];
-    c[13] += aa[1] * bb[12];
-
-    // 31
-    c[11] += aa[7] * bb[4];
-    c[12] += aa[5] * bb[7];
-    c[13] += aa[2] * bb[11];
-
-    // 31
-    c[11] += aa[8] * bb[3];
-    c[12] += aa[6] * bb[6];
-    c[13] += aa[3] * bb[10];
-
-    // 31
-    c[11] += aa[9] * bb[2];
-    c[12] += aa[7] * bb[5];
-    c[13] += aa[4] * bb[9];
-
-    // 31
-    c[11] += aa[10] * bb[1];
-    c[12] += aa[8] * bb[4];
-    c[13] += aa[5] * bb[8];
-
-    // 31
-    c[11] += aa[11] * bb[0];
-    c[12] += aa[9] * bb[3];
-    c[13] += aa[6] * bb[7];
-
-    // 30
-    c[12] += aa[10] * bb[2];
-    c[13] += aa[7] * bb[6];
-
-    // 30
-    c[12] += aa[11] * bb[1];
-    c[13] += aa[8] * bb[5];
-
-    // 30
-    c[12] += aa[12] * bb[0];
-    c[13] += aa[9] * bb[4];
-
-    // 29: Introduce 3 mores
-    aa[14] = a[14];
-    bb[14] = b[14];
-
-    // a:15 + b:15 + c:2 = 32
-    c[13] += aa[10] * bb[3];
-    c[14] = aa[0] * bb[14];
-
-    // 32
-    c[13] += aa[11] * bb[2];
-    c[14] += aa[1] * bb[13];
-
-    // 32
-    c[13] += aa[12] * bb[1];
-    c[14] += aa[2] * bb[12];
-
-    // 32
-    c[13] += aa[13] * bb[0];
-    c[14] += aa[3] * bb[11];
-
-    // 31
-    c[14] += aa[4] * bb[10];
-    c[14] += aa[5] * bb[9];
-    c[14] += aa[6] * bb[8];
-    c[14] += aa[7] * bb[7];
-    c[14] += aa[8] * bb[6];
-    c[14] += aa[9] * bb[5];
-    c[14] += aa[10] * bb[4];
-    c[14] += aa[11] * bb[3];
-    c[14] += aa[12] * bb[2];
-    c[14] += aa[13] * bb[1];
-    c[14] += aa[14] * bb[0];
-
-    // 30; Introduce 3 mores
-    aa[15] = a[15];
-    bb[15] = b[15];
-
-    // 33: a:16 + b:16 + c:1
-    c[15] = aa[0] * bb[15];
-    c[15] += aa[1] * bb[14];
-    c[15] += aa[2] * bb[13];
-    c[15] += aa[3] * bb[12];
-    c[15] += aa[4] * bb[11];
-    c[15] += aa[5] * bb[10];
-    c[15] += aa[6] * bb[9];
-    c[15] += aa[7] * bb[8];
-    c[15] += aa[8] * bb[7];
-    c[15] += aa[9] * bb[6];
-    c[15] += aa[10] * bb[5];
-    c[15] += aa[11] * bb[4];
-    c[15] += aa[12] * bb[3];
-    c[15] += aa[13] * bb[2];
-    c[15] += aa[14] * bb[1];
-    c[15] += aa[15] * bb[0];
-
-    // 32: a:15 + b:15 + c:2
-    c[16] = aa[1] * bb[15];
-    c[17] = aa[2] * bb[15];
-
-    c[16] += aa[2] * bb[14];
-    c[17] += aa[3] * bb[14];
-
-    c[16] += aa[3] * bb[13];
-    c[17] += aa[4] * bb[13];
-
-    c[16] += aa[4] * bb[12];
-    c[17] += aa[5] * bb[12];
-
-    c[16] += aa[5] * bb[11];
-    c[17] += aa[6] * bb[11];
-
-    c[16] += aa[6] * bb[10];
-    c[17] += aa[7] * bb[10];
-
-    c[16] += aa[7] * bb[9];
-    c[17] += aa[8] * bb[9];
-
-    c[16] += aa[8] * bb[8];
-    c[17] += aa[9] * bb[8];
-
-    c[16] += aa[9] * bb[7];
-    c[17] += aa[10] * bb[7];
-
-    c[16] += aa[10] * bb[6];
-    c[17] += aa[11] * bb[6];
-
-    c[16] += aa[11] * bb[5];
-    c[17] += aa[12] * bb[5];
-
-    c[16] += aa[12] * bb[4];
-    c[17] += aa[13] * bb[4];
-
-    c[16] += aa[13] * bb[3];
-    c[17] += aa[14] * bb[3];
-
-    c[16] += aa[14] * bb[2];
-    c[17] += aa[15] * bb[2];
-
-    // 31 = a:15 + b:15 + c:1
-    c[16] += aa[15] * bb[1];
-
-    // 32 = a:13 + b:13 + c:6
-    c[18] = aa[3] * bb[15];
-    c[19] = aa[4] * bb[15];
-    c[20] = aa[5] * bb[15];
-    c[21] = aa[6] * bb[15];
-    c[22] = aa[7] * bb[15];
-    c[23] = aa[8] * bb[15];
-
-    // 32
-    c[18] += aa[4] * bb[14];
-    c[19] += aa[5] * bb[14];
-    c[20] += aa[6] * bb[14];
-    c[21] += aa[7] * bb[14];
-    c[22] += aa[8] * bb[14];
-    c[23] += aa[9] * bb[14];
-
-    // 32
-    c[18] += aa[5] * bb[13];
-    c[19] += aa[6] * bb[13];
-    c[20] += aa[7] * bb[13];
-    c[21] += aa[8] * bb[13];
-    c[22] += aa[9] * bb[13];
-    c[23] += aa[10] * bb[13];
-
-    // 32
-    c[18] += aa[6] * bb[12];
-    c[19] += aa[7] * bb[12];
-    c[20] += aa[8] * bb[12];
-    c[21] += aa[9] * bb[12];
-    c[22] += aa[10] * bb[12];
-    c[23] += aa[11] * bb[12];
-
-    // 32
-    c[18] += aa[7] * bb[11];
-    c[19] += aa[8] * bb[11];
-    c[20] += aa[9] * bb[11];
-    c[21] += aa[10] * bb[11];
-    c[22] += aa[11] * bb[11];
-    c[23] += aa[12] * bb[11];
-
-    // 32
-    c[18] += aa[8] * bb[10];
-    c[19] += aa[9] * bb[10];
-    c[20] += aa[10] * bb[10];
-    c[21] += aa[11] * bb[10];
-    c[22] += aa[12] * bb[10];
-    c[23] += aa[13] * bb[10];
-
-    // 32
-    c[18] += aa[9] * bb[9];
-    c[19] += aa[10] * bb[9];
-    c[20] += aa[11] * bb[9];
-    c[21] += aa[12] * bb[9];
-    c[22] += aa[13] * bb[9];
-    c[23] += aa[14] * bb[9];
-
-    // 32
-    c[18] += aa[10] * bb[8];
-    c[19] += aa[11] * bb[8];
-    c[20] += aa[12] * bb[8];
-    c[21] += aa[13] * bb[8];
-    c[22] += aa[14] * bb[8];
-    c[23] += aa[15] * bb[8];
-
-    // 31
-    c[18] += aa[11] * bb[7];
-    c[19] += aa[12] * bb[7];
-    c[20] += aa[13] * bb[7];
-    c[21] += aa[14] * bb[7];
-    c[22] += aa[15] * bb[7];
-
-    // 30
-    c[18] += aa[12] * bb[6];
-    c[19] += aa[13] * bb[6];
-    c[20] += aa[14] * bb[6];
-    c[21] += aa[15] * bb[6];
-
-    // 29
-    c[18] += aa[13] * bb[5];
-    c[19] += aa[14] * bb[5];
-    c[20] += aa[15] * bb[5];
-
-    // 28
-    c[18] += aa[14] * bb[4];
-    c[19] += aa[15] * bb[4];
-
-    // 27
-    c[18] += aa[15] * bb[3];
-
-    // 22: a:7 + b:7 + c: 8
-    c[24] = aa[9] * bb[15];
-    c[25] = aa[10] * bb[15];
-    c[26] = aa[11] * bb[15];
-    c[27] = aa[12] * bb[15];
-    c[28] = aa[13] * bb[15];
-    c[29] = aa[14] * bb[15];
-    c[30] = aa[15] * bb[15];
-    c[31] = 0;
-
-    // 18
-    c[24] += aa[10] * bb[14];
-    c[25] += aa[11] * bb[14];
-    c[26] += aa[12] * bb[14];
-    c[27] += aa[13] * bb[14];
-    c[28] += aa[14] * bb[14];
-    c[29] += aa[15] * bb[14];
-
-    // 15
-    c[24] += aa[11] * bb[13];
-    c[25] += aa[12] * bb[13];
-    c[26] += aa[13] * bb[13];
-    c[27] += aa[14] * bb[13];
-    c[28] += aa[15] * bb[13];
-
-    // 12
-    c[24] += aa[12] * bb[12];
-    c[25] += aa[13] * bb[12];
-    c[26] += aa[14] * bb[12];
-    c[27] += aa[15] * bb[12];
+    uint16x8x2_t bb;
+    uint16x8x2_t tmp;
+    uint16x8_t aa, zero; 
+
+    bb = vld1q_u16_x2(b);
+    zero = vdupq_n_u16(0);
+
+    // 0
+    aa = vdupq_n_u16(a[0]);
+    sb_vmul(tmp.val[0], bb.val[0], aa);
+    sb_vmul(tmp.val[1], bb.val[1], aa);
+    sb_vstore(&c[0], tmp.val[0]);
+    
+    // 1
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[1]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[1], tmp.val[0]);
+
+    // 2 
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[2]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[2], tmp.val[0]);
+
+    // 3
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[3]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[3], tmp.val[0]);
+
+    // 4
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[4]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[4], tmp.val[0]);
+
+    // 5
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[5]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[5], tmp.val[0]);
+
+    // 6
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[6]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[6], tmp.val[0]);
+
+    // 7
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[7]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[7], tmp.val[0]);
+
+    // 8
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[8]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[8], tmp.val[0]);
 
     // 9
-    c[24] += aa[13] * bb[11];
-    c[25] += aa[14] * bb[11];
-    c[26] += aa[15] * bb[11];
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
 
-    // 6 = a:2 + b:2 + c: 2
-    c[24] += aa[14] * bb[10];
-    c[25] += aa[15] * bb[10];
+    aa = vdupq_n_u16(a[9]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[9], tmp.val[0]);
 
-    // 3 = a:1 + b:1 + c:1
-    c[24] += aa[15] * bb[9];
+    // 10
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[10]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[10], tmp.val[0]);
+
+    // 11
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[11]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[11], tmp.val[0]);
+
+    // 12
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[12]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[12], tmp.val[0]);
+
+    // 13
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[13]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[13], tmp.val[0]);
+
+    // 14
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[14]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[14], tmp.val[0]);
+
+    // 15
+    tmp.val[0] = vextq_u16(tmp.val[0], tmp.val[1], 1);
+    tmp.val[1] = vextq_u16(tmp.val[1], zero, 1);
+
+    aa = vdupq_n_u16(a[15]);
+    sb_vmla(tmp.val[0], bb[0], aa);
+    sb_vmla(tmp.val[1], bb[1], aa);
+    sb_vstore(&c[15], tmp.val[0]);
+
+    c[31] = 0;
 }
