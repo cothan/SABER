@@ -5,12 +5,14 @@
 #include "../api.h"
 #include "../SABER_params.h"
 #include "../poly.h"
-#include "cpucycles.h"
-#include "speed_print.h"
+// #include "cpucycles.h"
+// #include "speed_print.h"
+#include <time.h>
+#include "../print.h"
 
-#define NTESTS 100000
+#define NTESTS 1000000
 
-uint64_t t[NTESTS];
+// uint64_t t[NTESTS];
 uint8_t seed[SABER_SEEDBYTES] = {0};
 
 int main()
@@ -23,37 +25,72 @@ int main()
   
   uint16_t matrix[SABER_L][SABER_L][SABER_N] = {0};
   uint16_t s[SABER_L][SABER_N] = {0};
+  uint16_t a[SABER_L][SABER_N] = {0};
+  uint16_t b[SABER_L][SABER_N] = {0};
+  uint16_t acc[SABER_N] = {0};
+  clock_t start, end;
 
-
+  
+  start = clock();
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
+    // t[i] = cpucycles();
     GenMatrix(matrix, seed);
   }
-  print_results("GenMatrix: ", t, NTESTS);
-
+  end = clock() - start;
+  print("GenMatrix:", ((double) end)/NTESTS);
+  // print_results("GenMatrix: ", t, NTESTS);
+  
+  start = clock();
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
+    // t[i] = cpucycles();
     GenSecret(s, seed);
   }
-  print_results("GenSecret: ", t, NTESTS);
-
+  end = clock() - start;
+  print("GenSecret:", ((double) end)/NTESTS);
+  // print_results("GenSecret: ", t, NTESTS);
+  
+  start = clock();
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
+    // t[i] = cpucycles();
     crypto_kem_keypair(pk, sk);
   }
-  print_results("saber_keypair: ", t, NTESTS);
-
+  end = clock() - start;
+  print("crypto_kem_keypair:", ((double) end)/NTESTS);
+  // print_results("saber_keypair: ", t, NTESTS);
+  
+  start = clock();
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
+    // t[i] = cpucycles();
     crypto_kem_enc(ct, key, pk);
   }
-  print_results("saber_encaps: ", t, NTESTS);
-
+  end = clock() - start;
+  print("crypto_kem_enc:", ((double) end)/NTESTS);
+  // print_results("saber_encaps: ", t, NTESTS);
+  
+  start = clock();
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
+    // t[i] = cpucycles();
     crypto_kem_dec(key, ct, sk);
   }
-  print_results("saber_decaps: ", t, NTESTS);
+  end = clock() - start;
+  print("crypto_kem_dec:", ((double) end)/NTESTS);
+  // print_results("saber_decaps: ", t, NTESTS);
+
+  start = clock();
+  for(i=0;i<NTESTS;i++) {
+    InnerProd(a, b, acc);
+  }
+  end = clock() - start;
+  print("InnerProd:", ((double) end)/NTESTS);
+
+  start = clock();
+  for(i=0;i<NTESTS;i++) {
+    MatrixVectorMul(matrix, s, b, 1);
+  }
+  end = clock() - start;
+  print("MatrixVectorMul:", ((double) end)/NTESTS);
+
+
 
   return 0;
 }
