@@ -1,8 +1,9 @@
-CC 		  = /usr/bin/gcc
-CFLAGS  = -Wall -Wextra -Wmissing-prototypes -Wredundant-decls -O3 -fomit-frame-pointer -march=native
+CC 		  = clang
+CFLAGS  = -Wall -Wextra -Wmissing-prototypes -Wredundant-decls -O3 -fomit-frame-pointer -mtune=native -fwrapv -Qunused-arguments
 NISTFLAGS  = -Wno-unused-result -O3 -fomit-frame-pointer -march=native -std=c99 
 CLANG   = clang -march=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments
 RM 		  = /bin/rm
+LIBPAPI = lib/libpapi.a
 
 
 all: test/PQCgenKAT_kem \
@@ -26,22 +27,22 @@ test/kem: $(SOURCES) $(HEADERS) rng.o test/kem.c
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) rng.o test/kem.c -lcrypto
 
 test/speedusec512: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
-	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c -lpapi -lcrypto
+	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c $(LIBPAPI) -lcrypto
 
 test/speedusec768: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
-	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c -lpapi -lcrypto
+	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c $(LIBPAPI) -lcrypto
 
 test/speedusec1024: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
-	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c -lpapi -lcrypto
+	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c $(LIBPAPI) -lcrypto
 
 test/speed512: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c -lpapi -lcrypto
+	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c $(LIBPAPI) -lcrypto
 
 test/speed768: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c -lpapi -lcrypto
+	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c $(LIBPAPI) -lcrypto
 
 test/speed1024: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c -lpapi -lcrypto
+	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c $(LIBPAPI) -lcrypto
 
 rng.o: rng.c
 	$(CC) $(NISTFLAGS) -c rng.c -lcrypto -o $@ 
