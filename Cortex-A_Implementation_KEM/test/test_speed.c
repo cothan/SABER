@@ -5,13 +5,11 @@
 #include "../api.h"
 #include "../SABER_params.h"
 #include "../poly.h"
-#include "cpucycles.h"
-#include "speed_print.h"
 #include "../neon_poly_rq_mul.h"
+#include <papi.h>
 
 #define NTESTS 100000
 
-uint64_t t[NTESTS];
 uint8_t seed[SABER_SEEDBYTES] = {0};
 
 int main()
@@ -24,37 +22,53 @@ int main()
   
   uint16_t matrix[SABER_L][SABER_L][SABER_N] = {0};
   uint16_t s[SABER_L][SABER_N] = {0};
+  uint16_t a[SABER_L][SABER_N] = {0};
+  uint16_t b[SABER_L][SABER_N] = {0};
+  uint16_t acc[SABER_N] = {0};
 
-
+  PAPI_hl_region_begin("GenMatrix");
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
     GenMatrix(matrix, seed);
   }
-  print_results("GenMatrix: ", t, NTESTS);
+  PAPI_hl_region_end("GenMatrix");
 
+  PAPI_hl_region_begin("GenSecret");
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
     GenSecret(s, seed);
   }
-  print_results("GenSecret: ", t, NTESTS);
+  PAPI_hl_region_end("GenSecret");
 
+  PAPI_hl_region_begin("crypto_kem_keypair");
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
     crypto_kem_keypair(pk, sk);
   }
-  print_results("saber_keypair: ", t, NTESTS);
+  PAPI_hl_region_end("crypto_kem_keypair");
 
+  PAPI_hl_region_begin("crypto_kem_enc");
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
     crypto_kem_enc(ct, key, pk);
   }
-  print_results("saber_encaps: ", t, NTESTS);
+  PAPI_hl_region_end("crypto_kem_enc");
 
+  PAPI_hl_region_begin("crypto_kem_dec");
   for(i=0;i<NTESTS;i++) {
-    t[i] = cpucycles();
     crypto_kem_dec(key, ct, sk);
   }
-  print_results("saber_decaps: ", t, NTESTS);
+  PAPI_hl_region_end("crypto_kem_dec");
+
+  PAPI_hl_region_begin("neonInnerProd");
+  for(i=0;i<NTESTS;i++) {
+    neonInnerProd(acc, a, b, s[0], 0);
+  }
+  PAPI_hl_region_end("neonInnerProd");
+
+  PAPI_hl_region_begin("neonMatrixVectorMul");
+  for(i=0;i<NTESTS;i++) {
+    neonMatrixVectorMul(b, matrix, s, 1);
+  }
+  PAPI_hl_region_end("neonMatrixVectorMul");
+
+
 
   return 0;
 }

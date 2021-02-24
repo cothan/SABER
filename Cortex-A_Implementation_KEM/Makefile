@@ -26,23 +26,23 @@ test/PQCgenKAT_kem: $(SOURCES) $(HEADERS) rng.o test/PQCgenKAT_kem.c
 test/kem: $(SOURCES) $(HEADERS) rng.o test/kem.c
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) rng.o test/kem.c -lcrypto
 
-test/speedusec512: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
-	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c $(LIBPAPI) -lcrypto
+test/speedusec512: $(SOURCES) $(HEADERS) rng.c  test/test_speed_usec.c
+	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c  test/test_speed_usec.c $(LIBPAPI) -lcrypto
 
-test/speedusec768: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
-	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c $(LIBPAPI) -lcrypto
+test/speedusec768: $(SOURCES) $(HEADERS) rng.c  test/test_speed_usec.c
+	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c  test/test_speed_usec.c $(LIBPAPI) -lcrypto
 
-test/speedusec1024: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c
-	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed_usec.c $(LIBPAPI) -lcrypto
+test/speedusec1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed_usec.c
+	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c  test/test_speed_usec.c $(LIBPAPI) -lcrypto
 
-test/speed512: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c $(LIBPAPI) -lcrypto
+test/speed512: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c  test/test_speed.c $(LIBPAPI) -lcrypto
 
-test/speed768: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c $(LIBPAPI) -lcrypto
+test/speed768: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c  test/test_speed.c $(LIBPAPI) -lcrypto
 
-test/speed1024: $(SOURCES) $(HEADERS) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/cpucycles.c test/speed_print.c test/test_speed.c $(LIBPAPI) -lcrypto
+test/speed1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c  test/test_speed.c $(LIBPAPI) -lcrypto
 
 rng.o: rng.c
 	$(CC) $(NISTFLAGS) -c rng.c -lcrypto -o $@ 
@@ -58,9 +58,9 @@ test:
 	./test/kem
 
 bench:
-	./test/speed512
-	./test/speed768
-	./test/speed1024
+	./test/speed512 ; cat papi_hl_output/rank* | grep PAPI_TOT_CYC
+	./test/speed768 ; cat papi_hl_output/rank* | grep PAPI_TOT_CYC
+	./test/speed1024 ; cat papi_hl_output/rank* | grep PAPI_TOT_CYC
 
 clean:
 	-$(RM) -f *.o
