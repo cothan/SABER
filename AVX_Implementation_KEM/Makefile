@@ -1,5 +1,5 @@
-CC 		  = /usr/bin/gcc
-CFLAGS  = -Wall -Wextra -O3 -fomit-frame-pointer -msse2avx -mavx2 -march=native -lcrypto
+CC 		  = cc
+CFLAGS  = -Wall -Wextra -O3 -fomit-frame-pointer -msse2avx -mavx2 -march=native -mtune=native -lcrypto
 CFLAGS2  = -Wno-unused-results -O3 -fomit-frame-pointer -msse2avx -mavx2 -march=native -std=c11 
 CFLAGS3  = -Wall -Wextra -O3 -fomit-frame-pointer -msse2avx -mavx2 -march=native
 CLANG   = clang -march=native -O3 -fomit-frame-pointer -lcrypto -fwrapv -Qunused-arguments -w
@@ -10,7 +10,12 @@ all: test/PQCgenKAT_kem \
      test/test_kex \
      test/test_sample_matrix
 
-SOURCES = pack_unpack.c verify.c fips202.o SABER_indcpa.c kem.c cbd.c rng.o
+speed: \
+	test/speed512 \
+	test/speed768 \
+	test/speed1024
+
+SOURCES = pack_unpack.c verify.c fips202.o SABER_indcpa.c kem.c cbd.c rng.o cpucycles.c
 					
 
 SOURCES2 = pack_unpack.c rng.o verify.c fips202.o SABER_indcpa.c kem.c cbd.c 
@@ -27,6 +32,15 @@ test/test_sample_matrix: $(SOURCES) $(HEADERS) test/sample_matrix_test.c
 
 test/PQCgenKAT_kem: $(SOURCES2) $(HEADERS) test/PQCgenKAT_kem.c 
 	$(CC) $(CFLAGS3) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c -lcrypto  
+
+test/speed512: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
+
+test/speed768: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
+
+test/speed1024: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
 
 rng.o: rng.c
 	$(CC) $(CFLAGS2) -c rng.c -lcrypto -o $@ 
@@ -47,4 +61,7 @@ clean:
 	-$(RM) -rf test/test_kex
 	-$(RM) -rf test/PQCgenKAT_kem
 
-
+bench:
+	./test/speed512
+	./test/speed768
+	./test/speed1024 
