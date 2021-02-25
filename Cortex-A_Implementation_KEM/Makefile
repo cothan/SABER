@@ -3,6 +3,8 @@ CFLAGS  = -Wall -Wextra -Wmissing-prototypes -Wredundant-decls -O3 -fomit-frame-
 NISTFLAGS  = -Wno-unused-result -O3 -fomit-frame-pointer -mtune=native -std=c99 
 CLANG   = clang -mtune=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments
 RM 		  = /bin/rm
+LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
+CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
 
 
 all: test/PQCgenKAT_kem \
@@ -44,7 +46,7 @@ test/speed1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
 	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c  test/test_speed.c  -lcrypto
 
 rng.o: rng.c
-	$(CC) $(NISTFLAGS) -c rng.c -lcrypto -o $@ 
+	$(CC) $(NISTFLAGS) $(CPPFLAGS) $(LDFLAGS) -c rng.c -lcrypto -o $@ 
 
 # fips202.o: fips202.c
 # 	$(CLANG) -c $^ -o $@
