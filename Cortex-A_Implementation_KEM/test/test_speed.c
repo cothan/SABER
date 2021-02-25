@@ -37,7 +37,7 @@ int main()
     GenMatrix(matrix, seed);
   }
   end = clock() - start;
-  print("GenMatrix:", ((double) end)/NTESTS);
+  print("GenMatrix:", ((double) end)/CLOCKS_PER_SEC);
   // print_results("GenMatrix: ", t, NTESTS);
 
   start = clock();
@@ -46,7 +46,7 @@ int main()
     GenSecret(s, seed);
   }
   end = clock() - start;
-  print("GenSecret:", ((double) end)/NTESTS);
+  print("GenSecret:", ((double) end)/CLOCKS_PER_SEC);
   // print_results("GenSecret: ", t, NTESTS);
 
   start = clock();
@@ -55,7 +55,7 @@ int main()
     crypto_kem_keypair(pk, sk);
   }
   end = clock() - start;
-  print("crypto_kem_keypair:", ((double) end)/NTESTS);
+  print("crypto_kem_keypair:", ((double) end)/CLOCKS_PER_SEC);
   // print_results("saber_keypair: ", t, NTESTS);
 
   start = clock();
@@ -64,7 +64,7 @@ int main()
     crypto_kem_enc(ct, key, pk);
   }
   end = clock() - start;
-  print("crypto_kem_enc:", ((double) end)/NTESTS);
+  print("crypto_kem_enc:", ((double) end)/CLOCKS_PER_SEC);
   // print_results("saber_encaps: ", t, NTESTS);
 
   start = clock();
@@ -73,7 +73,7 @@ int main()
     crypto_kem_dec(key, ct, sk);
   }
   end = clock() - start;
-  print("crypto_kem_dec:", ((double) end)/NTESTS);
+  print("crypto_kem_dec:", ((double) end)/CLOCKS_PER_SEC);
   // print_results("saber_decaps: ", t, NTESTS);
 
   start = clock();
@@ -81,16 +81,16 @@ int main()
     neonInnerProd(acc, a, b, s[0], 0);
   }
   end = clock() - start;
-  print("neonInnerProd:", ((double) end)/NTESTS);
+  print("neonInnerProd:", ((double) end)/CLOCKS_PER_SEC);
 
   start = clock();
   for(i=0;i<NTESTS;i++) {
     neonMatrixVectorMul(b, matrix, s, 1);
   }
   end = clock() - start;
-  print("neonMatrixVectorMul:", ((double) end)/NTESTS);
+  print("neonMatrixVectorMul:", ((double) end)/CLOCKS_PER_SEC);
 
-
+  print("CLOCKS_PER_SEC:", CLOCKS_PER_SEC);
 
   return 0;
 }
