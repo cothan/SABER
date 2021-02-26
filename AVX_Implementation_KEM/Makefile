@@ -18,7 +18,7 @@ speed: \
 SOURCES = pack_unpack.c verify.c fips202.o SABER_indcpa.c kem.c cbd.c rng.o cpucycles.c
 					
 
-SOURCES2 = pack_unpack.c rng.o verify.c fips202.o SABER_indcpa.c kem.c cbd.c 
+SOURCES2 = pack_unpack.c rng.o verify.c fips202.o SABER_indcpa.c kem.c cbd.c cpucycles.c 
 					
 
 HEADERS = SABER_params.h pack_unpack.h verify.h cbd.h SABER_indcpa.h kem.h rng.h fips202.h api.h
@@ -33,14 +33,14 @@ test/test_sample_matrix: $(SOURCES) $(HEADERS) test/sample_matrix_test.c
 test/PQCgenKAT_kem: $(SOURCES2) $(HEADERS) test/PQCgenKAT_kem.c 
 	$(CC) $(CFLAGS3) -o $@ $(SOURCES2) test/PQCgenKAT_kem.c -lcrypto  
 
-test/speed512: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
+test/speed512: $(SOURCES2) $(HEADERS) rng.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=2 -o $@ $(SOURCES2)  test/test_speed.c  -lcrypto
 
-test/speed768: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
+test/speed768: $(SOURCES2) $(HEADERS) rng.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=3 -o $@ $(SOURCES2)  test/test_speed.c  -lcrypto
 
-test/speed1024: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
-	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
+test/speed1024: $(SOURCES2) $(HEADERS) rng.c test/test_speed.c
+	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES2) test/test_speed.c  -lcrypto
 
 rng.o: rng.c
 	$(CC) $(CFLAGS2) -c rng.c -lcrypto -o $@ 

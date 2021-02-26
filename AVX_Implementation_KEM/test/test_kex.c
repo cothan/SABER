@@ -16,7 +16,7 @@
 #include <immintrin.h>
 #include <string.h>
 
-#include <papi.h>
+// #include <papi.h>
 
 
 extern int crypto_kem_keypair(unsigned char *pk, unsigned char *sk);
@@ -35,11 +35,7 @@ int test_kem_cca()
   unsigned char entropy_input[48];
 	
   uint64_t i, j, repeat;
-<<<<<<< HEAD
-  repeat=100000;
-=======
   repeat=10000;
->>>>>>> bd6e1e9... add test speed using papi only
   //repeat = 1;
 
   uint64_t CLOCK1,CLOCK2;

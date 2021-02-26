@@ -16,7 +16,12 @@
 
 #define h2 ( (1<<(SABER_EP-2)) - (1<<(SABER_EP-SABER_ET-1)) + (1<<(SABER_EQ-SABER_EP-1)) )
 
+uint64_t clock_mul, clock_matrix, clock_secret, count_mul;
 
+uint64_t clock_mv_vv_mul;
+
+uint64_t count_enc;
+__m256i mask,inv3_avx,inv9_avx,inv15_avx,int45_avx,int30_avx,int0_avx;
 
 uint64_t mask_ar[4]={~(0UL)};
 __m256i mask_load;

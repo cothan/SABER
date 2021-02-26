@@ -14,6 +14,9 @@ int crypto_kem_keypair(unsigned char *pk, unsigned char *sk)
 {
   uint64_t CLOCK1, CLOCK2;
   int i;
+  uint64_t clock_kp_kex, clock_enc_kex, clock_dec_kex;
+  uint64_t clock_kp_temp;
+
 
   CLOCK1=cpucycles(); 
   indcpa_kem_keypair(pk, sk);					      // sk[0:SABER_INDCPA_SECRETKEYBYTES-1] <-- sk
@@ -39,6 +42,7 @@ int crypto_kem_enc(unsigned char *c, unsigned char *k, const unsigned char *pk)
   uint64_t CLOCK1, CLOCK2;
   unsigned char kr[64];                             	  // Will contain key, coins
   unsigned char buf[64];                          
+  uint64_t clock_kp_kex, clock_enc_kex, clock_dec_kex;
 
   randombytes(buf, 32);
 
@@ -68,6 +72,7 @@ int crypto_kem_dec(unsigned char *k, const unsigned char *c, const unsigned char
   unsigned char buf[64];
   unsigned char kr[64];                             // Will contain key, coins
   const unsigned char *pk = sk + SABER_INDCPA_SECRETKEYBYTES;
+  uint64_t clock_kp_kex, clock_enc_kex, clock_dec_kex;
 
    indcpa_kem_dec(sk, c, buf);			     // buf[0:31] <-- message
 
