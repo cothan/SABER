@@ -12,7 +12,11 @@
 
 #define NTESTS 1000000
 
-// uint64_t t[NTESTS];
+#define TIME(s) clock_gettime(CLOCK_MONOTONIC_RAW, &s);
+// Result is nanosecond per call 
+#define  CALC(start, stop) \
+  ((double) ((stop.tv_sec - start.tv_sec) * 1000000000 + (stop.tv_nsec - start.tv_nsec))) / NTESTS;
+
 uint8_t seed[SABER_SEEDBYTES] = {0};
 
 int main()
@@ -28,67 +32,66 @@ int main()
   uint16_t a[SABER_L][SABER_N] = {0};
   uint16_t b[SABER_L][SABER_N] = {0};
   uint16_t acc[SABER_N] = {0};
-  clock_t start, end;
+  struct timespec start, stop;
+  long ns;
+  
 
   
-  start = clock();
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
-    // t[i] = cpucycles();
     GenMatrix(matrix, seed);
   }
-  end = clock() - start;
-  print("GenMatrix:", ((double) end)/CLOCKS_PER_SEC);
-  // print_results("GenMatrix: ", t, NTESTS);
+  TIME(stop);
+  ns = CALC(start, stop);
+  print("GenMatrix:", ns);
   
-  start = clock();
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
-    // t[i] = cpucycles();
     GenSecret(s, seed);
   }
-  end = clock() - start;
-  print("GenSecret:", ((double) end)/CLOCKS_PER_SEC);
-  // print_results("GenSecret: ", t, NTESTS);
+  TIME(stop);
+  ns = CALC(start, stop);
+  print("GenSecret:", ns);
   
-  start = clock();
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
-    // t[i] = cpucycles();
     crypto_kem_keypair(pk, sk);
   }
-  end = clock() - start;
-  print("crypto_kem_keypair:", ((double) end)/CLOCKS_PER_SEC);
-  // print_results("saber_keypair: ", t, NTESTS);
+  TIME(stop);
+  ns = CALC(start, stop);
+  print("crypto_kem_keypair:", ns);
   
-  start = clock();
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
-    // t[i] = cpucycles();
     crypto_kem_enc(ct, key, pk);
   }
-  end = clock() - start;
-  print("crypto_kem_enc:", ((double) end)/CLOCKS_PER_SEC);
-  // print_results("saber_encaps: ", t, NTESTS);
+  TIME(stop);
+  ns = CALC(start, stop);
+  print("crypto_kem_enc:", ns);
   
-  start = clock();
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
-    // t[i] = cpucycles();
     crypto_kem_dec(key, ct, sk);
   }
-  end = clock() - start;
-  print("crypto_kem_dec:", ((double) end)/CLOCKS_PER_SEC);
-  // print_results("saber_decaps: ", t, NTESTS);
+  TIME(stop);
+  ns = CALC(start, stop);
+  print("crypto_kem_dec:", ns);
 
-  start = clock();
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     InnerProd(a, b, acc);
   }
-  end = clock() - start;
-  print("InnerProd:", ((double) end)/CLOCKS_PER_SEC);
+  TIME(stop);
+  ns = CALC(start, stop);
+  print("InnerProd:", ns);
 
-  start = clock();
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     MatrixVectorMul(matrix, s, b, 1);
   }
-  end = clock() - start;
-  print("MatrixVectorMul:", ((double) end)/CLOCKS_PER_SEC);
+  TIME(stop);
+  ns = CALC(start, stop);
+  print("MatrixVectorMul:", ns);
 
   print("CLOCKS_PER_SEC:", CLOCKS_PER_SEC);
 
