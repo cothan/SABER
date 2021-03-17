@@ -6,15 +6,14 @@
 #include "../SABER_params.h"
 #include "../poly.h"
 #include "../neon_poly_rq_mul.h"
-#include <time.h>
-#include "../print.h"
+#include "../m1cycles.h"
 
 #define NTESTS 1000000
 
-#define TIME(s) clock_gettime(CLOCK_MONOTONIC_RAW, &s);
-// Result is nanosecond per call 
-#define  CALC(start, stop) \
-  ((double) ((stop.tv_sec - start.tv_sec) * 1000000000 + (stop.tv_nsec - start.tv_nsec))) / NTESTS;
+#define TIME(s) s = rdtsc();
+// Result is clock cycles 
+#define  CALC(start, stop) (stop - start) / NTESTS;
+
 
 uint8_t seed[SABER_SEEDBYTES] = {0};
 
@@ -25,8 +24,8 @@ int main()
   unsigned char sk[CRYPTO_SECRETKEYBYTES] = {0};
   unsigned char ct[CRYPTO_CIPHERTEXTBYTES] = {0};
   unsigned char key[CRYPTO_BYTES] = {0};
-  struct timespec start, stop;
-  long ns;
+  long long start, stop;
+  long long ns;
   
   uint16_t matrix[SABER_L][SABER_L][SABER_N] = {0};
   uint16_t s[SABER_L][SABER_N] = {0};
@@ -34,13 +33,17 @@ int main()
   uint16_t b[SABER_L][SABER_N] = {0};
   uint16_t acc[SABER_N] = {0};
 
+  // setup cycles
+  setup_rdtsc();
+
+
   TIME(start);
   for(i=0;i<NTESTS;i++) {
     GenMatrix(matrix, seed);
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("GenMatrix:", ns);
+  printf("GenMatrix: %lld\n", ns);
 
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -48,7 +51,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("GenSecret:", ns);
+  printf("GenSecret: %lld\n", ns);
 
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -56,7 +59,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("crypto_kem_keypair:", ns);
+  printf("crypto_kem_keypair: %lld\n", ns);
 
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -64,7 +67,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("crypto_kem_enc:", ns);
+  printf("crypto_kem_enc: %lld\n", ns);
 
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -72,7 +75,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("crypto_kem_dec:", ns);
+  printf("crypto_kem_dec: %lld\n", ns);
 
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -80,7 +83,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("neonInnerProd:", ns);
+  printf("neonInnerProd: %lld\n", ns);
 
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -88,9 +91,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("neonMatrixVectorMul:", ns);
-
-  print("CLOCKS_PER_SEC:", CLOCKS_PER_SEC);
+  printf("neonMatrixVectorMul: %lld\n", ns);
 
   return 0;
 }

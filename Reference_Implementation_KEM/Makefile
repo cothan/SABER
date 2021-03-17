@@ -38,14 +38,14 @@ test/speedusec768: $(SOURCES) $(HEADERS) rng.c test/test_speed_usec.c
 test/speedusec1024: $(SOURCES) $(HEADERS) rng.c test/test_speed_usec.c
 	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/test_speed_usec.c  -lcrypto
 
-test/speed512: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
+test/speed512: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) m1cycles.c rng.c  test/test_speed.c  -lcrypto
 
-test/speed768: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
+test/speed768: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=3 -o $@ $(SOURCES) m1cycles.c rng.c  test/test_speed.c  -lcrypto
 
-test/speed1024: $(SOURCES) $(HEADERS) rng.c test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto
+test/speed1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) m1cycles.c rng.c  test/test_speed.c  -lcrypto
 
 rng.o: rng.c
 	$(CC) $(NISTFLAGS) $(CPPFLAGS) $(LDFLAGS) -c rng.c -lcrypto -o $@ 
