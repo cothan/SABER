@@ -1,11 +1,13 @@
-// For Apple M1: https://gist.github.com/dougallj/5bafb113492047c865c0c8cfbc930155#file-m1_robsize-c-L390
-#include <assert.h>
+/* 
+ * Duc Tri Nguyen (CERG GMU)
+ * Modified from M1: 
+ * https://gist.github.com/dougallj/5bafb113492047c865c0c8cfbc930155#file-m1_robsize-c-L390
+ */
+
 #include <dlfcn.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/mman.h>
-#include <libkern/OSCacheControl.h>
 #include "m1cycles.h"
 
 #define KPERF_LIST                               \
