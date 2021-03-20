@@ -13,7 +13,7 @@
 #include "../rng.h"
 #include "../api.h"
 #include "../SABER_params.h"
-#include "../cpucycles.c"
+#include "../cpucycles.h"
 
 #define	MAX_MARKER_LEN		50
 #define KAT_SUCCESS          0

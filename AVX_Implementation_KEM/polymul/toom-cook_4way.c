@@ -11,6 +11,7 @@ void KARA_interpol(__m256i *c_bucket, __m256i* result_final0, __m256i* result_fi
 void KARA_eval(__m256i* b, __m256i *b_bucket);
 void TC_eval(__m256i* b_avx, __m256i* b_bucket);
 
+__m256i mask,inv3_avx,inv9_avx,inv15_avx,int45_avx,int30_avx,int0_avx;
 
 void batch_64coefficient_multiplications_new(__m256i* a, __m256i* b_bucket, __m256i* c_bucket, int f)//all 7 Karatsuba evaluation and interpolation are done in AVX.
 {

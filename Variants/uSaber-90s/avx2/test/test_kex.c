@@ -6,7 +6,7 @@
 //#include "../randombytes.h"
 #include "../rng.h"
 
-#include "../cpucycles.c"
+#include "../cpucycles.h"
 #include "../verify.h"
 
 #include <stdio.h>

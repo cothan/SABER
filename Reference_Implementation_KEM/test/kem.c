@@ -3,7 +3,7 @@
 #include "../rng.h"
 #include "../SABER_indcpa.h"
 #include "../verify.h"
-#include "cpucycles.c"
+#include "cpucycles.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>

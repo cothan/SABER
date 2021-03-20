@@ -2,7 +2,7 @@
 #include "../rng.h"
 #include "../SABER_indcpa.h"
 #include "../kem.h"
-#include "../cpucycles.c"
+#include "../cpucycles.h"
 #include "../verify.h"
 #include <stdio.h>
 #include <stdint.h>

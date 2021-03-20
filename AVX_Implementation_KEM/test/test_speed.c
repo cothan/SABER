@@ -6,14 +6,12 @@
 #include "../SABER_params.h"
 #include "../SABER_indcpa.h"
 #include <time.h>
-#include "../print.h"
 
 #define NTESTS 1000000
 
-#define TIME(s) clock_gettime(CLOCK_MONOTONIC_RAW, &s);
+#define TIME(s) s = cpucycles();
 // Result is nanosecond per call 
-#define  CALC(start, stop) \
-  ((double) ((stop.tv_sec - start.tv_sec) * 1000000000 + (stop.tv_nsec - start.tv_nsec))) / NTESTS;
+#define  CALC(start, stop) (stop - start) / NTESTS;
 
 
 uint8_t seed[SABER_SEEDBYTES] = {0};
@@ -32,8 +30,8 @@ int main()
   uint16_t a[SABER_L][SABER_N] = {0};
   uint16_t b[SABER_L][SABER_N] = {0};
   uint16_t acc[SABER_N] = {0};
-  struct timespec start, stop;
-  long ns;
+  long long start, stop;
+  long long ns;
 
 
   
@@ -43,7 +41,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("GenMatrix:", ns);
+  printf("GenMatrix: %lld\n", ns);
   
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -51,7 +49,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("GenSecret:", ns);
+  printf("GenSecret: %lld\n", ns);
   
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -59,7 +57,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("crypto_kem_keypair:", ns);
+  printf("crypto_kem_keypair: %lld\n", ns);
   
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -67,7 +65,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("crypto_kem_enc:", ns);
+  printf("crypto_kem_enc: %lld\n", ns);
   
   TIME(start);
   for(i=0;i<NTESTS;i++) {
@@ -75,7 +73,7 @@ int main()
   }
   TIME(stop);
   ns = CALC(start, stop);
-  print("crypto_kem_dec:", ns);
+  printf("crypto_kem_dec: %lld\n", ns);
 
   // TIME(start);
   // for(i=0;i<NTESTS;i++) {
@@ -83,7 +81,7 @@ int main()
   // }
   // TIME(stop);
   // ns = CALC(start, stop);
-  // print("InnerProd:", ns);
+  // printf("InnerProd: %lld\n", ns);
 
   // TIME(start);
   // for(i=0;i<NTESTS;i++) {
@@ -91,7 +89,7 @@ int main()
   // }
   // TIME(stop);
   // ns = CALC(start, stop);
-  // print("MatrixVectorMul:", ns);
+  // printf("MatrixVectorMul: %lld\n", ns);
 
 
 
