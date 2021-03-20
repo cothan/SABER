@@ -62,6 +62,7 @@ clean:
 	-$(RM) -rf test/PQCgenKAT_kem
 
 bench:
+	sudo cpupower frequency-set --governor performance
 	./test/speed512
 	./test/speed768
 	./test/speed1024 
