@@ -31,7 +31,19 @@ int main()
   uint16_t s[SABER_L][SABER_N] = {0};
   uint16_t a[SABER_L][SABER_N] = {0};
   uint16_t b[SABER_L][SABER_N] = {0};
-  uint16_t acc[SABER_N] = {0};
+  uint16_t acc[2*SABER_N] = {0};
+
+  uint16_t *w[7];
+  uint16_t tmp[7 * SABER_N/2] = {0};
+
+  w[0] = &tmp[0 * SABER_N/2];
+  w[1] = &tmp[1 * SABER_N/2];
+  w[2] = &tmp[2 * SABER_N/2];
+  w[3] = &tmp[3 * SABER_N/2];
+  w[4] = &tmp[4 * SABER_N/2];
+  w[5] = &tmp[5 * SABER_N/2];
+  w[6] = &tmp[6 * SABER_N/2];
+
 
   // setup cycles
   setup_rdtsc();
@@ -92,6 +104,32 @@ int main()
   TIME(stop);
   ns = CALC(start, stop);
   printf("neonMatrixVectorMul: %lld\n", ns);
+
+  TIME(start);
+  for(i=0;i<NTESTS;i++) {
+    tc4_evaluate_neon_SB1(w, acc);
+  }
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("tc4_evaluate_neon_SB1: %lld\n", ns);
+
+  TIME(start);
+  for(i=0;i<NTESTS;i++) {
+    tc4_interpolate_neon_SB1(acc, w);
+    neon_poly_neon_reduction(s[0], acc);
+  }
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("tc4_interpolate_neon_SB1: %lld\n", ns);
+
+  TIME(start);
+  for(i=0;i<NTESTS;i++) {
+    tc4_interpolate_neon_SB1(acc, w);
+  }
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("tc4_interpolate_neon_SB1 without ring reduction: %lld\n", ns);
+
 
   return 0;
 }

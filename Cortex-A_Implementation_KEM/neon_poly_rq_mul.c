@@ -277,7 +277,6 @@ void karat_neon_interpolate_combine(uint16_t *restrict poly, uint16_t *restrict 
 }
 
 // Ultilize all 32 SIMD registers
-static
 void tc4_evaluate_neon_SB1(uint16_t *restrict w[7], uint16_t poly[SABER_N])
 {
     uint16_t *c0 = poly,
@@ -386,7 +385,6 @@ void tc4_evaluate_neon_SB3(uint16_t w[7 * SB3], uint16_t poly[4 * SB3])
 }
 
 // Ultilize all 32 SIMD registers
-static
 void tc4_interpolate_neon_SB1(uint16_t *restrict poly, uint16_t *restrict w[7])
 {
     uint16x8x4_t r0, r1, r2, r3, r4, r5, r6, tmp;
@@ -703,8 +701,8 @@ void neon_poly_neon_reduction_dec(uint16_t poly[SABER_N],
     }
 }
 
-static inline void neon_poly_neon_reduction_add(uint16_t poly[SABER_N], 
-                                                uint16_t tmp[SABER_N * 2], 
+static inline void neon_poly_neon_reduction_add(uint16_t poly[SABER_N],
+                                                uint16_t tmp[SABER_N * 2],
                                                 const uint16_t MASK)
 {
     uint16x8_t mask;
@@ -723,6 +721,18 @@ static inline void neon_poly_neon_reduction_add(uint16_t poly[SABER_N],
         // b[i][j] + h1 
         vadd(res, res, const_h1);
         vsr(res, res, SABER_EQ - SABER_EP);
+        vstore(&poly[addr], res);
+    }
+}
+
+void neon_poly_neon_reduction(uint16_t poly[SABER_N], uint16_t tmp[SABER_N * 2])
+{
+    uint16x8x4_t res, tmp1, tmp2;
+    for (uint16_t addr = 0; addr < SABER_N; addr += 32)
+    {
+        vload(tmp1, &tmp[addr]);
+        vload(tmp2, &tmp[addr + SABER_N]);
+        vsub(res, tmp1, tmp2);
         vstore(&poly[addr], res);
     }
 }

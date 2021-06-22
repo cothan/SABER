@@ -33,4 +33,10 @@ void neonMatrixVectorMul(uint16_t vectorB[SABER_L][SABER_N],
                          uint16_t matrixA[SABER_L][SABER_L][SABER_N],
                          uint16_t vectorS[SABER_L][SABER_N], const unsigned int transpose);
 
+void tc4_evaluate_neon_SB1(uint16_t *restrict w[7], uint16_t poly[SABER_N]);
+
+void tc4_interpolate_neon_SB1(uint16_t *restrict poly, uint16_t *restrict w[7]);
+
+void neon_poly_neon_reduction(uint16_t poly[SABER_N], uint16_t tmp[SABER_N * 2]);
+
 #endif
