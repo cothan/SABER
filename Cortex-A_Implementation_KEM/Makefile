@@ -11,6 +11,11 @@ all: test/PQCgenKAT_kem \
      test/test_kex \
      test/kem \
 
+time: \
+	test/time512 \
+	test/time768 \
+	test/time1024
+
 speed: test/speed512 \
 	test/speed768 \
 	test/speed1024
@@ -45,6 +50,16 @@ test/speed768: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
 test/speed1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) m1cycles.c rng.c  test/test_speed.c  -lcrypto
 
+test/time512: $(SOURCES) $(HEADERS) rng.c test/test_time.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c  test/test_time.c  -lcrypto
+
+test/time768: $(SOURCES) $(HEADERS) rng.c test/test_time.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c  test/test_time.c  -lcrypto
+
+test/time1024: $(SOURCES) $(HEADERS) rng.c test/test_time.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c  test/test_time.c  -lcrypto
+
+
 rng.o: rng.c
 	$(CC) $(NISTFLAGS) $(CPPFLAGS) $(LDFLAGS) -c rng.c -lcrypto -o $@ 
 
@@ -76,4 +91,9 @@ clean:
 	-$(RM) -f test/speedusec512
 	-$(RM) -f test/speedusec768
 	-$(RM) -f test/speedusec1024
+
+benchtime:
+	./test/time512
+	./test/time768
+	./test/time1024
 
