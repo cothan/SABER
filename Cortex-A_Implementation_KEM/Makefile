@@ -22,7 +22,7 @@ speed: \
 	test/speed768 \
 	test/speed1024
 
-speed: \
+speed_macos: \
 	test/speed512_macos \
 	test/speed768_macos \
 	test/speed1024_macos
@@ -49,13 +49,13 @@ test/speedusec1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed_usec.c
 	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c  test/test_speed_usec.c  -lcrypto
 
 test/speed512: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c $(LIBPAPI) test/test_speed.c  -lcrypto
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto $(LIBPAPI) 
 
 test/speed768: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c $(LIBPAPI) test/test_speed.c  -lcrypto
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto $(LIBPAPI)
 
 test/speed1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c $(LIBPAPI) test/test_speed.c  -lcrypto
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c test/test_speed.c  -lcrypto $(LIBPAPI)
 
 test/speed512_macos: $(SOURCES) $(HEADERS) rng.c  test/test_speed_macos.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c m1cycles.c test/test_speed_macos.c  -lcrypto

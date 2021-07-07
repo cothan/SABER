@@ -8,7 +8,7 @@
 #include "../poly.h"
 #include "../neon_poly_rq_mul.h"
 
-#define NTESTS 1000000
+#define NTESTS 100000
 
 #define START(funcname) PAPI_hl_region_begin(funcname);
 #define END(funcname) PAPI_hl_region_end(funcname);
