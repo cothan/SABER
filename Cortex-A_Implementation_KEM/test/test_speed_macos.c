@@ -2,16 +2,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <papi.h>
 #include "../api.h"
 #include "../SABER_params.h"
 #include "../poly.h"
 #include "../neon_poly_rq_mul.h"
+#include "../m1cycles.h"
 
 #define NTESTS 1000000
 
-#define START(funcname) PAPI_hl_region_begin(funcname);
-#define END(funcname) PAPI_hl_region_end(funcname);
+#define TIME(s) s = rdtsc();
+// Result is clock cycles 
+#define  CALC(start, stop) (stop - start) / NTESTS;
 
 
 uint8_t seed[SABER_SEEDBYTES] = {0};
@@ -44,69 +45,91 @@ int main()
   w[6] = &tmp[6 * SABER_N/2];
 
 
+  // setup cycles
+  setup_rdtsc();
 
 
-  START("GenMatrix");
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     GenMatrix(matrix, seed);
   }
-  END("GenMatrix");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("GenMatrix: %lld\n", ns);
 
-  START("GenSecret");
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     GenSecret(s, seed);
   }
-  END("GenSecret");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("GenSecret: %lld\n", ns);
 
-  START("crypto_kem_keypair");
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     crypto_kem_keypair(pk, sk);
   }
-  END("crypto_kem_keypair");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("crypto_kem_keypair: %lld\n", ns);
 
-  START("crypto_kem_enc");
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     crypto_kem_enc(ct, key, pk);
   }
-  END("crypto_kem_enc");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("crypto_kem_enc: %lld\n", ns);
 
-  START("crypto_kem_dec");
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     crypto_kem_dec(key, ct, sk);
   }
-  END("crypto_kem_dec");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("crypto_kem_dec: %lld\n", ns);
 
-  START("neonInnerProd");
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     neonInnerProd(acc, a, b, s[0], 0);
   }
-  END("neonInnerProd");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("neonInnerProd: %lld\n", ns);
 
-  START("neonMatrixVectorMul");
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     neonMatrixVectorMul(b, matrix, s, 1);
   }
-  END("neonMatrixVectorMul");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("neonMatrixVectorMul: %lld\n", ns);
 
-  START("tc4_evaluate_neon_SB1");
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     tc4_evaluate_neon_SB1(w, acc);
   }
-  END("tc4_evaluate_neon_SB1");
-  
-  START("tc4_interpolate_neon_SB1_reduce");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("tc4_evaluate_neon_SB1: %lld\n", ns);
+
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     tc4_interpolate_neon_SB1(acc, w);
     neon_poly_neon_reduction(s[0], acc);
   }
-  END("tc4_interpolate_neon_SB1_reduce");
-  
-  START("tc4_interpolate_neon_SB1");
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("tc4_interpolate_neon_SB1: %lld\n", ns);
+
+  TIME(start);
   for(i=0;i<NTESTS;i++) {
     tc4_interpolate_neon_SB1(acc, w);
   }
-  END("tc4_interpolate_neon_SB1");
-  
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("tc4_interpolate_neon_SB1 without ring reduction: %lld\n", ns);
+
 
   return 0;
 }

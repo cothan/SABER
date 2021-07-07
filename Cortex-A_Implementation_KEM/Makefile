@@ -3,8 +3,9 @@ CFLAGS  = -Wall -Wextra -Wmissing-prototypes -Wredundant-decls -O3 -fomit-frame-
 NISTFLAGS  = -Wno-unused-result -O3 -fomit-frame-pointer -mtune=native -std=c99 
 CLANG   = clang -mtune=native -O3 -fomit-frame-pointer -fwrapv -Qunused-arguments
 RM 		  = /bin/rm
-LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
-CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
+LDFLAGS = -L/opt/homebrew/opt/openssl@1.1/lib
+CPPFLAGS = -I/opt/homebrew/opt/openssl@1.1/include
+LIBPAPI = lib/libpapi.a
 
 
 all: test/PQCgenKAT_kem \
@@ -16,9 +17,15 @@ time: \
 	test/time768 \
 	test/time1024
 
-speed: test/speed512 \
+speed: \
+	test/speed512 \
 	test/speed768 \
 	test/speed1024
+
+speed: \
+	test/speed512_macos \
+	test/speed768_macos \
+	test/speed1024_macos
 
 SOURCES = neon_batch_multiplication.c neon_matrix_transpose.c neon_poly_rq_mul.c pack_unpack.c poly.c fips202.c verify.c cbd.c SABER_indcpa.c kem.c 
 HEADERS = SABER_params.h neon_batch_multiplication.h neon_matrix_transpose.h neon_poly_rq_mul.h pack_unpack.h poly.h rng.h fips202.h verify.h cbd.h SABER_indcpa.h
@@ -42,13 +49,22 @@ test/speedusec1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed_usec.c
 	$(CC) $(CFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c  test/test_speed_usec.c  -lcrypto
 
 test/speed512: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) m1cycles.c rng.c  test/test_speed.c  -lcrypto
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c $(LIBPAPI) test/test_speed.c  -lcrypto
 
 test/speed768: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=3 -o $@ $(SOURCES) m1cycles.c rng.c  test/test_speed.c  -lcrypto
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c $(LIBPAPI) test/test_speed.c  -lcrypto
 
 test/speed1024: $(SOURCES) $(HEADERS) rng.c  test/test_speed.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) m1cycles.c rng.c  test/test_speed.c  -lcrypto
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c $(LIBPAPI) test/test_speed.c  -lcrypto
+
+test/speed512_macos: $(SOURCES) $(HEADERS) rng.c  test/test_speed_macos.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c m1cycles.c test/test_speed_macos.c  -lcrypto
+
+test/speed768_macos: $(SOURCES) $(HEADERS) rng.c  test/test_speed_macos.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=3 -o $@ $(SOURCES) rng.c m1cycles.c test/test_speed_macos.c  -lcrypto
+
+test/speed1024_macos: $(SOURCES) $(HEADERS) rng.c  test/test_speed_macos.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=4 -o $@ $(SOURCES) rng.c m1cycles.c test/test_speed_macos.c  -lcrypto
 
 test/time512: $(SOURCES) $(HEADERS) rng.c test/test_time.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) -DSABER_L=2 -o $@ $(SOURCES) rng.c  test/test_time.c  -lcrypto
@@ -78,6 +94,11 @@ bench:
 	./test/speed768
 	./test/speed1024
 
+bench_macos:
+	./test/speed512_macos
+	./test/speed768_macos
+	./test/speed1024_macos
+
 clean:
 	-$(RM) -f *.o
 	-$(RM) -rf test/test_kex
@@ -91,6 +112,9 @@ clean:
 	-$(RM) -f test/speedusec512
 	-$(RM) -f test/speedusec768
 	-$(RM) -f test/speedusec1024
+	-$(RM) -f test/speedusec512_macos
+	-$(RM) -f test/speedusec768_macos
+	-$(RM) -f test/speedusec1024_macos
 
 benchtime:
 	./test/time512
