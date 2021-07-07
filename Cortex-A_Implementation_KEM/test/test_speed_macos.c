@@ -35,6 +35,7 @@ int main()
 
   uint16_t *w[7];
   uint16_t tmp[7 * SABER_N/2] = {0};
+  uint16_t out[32*64], in1[16*64], in2[16*64];
 
   w[0] = &tmp[0 * SABER_N/2];
   w[1] = &tmp[1 * SABER_N/2];
@@ -130,6 +131,21 @@ int main()
   ns = CALC(start, stop);
   printf("tc4_interpolate_neon_SB1 without ring reduction: %lld\n", ns);
 
+  TIME(start);
+  for(i=0;i<NTESTS;i++) {
+    schoolbook16x16(out, in1, in2, 8);
+  }
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("schoolbook16x16 8 iterations: %lld\n", ns);
+  
+  TIME(start);
+  for(i=0;i<NTESTS;i++) {
+    schoolbook16x16(out, in1, in2, 6);
+  }
+  TIME(stop);
+  ns = CALC(start, stop);
+  printf("schoolbook16x16 6 iterations: %lld\n", ns);
 
   return 0;
 }
