@@ -34,6 +34,7 @@ int main()
 
   uint16_t *w[7];
   uint16_t tmp[7 * SABER_N/2] = {0};
+  uint16_t out[32*64], in1[16*64], in2[16*64];
 
   w[0] = &tmp[0 * SABER_N/2];
   w[1] = &tmp[1 * SABER_N/2];
@@ -106,7 +107,18 @@ int main()
     tc4_interpolate_neon_SB1(acc, w);
   }
   END("tc4_interpolate_neon_SB1");
+
+  START("Schoolbook_16x16_iter8");
+  for(i=0;i<NTESTS;i++) {
+    schoolbook16x16(out, in1, in2, 8);
+  }
+  END("Schoolbook_16x16_iter8");
   
+  START("Schoolbook_16x16_iter6");
+  for(i=0;i<NTESTS;i++) {
+    schoolbook16x16(out, in1, in2, 6);
+  }
+  END("Schoolbook_16x16_iter6");
 
   return 0;
 }
